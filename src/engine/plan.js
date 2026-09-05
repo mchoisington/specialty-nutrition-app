@@ -20,11 +20,24 @@ function daysBetween(a, b) {
   return Math.floor((b - a) / DAY_MS);
 }
 
-export function tier2ParamFor(rule) {
-  if (rule.param) return rule.param;
-  if (!rule.nutrient) return null;
+function firstToken(x) { return String(x || '').split('_')[0]; }
+function paramMatches(nutrient, param) { if (!param) return true; if (param === 'all') return true; return nutrient === param || String(nutrient).startsWith(param) || firstToken(nutrient) === firstToken(param); }
+export function tier2ParamFor(rule, module) {
+  if (rule.param || rule.tier2_param) return rule.param || rule.tier2_param;
+  if (!rule.nutrient) return module && (module.tier2 || [])[0] ? module.tier2[0].param : null;
+  const base = rule.nutrient.replace(/_(g|mg|ug|iu|ml)$/, '');
+  const decl = module && (module.tier2 || []).find(t => t.param && t.param.startsWith(base));
+  if (decl) return decl.param;
   const op = rule.op || (rule.kind === 'limit' ? '<=' : '>=');
   return rule.nutrient + (op.startsWith('<') ? '_max' : '_min');
+}
+function nutrientBase(n) { return String(n || '').replace(/_(g|mg|ug|iu|ml)$/, ''); }
+export function normalizeConditions(c) { return Array.isArray(c) ? c : (c && Array.isArray(c.modules) ? c.modules : []); }
+function effectiveNutrient(rule) {
+  if (!rule.nutrient) return null;
+  if (rule.unit === 'percent_kcal') return nutrientBase(rule.nutrient) + '_pct_kcal';
+  if (rule.unit === 'g/1000kcal') return rule.nutrient + '_per_1000kcal';
+  return rule.nutrient;
 }
 
 function ruleRef(module, rule, extra = {}) {
@@ -42,7 +55,63 @@ function ruleRef(module, rule, extra = {}) {
   };
 }
 
+function bmiOf(person) {
+  const w = Number(person.weight_kg), h = Number(person.height_cm);
+  return w > 0 && h > 0 ? w / Math.pow(h / 100, 2) : null;
+}
+// Returns { apply: boolean, note?: string, asAvoid?: boolean }
+function ruleApplies(rule, m, person, ctx) {
+  const settings = person.rule_settings || {};
+  const optional = rule.optional === true || rule.default === 'off';
+  if (optional && !(person.optional_rules || []).includes(rule.id)) return { apply: false };
+  if (rule.configurable) {
+    const setting = settings[rule.id] ?? rule.default ?? rule.default_for_allergy ?? null;
+    if ((rule.kind === 'avoid') && (setting === 'allow' || setting === 'off')) return { apply: false };
+    if (rule.kind === 'info' && setting === 'exclude' && Array.isArray(rule.tags) && rule.tags.length) return { apply: true, asAvoid: true };
+  }
+  if (Array.isArray(rule.gated_by) && rule.gated_by.includes('eating-disorder-screen') && (ctx.screenPositive || ctx.isDisabled('weight-loss'))) return { apply: false, note: 'gated-by-screen' };
+  if (rule.variant) {
+    const chosen = ctx.variantsFor(m);
+    if (!chosen.includes(rule.variant)) return { apply: false };
+  }
+  const sexRule = rule.applies_to === 'women' || rule.applies_to === 'female' ? 'female' : rule.applies_to === 'men' || rule.applies_to === 'male' ? 'male' : (rule.applies_if && rule.applies_if.sex) || null;
+  if (sexRule) {
+    if (!person.sex) ctx.needSex = true; // unknown: apply (conservative)
+    else if (person.sex !== sexRule) return { apply: false };
+  }
+  if (rule.applies_if && Array.isArray(rule.applies_if.any)) {
+    const age = Number(person.age) || null;
+    const results = rule.applies_if.any.map(a => {
+      if (a.sex && person.sex && person.sex !== a.sex) return false;
+      if (a.sex && !person.sex) ctx.needSex = true;
+      if ((a.age_min != null || a.age_max != null) && !age) { ctx.needAge = true; return true; }
+      if (a.age_min != null && age < a.age_min) return false;
+      if (a.age_max != null && age > a.age_max) return false;
+      return true;
+    });
+    if (!results.some(Boolean)) return { apply: false };
+  } else if (rule.applies_if) {
+    const a = rule.applies_if;
+    const age = Number(person.age) || null;
+    if ((a.age_min != null || a.age_max != null)) {
+      if (!age) ctx.needAge = true; // unknown: apply (conservative)
+      else if ((a.age_min != null && age < a.age_min) || (a.age_max != null && age > a.age_max)) return { apply: false };
+    }
+    if (a.flag && !(person.flags && person.flags[a.flag])) return { apply: false };
+    if (a.flag_not && person.flags && person.flags[a.flag_not]) return { apply: false };
+    if (a.pregnancy === true && !person.pregnancy) return { apply: false };
+    if (a.breastfeeding === true && !person.breastfeeding) return { apply: false };
+  }
+  if (rule.applies_when === 'overweight') {
+    const bmi = bmiOf(person);
+    const flag = person.flags && person.flags.overweight;
+    if (!(flag || (bmi != null && bmi >= 25))) return { apply: false, note: 'not-overweight-or-unknown' };
+  }
+  return { apply: true };
+}
+
 export function buildPlan({ person, conditions, dictionaries, today = new Date() }) {
+  conditions = normalizeConditions(conditions);
   const byId = new Map(conditions.map(m => [m.id, m]));
   const notices = [];
   const selected = new Set(person.modules || []);
@@ -60,7 +129,8 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
     const m = byId.get(id);
     if (!m) continue;
     if (id === 'eating-disorder-screen' && !screenPositive) continue;
-    for (const f of m.disables || []) if (!disabled.has(f)) disabled.set(f, id);
+    const list = id === 'eating-disorder-screen' ? (m.disables_on_positive || m.disables || []) : (m.disables || []);
+    for (const f of list) if (!disabled.has(f)) disabled.set(f, id);
   }
   if (person.adult === false) {
     for (const f of ['weight-loss', 'ketogenic', 'low-carb-under-175g', 'intermittent-fasting', 'calorie-targets', 'new-elimination-protocols', 'elimination-protocols-except-allergen-celiac']) if (!disabled.has(f)) disabled.set(f, 'pediatric');
@@ -73,18 +143,46 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
     notices.push({ level: 'block', code: 'module-disabled', module: mid, text: `${m ? m.name : mid} is turned off because ${labelFor(byId, info.by)} disables ${info.feature.replace(/-/g, ' ')}.` });
   }
 
+  // Required confirmations (e.g. celiac ruled out before non-celiac gluten-free)
+  for (const id of selected) {
+    const m = byId.get(id);
+    if (!m || disabledModules.has(id)) continue;
+    const req = (m.rules || []).find(r => r.required_confirmation);
+    if (req && !(person.confirmations || []).includes(req.id)) {
+      disabledModules.set(id, { feature: 'confirmation', by: req.id });
+      notices.push({ level: 'block', code: 'confirmation-required', module: id, confirmId: req.id, text: `${m.name} is not active until you confirm: ${req.text}` });
+    }
+  }
   const active = [...selected].filter(id => byId.has(id) && !disabledModules.has(id)).map(id => byId.get(id));
   const activeIds = new Set(active.map(m => m.id));
+  const variantsFor = m => {
+    if (!Array.isArray(m.variants) || !m.variants.length) return [];
+    const stored = person.variants && person.variants[m.id];
+    if (Array.isArray(stored) && stored.length) return stored;
+    if (typeof stored === 'string') return [stored];
+    if (m.id === 'pregnancy-gdm-breastfeeding') { const v = []; if (person.pregnancy) v.push('pregnancy'); if (person.breastfeeding) v.push('breastfeeding'); if (person.flags && person.flags.gdm) v.push('gdm'); return v.length ? v : ['pregnancy']; }
+    return [m.variants[0].id];
+  };
+  const ctx = { screenPositive, isDisabled, variantsFor, needSex: false, needAge: false };
+  const variantAvoid = []; // {module, tags}
+  for (const m of active) for (const v of m.variants || []) if (variantsFor(m).includes(v.id) && Array.isArray(v.avoid_tags)) variantAvoid.push({ module: m, variant: v });
 
   // Medication-driven suppressions
   const suppressedRules = new Map(); // ruleId -> reason
+  const gatedRules = new Set();      // rules that apply only when a medication answer enables them
+  const enabledRules = new Set();
   for (const m of active) {
     for (const q of m.medication_questions || []) {
+      const effects = [].concat(q.effect || []).flatMap(e => String(e).split(';')).map(e => e.trim()).filter(Boolean);
+      for (const eff of effects) { const en = /^enable:(.+)$/.exec(eff); if (en) gatedRules.add(en[1]); }
       const answered = person.medications && person.medications[q.id];
       if (!answered) continue;
-      for (const eff of [].concat(q.effect || [])) {
-        const mm = /^suppress:(.+)$/.exec(eff);
-        if (mm) suppressedRules.set(mm[1], { reason: 'medication', text: q.text, module: m.id });
+      for (const eff of effects) {
+        const [verb, arg] = eff.split(':');
+        if (verb === 'suppress') suppressedRules.set(arg, { reason: 'medication', text: q.text, module: m.id });
+        else if (verb === 'enable') enabledRules.add(arg);
+        else if (verb === 'flag') notices.push({ level: 'warn', code: 'medication-flag', module: m.id, text: `${m.name}: because you answered yes to "${q.text}", note: ${String(arg || '').replace(/-/g, ' ')}.` });
+        else if (verb === 'require') notices.push({ level: 'warn', code: 'medication-require', module: m.id, text: `${m.name}: because you answered yes to "${q.text}", this pattern needs ${String(arg || '').replace(/-/g, ' ')} before you follow it.` });
       }
     }
   }
@@ -103,7 +201,14 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
       seenPair.add(key);
       const entry = { a: m.id, b: c.with, aName: m.name, bName: labelFor(byId, c.with), type: c.type, param: c.param || null, resolution: c.resolution || 'none', text: c.text || '', status: 'info' };
       const res = String(c.resolution || 'none');
-      if (c.type === 'hard' && res === 'clinician') {
+      if (c.type === 'hard' && res === 'clinician' && (c.param === 'all' || !c.param)) {
+        // Whole-module clash (e.g. CKD and ketogenic): the pattern module waits for clinician sign-off, acknowledged by the user.
+        const ackKey = 'clinician-ok|' + [m.id, c.with].sort().join('|');
+        const pattern = [m, byId.get(c.with)].find(x => x && x.category === 'pattern');
+        entry.ackKey = ackKey;
+        if ((person.acknowledged || []).includes(ackKey)) entry.status = 'acknowledged';
+        else { entry.status = 'needs-ack'; if (pattern) suppressedModuleParams.push({ module: pattern.id, param: 'all', by: pattern.id === m.id ? c.with : m.id }); }
+      } else if (c.type === 'hard' && res === 'clinician') {
         entry.status = 'blocked';
         if (c.param) blockedParams.set(c.param, entry);
       } else if (res.startsWith('suppress:')) {
@@ -114,7 +219,9 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
       } else if (res.startsWith('winner:')) {
         const winner = res.slice('winner:'.length);
         entry.status = 'winner';
-        winnerPairs.push({ winner, loser: winner === m.id ? c.with : m.id });
+        const loser = winner === m.id ? c.with : m.id;
+        winnerPairs.push({ winner, loser });
+        if (c.type === 'hard') suppressedModuleParams.push({ module: loser, param: c.param || null, by: winner });
       } else if (res === 'time-limit') {
         entry.status = 'time-limited';
       } else if (res === 'acknowledge') {
@@ -188,6 +295,7 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
   const avoid = {};    // tag -> {hard, rules:[]}
   const prefer = {};   // tag -> {rules:[]}
   const timing = [], behavior = [], info = [];
+  const periodic = {}; // per-meal and per-week numbers: { meal: {limits, targets}, week: {...} }
   const suppressed = [];
   const applied = [];
 
@@ -196,41 +304,61 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
   for (const m of active) {
     const phaseInfo = activePhaseRules.get(m.id);
     const modeInfo = activeModeRules.get(m.id);
-    for (const rule of m.rules || []) {
+    for (let rule of m.rules || []) {
       // phase gating
       if (phaseInfo && phaseInfo.phaseRuleIds.has(rule.id) && !phaseInfo.allowed.has(rule.id)) continue;
       if (modeInfo && modeInfo.modeRuleIds.has(rule.id) && !modeInfo.allowed.has(rule.id)) continue;
-      // medication suppression
+      // medication suppression and gating
       if (suppressedRules.has(rule.id)) { suppressed.push(ruleRef(m, rule, { reason: suppressedRules.get(rule.id) })); continue; }
+      if (gatedRules.has(rule.id) && !enabledRules.has(rule.id)) continue;
+      const app = ruleApplies(rule, m, person, ctx);
+      if (!app.apply) { if (app.note === 'gated-by-screen') suppressed.push(ruleRef(m, rule, { reason: { reason: 'screen' } })); continue; }
+      if (app.asAvoid) rule = { ...rule, kind: 'avoid' };
+      // The allergy module lists all nine allergens; only the person's confirmed allergens apply.
+      if (m.id === 'food-allergies' && rule.kind === 'avoid' && Array.isArray(rule.tags) && rule.tags.some(t => t.startsWith('allergen-'))) {
+        const mine = new Set(person.allergens || []);
+        const tags = rule.tags.filter(t => !t.startsWith('allergen-') || mine.has(t));
+        if (!tags.length) continue;
+        rule = { ...rule, tags };
+      }
       // conflict suppression on module+param
       const nut = rule.nutrient || null;
-      const sup = suppressedModuleParams.find(s => s.module === m.id && (s.param === null || s.param === nut || (nut && s.param && nut.startsWith(s.param))));
-      if (sup && (rule.kind === 'limit' || rule.kind === 'target')) { suppressed.push(ruleRef(m, rule, { reason: { reason: 'conflict', by: sup.by } })); continue; }
+      const sup = suppressedModuleParams.find(s => s.module === m.id && (s.param === 'all' || s.param === null || (nut && paramMatches(nut, s.param))));
+      if (sup && (sup.param === 'all' || rule.kind === 'limit' || rule.kind === 'target')) { suppressed.push(ruleRef(m, rule, { reason: { reason: 'conflict', by: sup.by } })); continue; }
       // blocked params (hard conflict, clinician)
       if (nut && (rule.kind === 'limit' || rule.kind === 'target')) {
-        const blocked = [...blockedParams.entries()].find(([p]) => nut === p || nut.startsWith(p));
+        const blocked = [...blockedParams.entries()].find(([p]) => p !== 'all' && paramMatches(nut, p));
         if (blocked) {
-          const param = tier2ParamFor(rule);
+          const param = tier2ParamFor(rule, m);
+          const base = nutrientBase(nut);
+          const anyKey = Object.keys(tier2Values).find(k => k.startsWith(base) && typeof tier2Values[k] === 'number');
           if (typeof tier2Values[param] === 'number') {
             // clinician number resolves the conflict
             applyNumber(rule, m, tier2Values[param], { clinician: true, conflict: blocked[1] });
             tier2Applied.push({ module: m.id, param, value: tier2Values[param] });
+          } else if (anyKey) {
+            suppressed.push(ruleRef(m, rule, { reason: { reason: 'clinician-number-governs', param: anyKey } }));
           } else {
             suppressed.push(ruleRef(m, rule, { reason: { reason: 'hard-conflict', with: blocked[1].a === m.id ? blocked[1].b : blocked[1].a } }));
-            if (!tier2Missing.some(t => t.param === param)) tier2Missing.push({ module: m.id, moduleName: m.name, param, label: `${labelNutrient(nut)} (${blocked[1].aName} and ${blocked[1].bName} conflict)`, consensus: 'Your clinician must set this number.', why: blocked[1].text, conflict: true });
+            const decl = (m.tier2 || []).find(t => t.param === param);
+            const entry = { module: m.id, moduleName: m.name, param, label: decl ? decl.label : `${labelNutrient(nut)} (${blocked[1].aName} and ${blocked[1].bName} conflict)`, consensus: decl ? decl.consensus : 'Your clinician must set this number.', why: decl ? decl.why : blocked[1].text, conflict: true, declared: !!decl, sources: rule.sources || [] };
+            const idx = tier2Missing.findIndex(t => firstToken(t.param) === firstToken(base));
+            if (idx === -1) tier2Missing.push(entry); else if (!tier2Missing[idx].declared && decl) tier2Missing[idx] = entry;
           }
           continue;
         }
       }
       // tier 2 gating
       if ((rule.tier || 1) === 2) {
-        const param = tier2ParamFor(rule);
+        const param = tier2ParamFor(rule, m);
         if (param && typeof tier2Values[param] === 'number') {
           applyNumber(rule, m, tier2Values[param], { clinician: true });
           tier2Applied.push({ module: m.id, param, value: tier2Values[param] });
-        } else {
+        } else if (rule.kind === 'limit' || rule.kind === 'target') {
           const decl = (m.tier2 || []).find(t => t.param === param) || {};
-          if (!tier2Missing.some(t => t.param === param && t.module === m.id)) tier2Missing.push({ module: m.id, moduleName: m.name, param, label: decl.label || rule.text, consensus: decl.consensus || '', why: decl.why || '', ruleText: rule.text, sources: rule.sources || [] });
+          if (!tier2Missing.some(t => t.param === param)) tier2Missing.push({ module: m.id, moduleName: m.name, param, label: decl.label || rule.text, consensus: decl.consensus || '', why: decl.why || '', ruleText: rule.text, sources: rule.sources || [] });
+          info.push(ruleRef(m, rule, { tier2Pending: true }));
+        } else {
           info.push(ruleRef(m, rule, { tier2Pending: true }));
         }
         continue;
@@ -239,8 +367,8 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
       if (nut === 'kcal' && isDisabled('calorie-targets')) { suppressed.push(ruleRef(m, rule, { reason: { reason: 'feature-disabled', feature: 'calorie-targets' } })); continue; }
 
       switch (rule.kind) {
-        case 'limit': applyNumber(rule, m, rule.value, {}); break;
-        case 'target': applyNumber(rule, m, rule.value, {}); break;
+        case 'limit': applyNumber(rule, m, rule.op === 'range' ? rule.max : rule.value, {}); break;
+        case 'target': applyNumber(rule, m, rule.op === 'range' ? rule.min : rule.value, {}); break;
         case 'avoid':
           for (const tag of rule.tags || []) {
             if (!avoid[tag]) avoid[tag] = { hard: false, rules: [] };
@@ -264,11 +392,13 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
   }
 
   function applyNumber(rule, m, value, meta) {
-    const nut = rule.nutrient;
-    if (!nut) { info.push(ruleRef(m, rule)); return; }
+    if (rule.fiber_type && rule.fiber_type !== 'total') { info.push(ruleRef(m, rule, { unmeasured: rule.fiber_type + ' fiber is not in the USDA data; shown for guidance' })); return; }
+    const nut = effectiveNutrient(rule);
+    if (!nut || typeof value !== 'number') { (rule.kind === 'behavior' ? behavior : info).push(ruleRef(m, rule, meta)); return; }
     let v = value;
     let scaled = false;
-    if (rule.per_kg) {
+    const perKg = !!rule.per_kg || (meta.clinician && /per_kg/.test(tier2ParamFor(rule, m) || ''));
+    if (perKg) {
       if (!weight) {
         notices.push({ level: 'info', code: 'weight-needed', module: m.id, text: `${m.name}: "${rule.text}" is per kilogram of body weight. Enter a weight to turn it into a daily number.` });
         info.push(ruleRef(m, rule, { needsWeight: true }));
@@ -277,25 +407,29 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
       v = Math.round(value * weight * 10) / 10;
       scaled = true;
     }
-    const ref = ruleRef(m, rule, { value: v, raw: value, per_kg: !!rule.per_kg, ...meta });
+    const ref = ruleRef(m, rule, { value: v, raw: value, per_kg: perKg, unit: rule.unit || null, per: rule.per || 'day', ...meta });
     applied.push(ref);
-    const op = rule.op || (rule.kind === 'limit' ? '<=' : '>=');
+    const per = rule.per || 'day';
+    const op = rule.op === 'range' ? (rule.kind === 'limit' ? '<=' : '>=') : (rule.op || (rule.kind === 'limit' ? '<=' : '>='));
+    const limitsMap = per === 'day' ? limits : (periodic[per] ||= { limits: {}, targets: {} }).limits;
+    const targetsMap = per === 'day' ? targets : (periodic[per] ||= { limits: {}, targets: {} }).targets;
     if (op.startsWith('<')) {
-      const cur = limits[nut];
-      const ideal = rule.per_kg && rule.ideal ? Math.round(rule.ideal * weight * 10) / 10 : (rule.ideal ?? null);
-      if (!cur) limits[nut] = { value: v, ideal, per: rule.per || 'day', rules: [ref], clinician: !!meta.clinician };
+      const cur = limitsMap[nut];
+      const ideal = perKg && rule.ideal ? Math.round(rule.ideal * weight * 10) / 10 : (rule.ideal ?? null);
+      if (!cur) limitsMap[nut] = { value: v, ideal, per, rules: [ref], clinician: !!meta.clinician, unit: rule.unit || null };
       else {
         if (v < cur.value) { cur.value = v; cur.clinician = !!meta.clinician; }
         if (ideal != null && (cur.ideal == null || ideal < cur.ideal)) cur.ideal = ideal;
         cur.rules.push(ref);
       }
     } else {
-      const cur = targets[nut];
-      const max = rule.max != null ? (rule.per_kg ? Math.round(rule.max * weight * 10) / 10 : rule.max) : null;
-      if (!cur) targets[nut] = { min: v, max, per: rule.per || 'day', rules: [ref], clinician: !!meta.clinician };
+      const cur = targetsMap[nut];
+      const max = rule.max != null && !meta.clinician ? (perKg ? Math.round(rule.max * weight * 10) / 10 : rule.max) : null;
+      if (!cur) targetsMap[nut] = { min: v, max, per, rules: [ref], clinician: !!meta.clinician, unit: rule.unit || null };
       else {
         if (v > cur.min) { cur.min = v; cur.clinician = !!meta.clinician; }
-        if (max != null && (cur.max == null || max < cur.max)) cur.max = max;
+        if (max != null && (cur.max == null || max < cur.max) && max >= cur.min) cur.max = max;
+        if (cur.max != null && cur.max < cur.min) cur.max = null;
         cur.rules.push(ref);
       }
     }
@@ -313,6 +447,15 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
     }
   }
 
+  // Variant-level avoid tags (vegetarian, vegan)
+  for (const { module: m, variant: v } of variantAvoid) {
+    for (const tag of v.avoid_tags) {
+      if (!avoid[tag]) avoid[tag] = { hard: false, rules: [] };
+      avoid[tag].rules.push({ module: m.id, moduleName: m.name, rule: `variant:${v.id}`, kind: 'avoid', text: `${v.id} pattern`, strength: 'should', tier: 1, sources: m.sources || [] });
+    }
+  }
+  if (ctx.needSex) notices.push({ level: 'info', code: 'sex-needed', text: 'Some numbers differ by sex. Until sex is entered, the app applies the stricter value.' });
+  if (ctx.needAge) notices.push({ level: 'info', code: 'age-needed', text: 'Some numbers differ by age. Until age is entered, the app applies the stricter value.' });
   // User allergens: absolute
   for (const tag of person.allergens || []) {
     if (!avoid[tag]) avoid[tag] = { hard: true, rules: [] };
@@ -331,10 +474,14 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
   }
 
   // Restriction load
-  const elim = ELIMINATION_MODULES.filter(id => activeIds.has(id));
+  const eds = byId.get('eating-disorder-screen');
+  const loadRule = eds && (eds.rules || []).find(r => Array.isArray(r.counts));
+  const countIds = loadRule ? loadRule.counts : ELIMINATION_MODULES;
+  const threshold = loadRule && loadRule.threshold ? loadRule.threshold : 3;
   const prefAvoid = (person.preferences && person.preferences.avoid_tags) || [];
-  if (prefAvoid.includes('allergen-milk') && !(person.allergens || []).includes('allergen-milk')) elim.push('dairy-free (preference)');
-  const restrictionLoad = { count: elim.length, modules: elim, warn: elim.length >= 3 };
+  const dairyFreePref = (prefAvoid.includes('allergen-milk') || (prefAvoid.includes('full-fat-dairy') && prefAvoid.includes('low-fat-dairy'))) && !(person.allergens || []).includes('allergen-milk');
+  const elim = countIds.filter(id => id === 'dairy-free-non-allergy' ? dairyFreePref : activeIds.has(id));
+  const restrictionLoad = { count: elim.length, modules: elim, warn: elim.length >= threshold, threshold };
   if (restrictionLoad.warn) notices.push({ level: 'warn', code: 'restriction-load', text: `You have ${elim.length} elimination-style restrictions running at once. That is a lot of restriction, and the guidelines behind these protocols warn about it. Consider working with a dietitian, and do one elimination at a time where you can.` });
 
   for (const t of tier2Missing) notices.push({ level: 'warn', code: 'tier2-missing', module: t.module, text: `${t.moduleName}: ${t.label} was not applied. The app does not set this number. Enter the value your clinician gave you.${t.consensus ? ' Published range: ' + t.consensus : ''}` });
@@ -353,7 +500,7 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
     disabledModules: [...disabledModules].map(([id, x]) => ({ id, ...x })),
     disabledFeatures: [...disabled].map(([feature, by]) => ({ feature, by })),
     isDisabled,
-    limits, targets, avoid, prefer, timing, behavior, info,
+    limits, targets, periodic, avoid, prefer, timing, behavior, info,
     applied, suppressed, conflicts, phases,
     modes: [...activeModeRules].map(([module, x]) => ({ module, mode: x.mode })),
     tier2: { applied: tier2Applied, missing: tier2Missing },

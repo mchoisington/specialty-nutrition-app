@@ -50,7 +50,8 @@ export function derived(totals) {
   return {
     satfat_pct_kcal: kcal ? (totals.satfat_g * 9) / kcal * 100 : null,
     carb_pct_kcal: kcal ? (totals.carb_g * 4) / kcal * 100 : null,
-    added_sugar_pct_kcal: kcal && totals.added_sugar_g ? (totals.added_sugar_g * 4) / kcal * 100 : null
+    added_sugar_pct_kcal: kcal && totals.added_sugar_g ? (totals.added_sugar_g * 4) / kcal * 100 : null,
+    fiber_g_per_1000kcal: kcal ? totals.fiber_g / kcal * 1000 : null
   };
 }
 

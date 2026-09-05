@@ -1,0 +1,6035 @@
+[
+  {
+    "fdcId": 2710822,
+    "short": "Arugula, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2710823,
+    "short": "Asparagus, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructan",
+      "fodmap-fructose"
+    ]
+  },
+  {
+    "fdcId": 2346400,
+    "short": "Green beans, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 321611,
+    "short": "Green beans, canned",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169141,
+    "short": "Green beans, cooked",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2685576,
+    "short": "Beets, raw",
+    "tags": [
+      "oxalate-high",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169966,
+    "short": "Beets, canned",
+    "tags": [
+      "oxalate-high",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 747447,
+    "short": "Broccoli, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "Newer of the two Foundation broccoli records (747447 supersedes 321900).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169967,
+    "short": "Broccoli, cooked",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169969,
+    "short": "Broccoli, frozen, cooked",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2685575,
+    "short": "Brussels sprouts, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructan"
+    ]
+  },
+  {
+    "fdcId": 2685572,
+    "short": "Bok choy, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346407,
+    "short": "Cabbage, green, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346408,
+    "short": "Cabbage, red, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169976,
+    "short": "Cabbage, cooked",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2258586,
+    "short": "Carrots, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2258587,
+    "short": "Baby carrots, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170394,
+    "short": "Carrots, cooked",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746764,
+    "short": "Carrots, frozen",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2685573,
+    "short": "Cauliflower, raw",
+    "tags": [
+      "fodmap-mannitol",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170399,
+    "short": "Cauliflower, frozen, cooked",
+    "tags": [
+      "fodmap-mannitol",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346405,
+    "short": "Celery, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-mannitol"
+    ]
+  },
+  {
+    "fdcId": 2685574,
+    "short": "Collard greens, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170407,
+    "short": "Collard greens, cooked",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2710826,
+    "short": "Corn, sweet, raw",
+    "tags": [
+      "skin-or-seed",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169999,
+    "short": "Corn, sweet, cooked",
+    "tags": [
+      "skin-or-seed",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169214,
+    "short": "Corn, canned",
+    "tags": [
+      "skin-or-seed",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346406,
+    "short": "Cucumber, with peel, raw",
+    "tags": [
+      "raw-vegetable",
+      "skin-or-seed",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2685577,
+    "short": "Eggplant, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169229,
+    "short": "Eggplant, cooked",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169230,
+    "short": "Garlic, raw",
+    "tags": [
+      "fodmap-fructan",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "SR Legacy chosen over Foundation 1104647, which carries no mineral data (no sodium or potassium).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169231,
+    "short": "Ginger root, raw",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 323505,
+    "short": "Kale, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169238,
+    "short": "Kale, cooked",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169246,
+    "short": "Leeks, raw",
+    "tags": [
+      "fodmap-fructan",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346389,
+    "short": "Lettuce, romaine",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346388,
+    "short": "Lettuce, iceberg",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346391,
+    "short": "Lettuce, green leaf",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 1999629,
+    "short": "Mushrooms, white button, raw",
+    "tags": [
+      "fodmap-mannitol",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "Newer Foundation record (2021-10) with more nutrients than 1750347.",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2003601,
+    "short": "Mushrooms, cremini, raw",
+    "tags": [
+      "fodmap-mannitol",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2003598,
+    "short": "Mushrooms, portabella, raw",
+    "tags": [
+      "fodmap-mannitol",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 1999628,
+    "short": "Mushrooms, shiitake, raw",
+    "tags": [
+      "fodmap-mannitol",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169254,
+    "short": "Mushrooms, canned",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-mannitol"
+    ],
+    "tag_notes": {
+      "fodmap-mannitol": "Canned mushrooms test low FODMAP in typical servings; left untagged pending review."
+    }
+  },
+  {
+    "fdcId": 169260,
+    "short": "Okra, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 790646,
+    "short": "Onion, yellow, raw",
+    "tags": [
+      "fodmap-fructan",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 790577,
+    "short": "Onion, red, raw",
+    "tags": [
+      "fodmap-fructan",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170005,
+    "short": "Scallions (green onions), raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructan"
+    ],
+    "tag_notes": {
+      "fodmap-fructan": "Green tops are low FODMAP; white bulb is high."
+    }
+  },
+  {
+    "fdcId": 170001,
+    "short": "Onion, cooked",
+    "tags": [
+      "fodmap-fructan",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170410,
+    "short": "Onion, frozen, chopped",
+    "tags": [
+      "fodmap-fructan",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169205,
+    "short": "Artichoke, globe, raw",
+    "tags": [
+      "fodmap-fructan",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170010,
+    "short": "Snow / sugar snap peas, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructan"
+    ]
+  },
+  {
+    "fdcId": 170420,
+    "short": "Peas, green, cooked",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-gos",
+      "legume"
+    ]
+  },
+  {
+    "fdcId": 170017,
+    "short": "Peas, green, frozen, cooked",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-gos",
+      "legume"
+    ]
+  },
+  {
+    "fdcId": 2644291,
+    "short": "Peas, green, canned",
+    "tags": [
+      "added-sugar",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-gos"
+    ]
+  },
+  {
+    "fdcId": 170018,
+    "short": "Peas and carrots, frozen, cooked",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169954,
+    "short": "Lima beans, frozen, cooked",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2258588,
+    "short": "Bell pepper, green, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2258590,
+    "short": "Bell pepper, red, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168576,
+    "short": "Jalapeno pepper, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346401,
+    "short": "Potato, russet, raw",
+    "tags": [
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346402,
+    "short": "Potato, red, raw",
+    "tags": [
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170093,
+    "short": "Potato, baked, with skin",
+    "tags": [
+      "potassium-high-food",
+      "skin-or-seed",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170033,
+    "short": "Potato, baked, flesh only",
+    "tags": [
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170440,
+    "short": "Potato, boiled, peeled",
+    "tags": [
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168450,
+    "short": "Pumpkin, canned",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169276,
+    "short": "Radishes, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 1999632,
+    "short": "Spinach, baby, raw",
+    "tags": [
+      "histamine-high",
+      "oxalate-high",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "Newer Foundation record (2021-10).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168463,
+    "short": "Spinach, cooked",
+    "tags": [
+      "histamine-high",
+      "oxalate-high",
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169288,
+    "short": "Spinach, frozen, cooked",
+    "tags": [
+      "histamine-high",
+      "oxalate-high",
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169991,
+    "short": "Swiss chard, raw",
+    "tags": [
+      "oxalate-high",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170401,
+    "short": "Swiss chard, cooked",
+    "tags": [
+      "oxalate-high",
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169291,
+    "short": "Zucchini, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "SR Legacy chosen: the Foundation record has no energy value (no 1008/2047/2048) (2685568).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169292,
+    "short": "Zucchini, cooked",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168464,
+    "short": "Yellow squash, raw",
+    "tags": [
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "SR Legacy chosen: the Foundation record has no energy value (no 1008/2047/2048) (2685569).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2685570,
+    "short": "Butternut squash, raw",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-gos",
+      "fodmap-mannitol"
+    ]
+  },
+  {
+    "fdcId": 169299,
+    "short": "Spaghetti squash, cooked",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346404,
+    "short": "Sweet potato, raw",
+    "tags": [
+      "oxalate-high",
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168483,
+    "short": "Sweet potato, baked in skin",
+    "tags": [
+      "oxalate-high",
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168484,
+    "short": "Sweet potato, boiled",
+    "tags": [
+      "oxalate-high",
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 1999634,
+    "short": "Tomato, roma, raw",
+    "tags": [
+      "histamine-high",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "Newer Foundation record (2021-10).",
+    "tag_review": [
+      "fodmap-fructose"
+    ]
+  },
+  {
+    "fdcId": 170457,
+    "short": "Tomato, raw",
+    "tags": [
+      "histamine-high",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructose"
+    ]
+  },
+  {
+    "fdcId": 321360,
+    "short": "Tomatoes, grape, raw",
+    "tags": [
+      "histamine-high",
+      "raw-vegetable",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructose"
+    ]
+  },
+  {
+    "fdcId": 333281,
+    "short": "Tomatoes, canned, diced",
+    "tags": [
+      "histamine-high",
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2685581,
+    "short": "Tomatoes, canned, crushed",
+    "tags": [
+      "histamine-high",
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2685578,
+    "short": "Tomatoes, canned, whole",
+    "tags": [
+      "histamine-high",
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2685580,
+    "short": "Tomato paste",
+    "tags": [
+      "histamine-high",
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2685579,
+    "short": "Tomato sauce, canned",
+    "tags": [
+      "histamine-high",
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2685582,
+    "short": "Tomato puree",
+    "tags": [
+      "histamine-high",
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168567,
+    "short": "Sun-dried tomatoes",
+    "tags": [
+      "histamine-high",
+      "potassium-high-food",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2003596,
+    "short": "Tomato juice",
+    "tags": [
+      "histamine-high",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "vegetable"
+    ]
+  },
+  {
+    "fdcId": 2710824,
+    "short": "Avocado",
+    "tags": [
+      "fruit",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-sorbitol"
+    ]
+  },
+  {
+    "fdcId": 168558,
+    "short": "Pickles, dill",
+    "tags": [
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "histamine-high"
+    ]
+  },
+  {
+    "fdcId": 169279,
+    "short": "Sauerkraut, canned",
+    "tags": [
+      "histamine-fermented",
+      "histamine-high",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fermented-live-culture"
+    ],
+    "tag_notes": {
+      "fermented-live-culture": "Canned sauerkraut is heat treated; refrigerated raw sauerkraut would carry live cultures."
+    }
+  },
+  {
+    "fdcId": 170392,
+    "short": "Kimchi",
+    "tags": [
+      "fermented-live-culture",
+      "histamine-fermented",
+      "histamine-high",
+      "vegetable"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructan"
+    ]
+  },
+  {
+    "fdcId": 169094,
+    "short": "Olives, ripe, canned",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fruit",
+      "histamine-high"
+    ]
+  },
+  {
+    "fdcId": 168411,
+    "short": "Edamame, frozen, prepared",
+    "tags": [
+      "allergen-soy",
+      "legume",
+      "soy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-gos"
+    ]
+  },
+  {
+    "fdcId": 171688,
+    "short": "Apple, with skin, raw",
+    "tags": [
+      "fodmap-fructose",
+      "fodmap-sorbitol",
+      "fruit",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "Generic SR apple; Foundation only has per-variety records.",
+    "tag_review": []
+  },
+  {
+    "fdcId": 1750343,
+    "short": "Apple, Honeycrisp",
+    "tags": [
+      "fodmap-fructose",
+      "fodmap-sorbitol",
+      "fruit",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 1750341,
+    "short": "Apple, Gala",
+    "tags": [
+      "fodmap-fructose",
+      "fodmap-sorbitol",
+      "fruit",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346414,
+    "short": "Applesauce, unsweetened",
+    "tags": [
+      "fodmap-fructose",
+      "fodmap-sorbitol",
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2710815,
+    "short": "Apricot, raw",
+    "tags": [
+      "fodmap-sorbitol",
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173941,
+    "short": "Apricots, dried",
+    "tags": [
+      "fodmap-sorbitol",
+      "fruit",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 1105314,
+    "short": "Banana, ripe",
+    "tags": [
+      "fruit",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "Foundation banana record with the most nutrients (54 vs 43 for 790991).",
+    "tag_review": [
+      "fodmap-fructan"
+    ]
+  },
+  {
+    "fdcId": 173944,
+    "short": "Banana, raw",
+    "tags": [
+      "fruit",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "Generic SR banana kept alongside the Foundation ripeness-specific record.",
+    "tag_review": [
+      "fodmap-fructan"
+    ]
+  },
+  {
+    "fdcId": 173946,
+    "short": "Blackberries, raw",
+    "tags": [
+      "fruit",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346411,
+    "short": "Blueberries, raw",
+    "tags": [
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "Newer Foundation record (2022-10).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173950,
+    "short": "Blueberries, frozen",
+    "tags": [
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746770,
+    "short": "Cantaloupe",
+    "tags": [
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346399,
+    "short": "Cherries, sweet, raw",
+    "tags": [
+      "fodmap-fructose",
+      "fodmap-sorbitol",
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168195,
+    "short": "Clementine",
+    "tags": [
+      "fruit",
+      "histamine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171722,
+    "short": "Cranberries, raw",
+    "tags": [
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171723,
+    "short": "Cranberries, dried, sweetened",
+    "tags": [
+      "added-sugar",
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168191,
+    "short": "Dates, Medjool",
+    "tags": [
+      "fodmap-fructan",
+      "fruit",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746768,
+    "short": "Figs, dried",
+    "tags": [
+      "fruit",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructan",
+      "fodmap-fructose"
+    ]
+  },
+  {
+    "fdcId": 174673,
+    "short": "Grapefruit, pink or red",
+    "tags": [
+      "fruit",
+      "histamine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346412,
+    "short": "Grapes, red, seedless",
+    "tags": [
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "Newer Foundation record (2022-10).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2710831,
+    "short": "Kiwi, green",
+    "tags": [
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 167746,
+    "short": "Lemon, raw",
+    "tags": [
+      "fruit",
+      "histamine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 167747,
+    "short": "Lemon juice, fresh",
+    "tags": [
+      "histamine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168155,
+    "short": "Lime, raw",
+    "tags": [
+      "fruit",
+      "histamine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168156,
+    "short": "Lime juice, fresh",
+    "tags": [
+      "histamine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2710833,
+    "short": "Mango",
+    "tags": [
+      "fodmap-fructose",
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2710816,
+    "short": "Honeydew melon",
+    "tags": [
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 327357,
+    "short": "Nectarine",
+    "tags": [
+      "fodmap-sorbitol",
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746771,
+    "short": "Orange, navel",
+    "tags": [
+      "fruit",
+      "histamine-high",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2003597,
+    "short": "Orange juice, not from concentrate",
+    "tags": [
+      "histamine-high",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 325430,
+    "short": "Peach, raw",
+    "tags": [
+      "fodmap-sorbitol",
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169930,
+    "short": "Peaches, canned in juice",
+    "tags": [
+      "fodmap-sorbitol",
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2710836,
+    "short": "Pear, Anjou",
+    "tags": [
+      "fodmap-fructose",
+      "fodmap-sorbitol",
+      "fruit",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746773,
+    "short": "Pear, Bartlett",
+    "tags": [
+      "fodmap-fructose",
+      "fodmap-sorbitol",
+      "fruit",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346398,
+    "short": "Pineapple, raw",
+    "tags": [
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2710837,
+    "short": "Plum, black",
+    "tags": [
+      "fodmap-sorbitol",
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168162,
+    "short": "Prunes",
+    "tags": [
+      "fodmap-sorbitol",
+      "fruit",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169134,
+    "short": "Pomegranate",
+    "tags": [
+      "fruit",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168165,
+    "short": "Raisins",
+    "tags": [
+      "fodmap-fructan",
+      "fruit",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346410,
+    "short": "Raspberries, raw",
+    "tags": [
+      "fruit",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "Newer Foundation record (2022-10).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346409,
+    "short": "Strawberries, raw",
+    "tags": [
+      "fruit",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "Newest of four Foundation strawberry records.",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168173,
+    "short": "Strawberries, frozen",
+    "tags": [
+      "fruit",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 167765,
+    "short": "Watermelon",
+    "tags": [
+      "fodmap-fructose",
+      "fruit"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructan",
+      "fodmap-mannitol"
+    ]
+  },
+  {
+    "fdcId": 2003590,
+    "short": "Apple juice",
+    "tags": [
+      "fodmap-fructose",
+      "fodmap-sorbitol"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170174,
+    "short": "Coconut water",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "potassium-high-food"
+    ]
+  },
+  {
+    "fdcId": 2346396,
+    "short": "Oats, rolled, old fashioned",
+    "tags": [
+      "high-fiber",
+      "oats-regular",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346397,
+    "short": "Oats, steel cut",
+    "tags": [
+      "high-fiber",
+      "oats-regular",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173905,
+    "short": "Oatmeal, cooked",
+    "tags": [
+      "oats-regular",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171661,
+    "short": "Oatmeal, instant, plain, dry",
+    "tags": [
+      "oats-regular",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2512380,
+    "short": "Rice, brown, long grain, raw",
+    "tags": [
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169704,
+    "short": "Rice, brown, cooked",
+    "tags": [
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2512381,
+    "short": "Rice, white, long grain, raw",
+    "tags": [
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168878,
+    "short": "Rice, white, cooked",
+    "tags": [
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2710821,
+    "short": "Wild rice, dry",
+    "tags": [
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168897,
+    "short": "Wild rice, cooked",
+    "tags": [
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168874,
+    "short": "Quinoa, uncooked",
+    "tags": [
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168917,
+    "short": "Quinoa, cooked",
+    "tags": [
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170284,
+    "short": "Barley, pearled, raw",
+    "tags": [
+      "fodmap-fructan",
+      "gluten"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "refined-grain",
+      "whole-grain"
+    ]
+  },
+  {
+    "fdcId": 170285,
+    "short": "Barley, pearled, cooked",
+    "tags": [
+      "fodmap-fructan",
+      "gluten"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "refined-grain",
+      "whole-grain"
+    ]
+  },
+  {
+    "fdcId": 2710820,
+    "short": "Bulgur, dry",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170287,
+    "short": "Bulgur, cooked",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2710828,
+    "short": "Farro, pearled, dry",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "whole-grain"
+    ]
+  },
+  {
+    "fdcId": 169699,
+    "short": "Couscous, dry",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169700,
+    "short": "Couscous, cooked",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2512379,
+    "short": "Millet, whole grain",
+    "tags": [
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2512378,
+    "short": "Buckwheat, whole grain",
+    "tags": [
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169697,
+    "short": "Cornmeal, whole grain, yellow",
+    "tags": [
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2710835,
+    "short": "Masa harina",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "whole-grain"
+    ]
+  },
+  {
+    "fdcId": 171672,
+    "short": "Grits, cooked",
+    "tags": [
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169736,
+    "short": "Pasta, dry",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169737,
+    "short": "Pasta, cooked",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169738,
+    "short": "Pasta, whole wheat, dry",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168910,
+    "short": "Pasta, whole wheat, cooked",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169731,
+    "short": "Egg noodles, dry",
+    "tags": [
+      "allergen-egg",
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169732,
+    "short": "Egg noodles, cooked",
+    "tags": [
+      "allergen-egg",
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169742,
+    "short": "Rice noodles, dry",
+    "tags": [
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168914,
+    "short": "Rice noodles, cooked",
+    "tags": [
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 789951,
+    "short": "Flour, all-purpose, enriched",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 790085,
+    "short": "Flour, whole wheat",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 790146,
+    "short": "Flour, bread",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2003587,
+    "short": "Flour, spelt, whole grain",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2261420,
+    "short": "Flour, almond",
+    "tags": [
+      "allergen-tree-nut",
+      "nut",
+      "oxalate-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2261421,
+    "short": "Flour, oat",
+    "tags": [
+      "oats-regular",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 790214,
+    "short": "Flour, rice, white",
+    "tags": [
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173884,
+    "short": "Cheerios",
+    "tags": [
+      "added-sugar",
+      "oats-regular",
+      "ultra-processed",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173911,
+    "short": "Shredded wheat",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171647,
+    "short": "Grape-Nuts",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "ultra-processed"
+    ]
+  },
+  {
+    "fdcId": 167954,
+    "short": "Granola bar, soft, plain",
+    "tags": [
+      "added-sugar",
+      "oats-regular",
+      "ultra-processed",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170250,
+    "short": "Rice cakes, brown rice, plain",
+    "tags": [
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 167959,
+    "short": "Popcorn, air-popped",
+    "tags": [
+      "skin-or-seed",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 167549,
+    "short": "Popcorn, microwave",
+    "tags": [
+      "skin-or-seed",
+      "ultra-processed",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 325871,
+    "short": "Bread, white",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "soy"
+    ]
+  },
+  {
+    "fdcId": 335240,
+    "short": "Bread, whole wheat",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "ultra-processed",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172684,
+    "short": "Bread, rye",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172675,
+    "short": "Bread, French / sourdough",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [],
+    "tag_notes": {
+      "fodmap-fructan": "Traditional slow-fermented sourdough is lower in fructans than this generic record suggests."
+    }
+  },
+  {
+    "fdcId": 168013,
+    "short": "Bread, multigrain",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "ultra-processed",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174915,
+    "short": "Pita, white",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174916,
+    "short": "Pita, whole wheat",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174899,
+    "short": "Bagel, plain",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175063,
+    "short": "English muffin, plain",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172796,
+    "short": "Hamburger / hot dog bun",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 167535,
+    "short": "Tortilla, flour",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175036,
+    "short": "Tortilla, corn",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "whole-grain"
+    ]
+  },
+  {
+    "fdcId": 171845,
+    "short": "Naan",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "allergen-egg",
+      "allergen-milk"
+    ]
+  },
+  {
+    "fdcId": 172746,
+    "short": "Crackers, saltines",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172749,
+    "short": "Crackers, whole wheat",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "ultra-processed",
+      "whole-grain"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174982,
+    "short": "Crackers, snack-type (round)",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "soy-refined-oil"
+    ]
+  },
+  {
+    "fdcId": 174975,
+    "short": "Crackers, cheese",
+    "tags": [
+      "allergen-milk",
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 167555,
+    "short": "Pretzels, hard",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175038,
+    "short": "Waffles, frozen",
+    "tags": [
+      "allergen-egg",
+      "allergen-milk",
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172765,
+    "short": "Muffin, blueberry",
+    "tags": [
+      "added-sugar",
+      "allergen-egg",
+      "allergen-milk",
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172716,
+    "short": "Cookies, chocolate chip",
+    "tags": [
+      "added-sugar",
+      "allergen-wheat",
+      "caffeine",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "allergen-egg",
+      "allergen-milk",
+      "soy-lecithin"
+    ]
+  },
+  {
+    "fdcId": 172758,
+    "short": "Doughnut, glazed",
+    "tags": [
+      "added-sugar",
+      "allergen-egg",
+      "allergen-milk",
+      "allergen-wheat",
+      "fodmap-fructan",
+      "fried",
+      "gluten",
+      "refined-grain",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170317,
+    "short": "Pizza, cheese, frozen",
+    "tags": [
+      "allergen-milk",
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "lactose-low",
+      "refined-grain",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "histamine-high"
+    ]
+  },
+  {
+    "fdcId": 173325,
+    "short": "Macaroni and cheese, canned",
+    "tags": [
+      "allergen-milk",
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "refined-grain",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "lactose-low",
+      "phosphate-additive"
+    ]
+  },
+  {
+    "fdcId": 173336,
+    "short": "Burrito, bean and cheese, frozen",
+    "tags": [
+      "allergen-milk",
+      "allergen-wheat",
+      "fodmap-fructan",
+      "fodmap-gos",
+      "gluten",
+      "legume",
+      "refined-grain",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2644285,
+    "short": "Black beans, canned",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [],
+    "tag_notes": {
+      "fodmap-gos": "Canned, drained and rinsed beans are lower in GOS than home-cooked."
+    }
+  },
+  {
+    "fdcId": 175238,
+    "short": "Black beans, canned, low sodium",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173735,
+    "short": "Black beans, cooked",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173734,
+    "short": "Black beans, dry",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2644292,
+    "short": "Pinto beans, canned",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175200,
+    "short": "Pinto beans, cooked",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2644289,
+    "short": "Kidney beans, dark red, canned",
+    "tags": [
+      "added-sugar",
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173740,
+    "short": "Kidney beans, cooked",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2644288,
+    "short": "Chickpeas, canned",
+    "tags": [
+      "fodmap-gos",
+      "legume"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [],
+    "tag_notes": {
+      "fodmap-gos": "Low FODMAP at 1/4 cup canned, drained."
+    }
+  },
+  {
+    "fdcId": 173757,
+    "short": "Chickpeas, cooked",
+    "tags": [
+      "fodmap-gos",
+      "legume"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2644282,
+    "short": "Chickpeas, dry",
+    "tags": [
+      "fodmap-gos",
+      "legume"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2644286,
+    "short": "Navy beans, canned",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173746,
+    "short": "Navy beans, cooked",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2644287,
+    "short": "Cannellini beans, canned",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175203,
+    "short": "White beans, cooked",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2644294,
+    "short": "Great northern beans, canned",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2644283,
+    "short": "Lentils, dry",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172421,
+    "short": "Lentils, cooked",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172429,
+    "short": "Split peas, cooked",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2644293,
+    "short": "Black-eyed peas, canned",
+    "tags": [
+      "fodmap-gos",
+      "legume"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174253,
+    "short": "Lima beans, cooked",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172438,
+    "short": "Refried beans, canned",
+    "tags": [
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175182,
+    "short": "Baked beans, canned, plain",
+    "tags": [
+      "added-sugar",
+      "fodmap-gos",
+      "legume",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 321358,
+    "short": "Hummus",
+    "tags": [
+      "allergen-sesame",
+      "fodmap-fructan",
+      "fodmap-gos",
+      "legume"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172475,
+    "short": "Tofu, firm",
+    "tags": [
+      "allergen-soy",
+      "calcium-rich",
+      "legume",
+      "soy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174290,
+    "short": "Tofu, extra firm",
+    "tags": [
+      "allergen-soy",
+      "legume",
+      "soy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172449,
+    "short": "Tofu, soft",
+    "tags": [
+      "allergen-soy",
+      "calcium-rich",
+      "legume",
+      "soy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174272,
+    "short": "Tempeh",
+    "tags": [
+      "allergen-soy",
+      "histamine-fermented",
+      "histamine-high",
+      "legume",
+      "soy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172442,
+    "short": "Miso",
+    "tags": [
+      "allergen-soy",
+      "histamine-fermented",
+      "histamine-high",
+      "soy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fermented-live-culture",
+      "gluten-hidden"
+    ]
+  },
+  {
+    "fdcId": 174277,
+    "short": "Soy sauce",
+    "tags": [
+      "allergen-soy",
+      "allergen-wheat",
+      "gluten",
+      "histamine-fermented",
+      "histamine-high",
+      "soy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172473,
+    "short": "Soy sauce, low sodium",
+    "tags": [
+      "allergen-soy",
+      "allergen-wheat",
+      "gluten",
+      "histamine-fermented",
+      "histamine-high",
+      "soy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174278,
+    "short": "Tamari",
+    "tags": [
+      "allergen-soy",
+      "histamine-fermented",
+      "histamine-high",
+      "soy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "gluten-hidden"
+    ]
+  },
+  {
+    "fdcId": 1999630,
+    "short": "Soy milk, unsweetened",
+    "tags": [
+      "allergen-soy",
+      "soy"
+    ],
+    "portions_add": [],
+    "why": "Newer Foundation record (2021-10).",
+    "tag_review": [
+      "calcium-rich"
+    ]
+  },
+  {
+    "fdcId": 173806,
+    "short": "Peanuts, dry roasted, unsalted",
+    "tags": [
+      "allergen-peanut",
+      "large-particle",
+      "nut",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174262,
+    "short": "Peanuts, dry roasted, salted",
+    "tags": [
+      "allergen-peanut",
+      "large-particle",
+      "nut",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 324860,
+    "short": "Peanut butter, smooth, salted",
+    "tags": [
+      "allergen-peanut",
+      "nut"
+    ],
+    "portions_add": [],
+    "why": "Foundation record with the fuller nutrient panel (103 vs 62 nutrients for 2262072) and portions.",
+    "tag_review": [
+      "added-sugar",
+      "ultra-processed"
+    ]
+  },
+  {
+    "fdcId": 172470,
+    "short": "Peanut butter, smooth, no salt",
+    "tags": [
+      "allergen-peanut",
+      "nut"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346393,
+    "short": "Almonds, raw",
+    "tags": [
+      "allergen-tree-nut",
+      "large-particle",
+      "nut",
+      "oxalate-high",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2262074,
+    "short": "Almond butter",
+    "tags": [
+      "allergen-tree-nut",
+      "nut",
+      "oxalate-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2515373,
+    "short": "Brazil nuts",
+    "tags": [
+      "allergen-tree-nut",
+      "large-particle",
+      "nut",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2515374,
+    "short": "Cashews, raw",
+    "tags": [
+      "allergen-tree-nut",
+      "fodmap-fructan",
+      "fodmap-gos",
+      "large-particle",
+      "nut",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2515375,
+    "short": "Hazelnuts",
+    "tags": [
+      "allergen-tree-nut",
+      "large-particle",
+      "nut",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2515378,
+    "short": "Macadamia nuts",
+    "tags": [
+      "allergen-tree-nut",
+      "large-particle",
+      "nut",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346395,
+    "short": "Pecans",
+    "tags": [
+      "allergen-tree-nut",
+      "large-particle",
+      "nut",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346392,
+    "short": "Pine nuts",
+    "tags": [
+      "allergen-tree-nut",
+      "nut"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2515379,
+    "short": "Pistachios, raw",
+    "tags": [
+      "allergen-tree-nut",
+      "fodmap-fructan",
+      "fodmap-gos",
+      "large-particle",
+      "nut",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346394,
+    "short": "Walnuts",
+    "tags": [
+      "allergen-tree-nut",
+      "large-particle",
+      "nut",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168599,
+    "short": "Mixed nuts, dry roasted, salted",
+    "tags": [
+      "allergen-peanut",
+      "allergen-tree-nut",
+      "large-particle",
+      "nut",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2710819,
+    "short": "Chia seeds",
+    "tags": [
+      "seed",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2262075,
+    "short": "Flaxseed, ground",
+    "tags": [
+      "seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170148,
+    "short": "Hemp seeds, hulled",
+    "tags": [
+      "seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2515380,
+    "short": "Pumpkin seeds (pepitas)",
+    "tags": [
+      "seed",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2515381,
+    "short": "Sunflower seeds, raw",
+    "tags": [
+      "seed",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170150,
+    "short": "Sesame seeds",
+    "tags": [
+      "allergen-sesame",
+      "seed",
+      "skin-or-seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "oxalate-high"
+    ]
+  },
+  {
+    "fdcId": 2262073,
+    "short": "Tahini (sesame butter)",
+    "tags": [
+      "allergen-sesame",
+      "seed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170173,
+    "short": "Coconut milk, canned",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "allergen-tree-nut"
+    ],
+    "tag_notes": {
+      "allergen-tree-nut": "FDA removed coconut from its tree nut list in 2025; kept off pending review."
+    }
+  },
+  {
+    "fdcId": 746782,
+    "short": "Milk, whole",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "fodmap-lactose",
+      "full-fat-dairy",
+      "lactose-high",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "Newer Foundation re-release (2019-12) of 322892.",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746778,
+    "short": "Milk, 2%",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "fodmap-lactose",
+      "lactose-high",
+      "low-fat-dairy",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746772,
+    "short": "Milk, 1%",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "fodmap-lactose",
+      "lactose-high",
+      "low-fat-dairy",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746776,
+    "short": "Milk, skim",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "fodmap-lactose",
+      "lactose-high",
+      "low-fat-dairy",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170879,
+    "short": "Chocolate milk, whole",
+    "tags": [
+      "added-sugar",
+      "allergen-milk",
+      "caffeine",
+      "calcium-rich",
+      "fodmap-lactose",
+      "full-fat-dairy",
+      "lactose-high",
+      "potassium-high-food",
+      "sugar-sweetened-beverage"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2259792,
+    "short": "Buttermilk, low fat",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "fodmap-lactose",
+      "lactose-high",
+      "low-fat-dairy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fermented-live-culture",
+      "histamine-fermented"
+    ]
+  },
+  {
+    "fdcId": 2259793,
+    "short": "Yogurt, plain, whole milk",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "fermented-live-culture",
+      "fodmap-lactose",
+      "full-fat-dairy",
+      "histamine-fermented",
+      "lactose-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "histamine-high"
+    ]
+  },
+  {
+    "fdcId": 2647437,
+    "short": "Yogurt, plain, nonfat",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "fermented-live-culture",
+      "fodmap-lactose",
+      "histamine-fermented",
+      "lactose-high",
+      "low-fat-dairy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "histamine-high"
+    ]
+  },
+  {
+    "fdcId": 2259794,
+    "short": "Greek yogurt, plain, whole milk",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "fermented-live-culture",
+      "fodmap-lactose",
+      "full-fat-dairy",
+      "histamine-fermented",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "histamine-high"
+    ],
+    "tag_notes": {
+      "fodmap-lactose": "Low FODMAP at small servings (about 25 g); high at a full cup."
+    }
+  },
+  {
+    "fdcId": 330137,
+    "short": "Greek yogurt, plain, nonfat",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "fermented-live-culture",
+      "fodmap-lactose",
+      "histamine-fermented",
+      "lactose-low",
+      "low-fat-dairy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "histamine-high"
+    ]
+  },
+  {
+    "fdcId": 170904,
+    "short": "Kefir, low fat, plain",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "fermented-live-culture",
+      "histamine-fermented",
+      "lactose-low",
+      "low-fat-dairy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "histamine-high"
+    ]
+  },
+  {
+    "fdcId": 328637,
+    "short": "Cheese, cheddar",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "full-fat-dairy",
+      "histamine-aged",
+      "histamine-high",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 329370,
+    "short": "Cheese, mozzarella, part skim",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "full-fat-dairy",
+      "low-fat-dairy"
+    ]
+  },
+  {
+    "fdcId": 170845,
+    "short": "Cheese, mozzarella, whole milk",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "full-fat-dairy",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2259795,
+    "short": "Cheese, parmesan, grated",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "full-fat-dairy",
+      "histamine-aged",
+      "histamine-high",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "Newer Foundation parmesan (2022-04).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746767,
+    "short": "Cheese, Swiss",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "full-fat-dairy",
+      "histamine-aged",
+      "histamine-high",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2259796,
+    "short": "Cheese, feta",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "full-fat-dairy",
+      "histamine-aged",
+      "histamine-high",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2647438,
+    "short": "Cheese, Monterey Jack",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "full-fat-dairy",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "histamine-aged"
+    ]
+  },
+  {
+    "fdcId": 2647440,
+    "short": "Cheese, provolone",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "full-fat-dairy",
+      "histamine-aged",
+      "histamine-high",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172175,
+    "short": "Cheese, blue",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "full-fat-dairy",
+      "histamine-aged",
+      "histamine-high",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172177,
+    "short": "Cheese, brie",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "full-fat-dairy",
+      "histamine-aged",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "histamine-high"
+    ]
+  },
+  {
+    "fdcId": 173435,
+    "short": "Cheese, goat, soft",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "full-fat-dairy",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171241,
+    "short": "Cheese, gouda",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "full-fat-dairy",
+      "histamine-aged",
+      "histamine-high",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2647442,
+    "short": "Queso fresco",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "full-fat-dairy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "lactose-low"
+    ]
+  },
+  {
+    "fdcId": 2346384,
+    "short": "Cottage cheese, full fat",
+    "tags": [
+      "allergen-milk",
+      "fodmap-lactose",
+      "full-fat-dairy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "lactose-high",
+      "lactose-low"
+    ]
+  },
+  {
+    "fdcId": 328841,
+    "short": "Cottage cheese, 2%",
+    "tags": [
+      "allergen-milk",
+      "fodmap-lactose",
+      "low-fat-dairy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "lactose-high",
+      "lactose-low"
+    ]
+  },
+  {
+    "fdcId": 746766,
+    "short": "Cheese, ricotta, whole milk",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "fodmap-lactose",
+      "full-fat-dairy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "lactose-high",
+      "lactose-low"
+    ]
+  },
+  {
+    "fdcId": 2346385,
+    "short": "Cream cheese",
+    "tags": [
+      "allergen-milk",
+      "full-fat-dairy",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2647439,
+    "short": "American cheese singles",
+    "tags": [
+      "allergen-milk",
+      "calcium-rich",
+      "full-fat-dairy",
+      "lactose-low",
+      "phosphate-additive",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173410,
+    "short": "Butter, salted",
+    "tags": [
+      "allergen-milk",
+      "full-fat-dairy",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "SR Legacy chosen: the Foundation record has no energy value (no 1008/2047/2048) (790508).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173430,
+    "short": "Butter, unsalted",
+    "tags": [
+      "allergen-milk",
+      "full-fat-dairy",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "SR Legacy chosen: the Foundation record has no energy value (no 1008/2047/2048) (789828).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346386,
+    "short": "Cream, heavy",
+    "tags": [
+      "allergen-milk",
+      "full-fat-dairy",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171255,
+    "short": "Half and half",
+    "tags": [
+      "allergen-milk",
+      "fodmap-lactose",
+      "full-fat-dairy",
+      "lactose-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2346387,
+    "short": "Sour cream",
+    "tags": [
+      "allergen-milk",
+      "full-fat-dairy",
+      "lactose-low"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fermented-live-culture",
+      "histamine-fermented"
+    ]
+  },
+  {
+    "fdcId": 167575,
+    "short": "Ice cream, vanilla",
+    "tags": [
+      "added-sugar",
+      "allergen-milk",
+      "fodmap-lactose",
+      "full-fat-dairy",
+      "lactose-high",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "allergen-egg"
+    ]
+  },
+  {
+    "fdcId": 2257045,
+    "short": "Almond milk, unsweetened",
+    "tags": [
+      "allergen-tree-nut"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "calcium-rich",
+      "ultra-processed"
+    ]
+  },
+  {
+    "fdcId": 2257046,
+    "short": "Oat milk, unsweetened",
+    "tags": [
+      "oats-regular"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "calcium-rich",
+      "ultra-processed"
+    ]
+  },
+  {
+    "fdcId": 171287,
+    "short": "Egg, whole, raw",
+    "tags": [
+      "allergen-egg",
+      "raw-animal"
+    ],
+    "portions_add": [],
+    "why": "SR Legacy kept over Foundation 748967: the Foundation egg lacks sugar, trans fat, vitamin C, folate DFE and has one portion versus six.",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172183,
+    "short": "Egg white, raw",
+    "tags": [
+      "allergen-egg",
+      "raw-animal"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173424,
+    "short": "Egg, hard-boiled",
+    "tags": [
+      "allergen-egg"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172187,
+    "short": "Egg, scrambled",
+    "tags": [
+      "allergen-egg",
+      "allergen-milk"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [],
+    "tag_notes": {
+      "allergen-milk": "USDA scrambled egg record includes milk and butter."
+    }
+  },
+  {
+    "fdcId": 2646170,
+    "short": "Chicken breast, boneless skinless, raw",
+    "tags": [
+      "poultry",
+      "purine-moderate"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171477,
+    "short": "Chicken breast, roasted",
+    "tags": [
+      "poultry",
+      "purine-moderate"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2646171,
+    "short": "Chicken thigh, boneless skinless, raw",
+    "tags": [
+      "poultry",
+      "purine-moderate"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172388,
+    "short": "Chicken thigh, roasted",
+    "tags": [
+      "poultry",
+      "purine-moderate"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 331897,
+    "short": "Chicken drumstick, braised",
+    "tags": [
+      "poultry",
+      "purine-moderate"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173630,
+    "short": "Chicken wing, roasted",
+    "tags": [
+      "poultry",
+      "purine-moderate"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2514746,
+    "short": "Chicken, ground, raw",
+    "tags": [
+      "poultry",
+      "purine-moderate"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "phosphate-additive"
+    ]
+  },
+  {
+    "fdcId": 171117,
+    "short": "Chicken, ground, cooked",
+    "tags": [
+      "poultry",
+      "purine-moderate"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171123,
+    "short": "Rotisserie chicken, breast with skin",
+    "tags": [
+      "poultry",
+      "purine-moderate"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "phosphate-additive"
+    ]
+  },
+  {
+    "fdcId": 174516,
+    "short": "Turkey breast, roasted",
+    "tags": [
+      "poultry",
+      "purine-moderate"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2514747,
+    "short": "Turkey, ground, 93% lean, raw",
+    "tags": [
+      "poultry",
+      "purine-moderate"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746785,
+    "short": "Turkey, ground, 93% lean, cooked",
+    "tags": [
+      "poultry",
+      "purine-moderate"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172941,
+    "short": "Deli turkey breast, sliced",
+    "tags": [
+      "deli-meat",
+      "poultry",
+      "processed-meat",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "histamine-high",
+      "phosphate-additive"
+    ]
+  },
+  {
+    "fdcId": 171625,
+    "short": "Hot dog, turkey",
+    "tags": [
+      "histamine-high",
+      "poultry",
+      "processed-meat",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "phosphate-additive"
+    ]
+  },
+  {
+    "fdcId": 746783,
+    "short": "Turkey breakfast sausage, raw",
+    "tags": [
+      "poultry",
+      "processed-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171639,
+    "short": "Turkey bacon, cooked",
+    "tags": [
+      "histamine-high",
+      "poultry",
+      "processed-meat",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171061,
+    "short": "Chicken liver, cooked",
+    "tags": [
+      "poultry",
+      "purine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2514743,
+    "short": "Ground beef, 90% lean, raw",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171796,
+    "short": "Ground beef, 85% lean, raw",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2514744,
+    "short": "Ground beef, 80% lean, raw",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174031,
+    "short": "Ground beef patty, 90% lean, broiled",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174032,
+    "short": "Ground beef patty, 85% lean, broiled",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174034,
+    "short": "Ground beef crumbles, 85% lean, browned",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2646172,
+    "short": "Beef ribeye steak, raw",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746759,
+    "short": "Beef strip steak, raw, lean",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173119,
+    "short": "Beef strip steak, broiled, lean",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173118,
+    "short": "Beef sirloin steak, broiled, lean",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746758,
+    "short": "Beef tenderloin, roasted, lean",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2646173,
+    "short": "Beef top round, raw",
+    "tags": [
+      "large-particle",
+      "purine-moderate",
+      "red-meat",
+      "tough-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2646174,
+    "short": "Beef chuck roast, raw",
+    "tags": [
+      "large-particle",
+      "purine-moderate",
+      "red-meat",
+      "tough-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170615,
+    "short": "Beef chuck pot roast, braised",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168611,
+    "short": "Beef flank steak, broiled",
+    "tags": [
+      "large-particle",
+      "purine-moderate",
+      "red-meat",
+      "tough-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170601,
+    "short": "Beef brisket, braised",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168626,
+    "short": "Beef liver, braised",
+    "tags": [
+      "purine-high",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 323121,
+    "short": "Hot dog, beef",
+    "tags": [
+      "histamine-high",
+      "processed-meat",
+      "red-meat",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "phosphate-additive"
+    ]
+  },
+  {
+    "fdcId": 172012,
+    "short": "Bologna, beef",
+    "tags": [
+      "deli-meat",
+      "histamine-high",
+      "processed-meat",
+      "red-meat",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172935,
+    "short": "Salami, cooked, beef",
+    "tags": [
+      "deli-meat",
+      "histamine-high",
+      "processed-meat",
+      "red-meat",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174575,
+    "short": "Pepperoni",
+    "tags": [
+      "histamine-aged",
+      "histamine-high",
+      "processed-meat",
+      "red-meat",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174570,
+    "short": "Deli roast beef, sliced",
+    "tags": [
+      "deli-meat",
+      "processed-meat",
+      "red-meat",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 167536,
+    "short": "Beef jerky",
+    "tags": [
+      "histamine-high",
+      "large-particle",
+      "processed-meat",
+      "red-meat",
+      "tough-meat",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2646168,
+    "short": "Pork loin, boneless, raw",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2646169,
+    "short": "Pork tenderloin, raw",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168250,
+    "short": "Pork tenderloin, roasted",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168253,
+    "short": "Pork loin chop, boneless, broiled",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2514745,
+    "short": "Pork, ground, raw",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 167903,
+    "short": "Pork, ground, cooked",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 167848,
+    "short": "Pork shoulder, roasted, lean",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169178,
+    "short": "Pork spareribs, roasted",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168322,
+    "short": "Bacon, pan-fried",
+    "tags": [
+      "histamine-high",
+      "processed-meat",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 749420,
+    "short": "Bacon, cooked (restaurant)",
+    "tags": [
+      "histamine-high",
+      "processed-meat",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 167871,
+    "short": "Ham, extra lean, roasted",
+    "tags": [
+      "histamine-high",
+      "processed-meat",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 332397,
+    "short": "Deli ham, sliced",
+    "tags": [
+      "deli-meat",
+      "histamine-high",
+      "processed-meat",
+      "red-meat",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746780,
+    "short": "Italian sausage, pork, cooked",
+    "tags": [
+      "processed-meat",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172971,
+    "short": "Pork breakfast sausage, cooked",
+    "tags": [
+      "processed-meat",
+      "red-meat",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174584,
+    "short": "Smoked sausage, pork",
+    "tags": [
+      "histamine-high",
+      "processed-meat",
+      "red-meat",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746781,
+    "short": "Chorizo, cooked",
+    "tags": [
+      "processed-meat",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "histamine-high"
+    ]
+  },
+  {
+    "fdcId": 174370,
+    "short": "Lamb, ground, raw",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172544,
+    "short": "Lamb, ground, broiled",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172492,
+    "short": "Lamb loin chop, broiled, lean",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172487,
+    "short": "Lamb leg, roasted, lean",
+    "tags": [
+      "purine-moderate",
+      "red-meat"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2684441,
+    "short": "Salmon, Atlantic, farmed, raw",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish",
+      "raw-animal"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175168,
+    "short": "Salmon, Atlantic, farmed, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171998,
+    "short": "Salmon, Atlantic, wild, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2684440,
+    "short": "Salmon, sockeye, wild, raw",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish",
+      "raw-animal"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173692,
+    "short": "Salmon, sockeye, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175175,
+    "short": "Salmon, pink, canned",
+    "tags": [
+      "allergen-fish",
+      "calcium-rich",
+      "fish",
+      "histamine-high",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173687,
+    "short": "Smoked salmon (lox)",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "histamine-high",
+      "mercury-low-fish",
+      "raw-animal"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2684444,
+    "short": "Cod, Atlantic, raw",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish",
+      "raw-animal"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171956,
+    "short": "Cod, Atlantic, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2684442,
+    "short": "Tilapia, raw",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish",
+      "raw-animal"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175177,
+    "short": "Tilapia, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 334194,
+    "short": "Tuna, light, canned in water",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "histamine-high",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175158,
+    "short": "Tuna, albacore (white), canned in water",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "histamine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "mercury-high",
+      "mercury-low-fish"
+    ],
+    "tag_notes": {
+      "mercury": "FDA lists albacore as a \"good choice\" (one serving a week), between the low and high tiers."
+    }
+  },
+  {
+    "fdcId": 175159,
+    "short": "Tuna, yellowfin, raw",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "raw-animal"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "mercury-high",
+      "mercury-low-fish"
+    ]
+  },
+  {
+    "fdcId": 175139,
+    "short": "Sardines, canned in oil",
+    "tags": [
+      "allergen-fish",
+      "calcium-rich",
+      "fish",
+      "histamine-high",
+      "mercury-low-fish",
+      "purine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174183,
+    "short": "Anchovies, canned in oil",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "histamine-high",
+      "mercury-low-fish",
+      "purine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175120,
+    "short": "Mackerel, Atlantic, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "histamine-high",
+      "mercury-low-fish",
+      "purine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174236,
+    "short": "Mackerel, king, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-high",
+      "purine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173704,
+    "short": "Swordfish, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175117,
+    "short": "Herring, Atlantic, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish",
+      "purine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175118,
+    "short": "Herring, pickled",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "histamine-high",
+      "mercury-low-fish",
+      "purine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173718,
+    "short": "Trout, rainbow, farmed, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174201,
+    "short": "Halibut, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "mercury-high",
+      "mercury-low-fish"
+    ]
+  },
+  {
+    "fdcId": 174198,
+    "short": "Haddock, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173681,
+    "short": "Pollock, Alaska, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175166,
+    "short": "Catfish, farmed, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174197,
+    "short": "Flounder / sole, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171992,
+    "short": "Mahi-mahi, cooked",
+    "tags": [
+      "allergen-fish",
+      "fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "mercury-high",
+      "mercury-low-fish"
+    ]
+  },
+  {
+    "fdcId": 174195,
+    "short": "Fish sticks, frozen, prepared",
+    "tags": [
+      "allergen-fish",
+      "allergen-wheat",
+      "fish",
+      "fried",
+      "gluten",
+      "mercury-low-fish",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 2684443,
+    "short": "Shrimp, raw",
+    "tags": [
+      "allergen-crustacean",
+      "fish",
+      "mercury-low-fish",
+      "raw-animal"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "purine-high",
+      "purine-moderate"
+    ]
+  },
+  {
+    "fdcId": 171971,
+    "short": "Shrimp, cooked",
+    "tags": [
+      "allergen-crustacean",
+      "fish",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "phosphate-additive",
+      "purine-high",
+      "purine-moderate"
+    ]
+  },
+  {
+    "fdcId": 171970,
+    "short": "Shrimp, breaded, fried",
+    "tags": [
+      "allergen-crustacean",
+      "allergen-wheat",
+      "fish",
+      "fried",
+      "gluten",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "allergen-egg"
+    ]
+  },
+  {
+    "fdcId": 2684446,
+    "short": "Crab, lump, pasteurized",
+    "tags": [
+      "allergen-crustacean",
+      "fish",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174209,
+    "short": "Lobster, cooked",
+    "tags": [
+      "allergen-crustacean",
+      "fish",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174217,
+    "short": "Mussels, cooked",
+    "tags": [
+      "fish",
+      "mercury-low-fish",
+      "purine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174220,
+    "short": "Scallops, raw",
+    "tags": [
+      "fish",
+      "mercury-low-fish",
+      "purine-high",
+      "raw-animal"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171978,
+    "short": "Oysters, raw",
+    "tags": [
+      "fish",
+      "mercury-low-fish",
+      "raw-animal"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171976,
+    "short": "Clams, canned",
+    "tags": [
+      "fish",
+      "histamine-high",
+      "mercury-low-fish"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171413,
+    "short": "Olive oil",
+    "tags": [
+      "olive-oil"
+    ],
+    "portions_add": [],
+    "why": "SR Legacy chosen: the Foundation record has no energy value (no 1008/2047/2048), sodium or potassium (748608 extra virgin, 1750351 extra light).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172336,
+    "short": "Canola oil",
+    "tags": [],
+    "portions_add": [],
+    "why": "SR Legacy chosen: the Foundation record has no energy value (no 1008/2047/2048), sodium or potassium (748278).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 330458,
+    "short": "Coconut oil",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172370,
+    "short": "Vegetable (soybean) oil",
+    "tags": [
+      "soy-refined-oil"
+    ],
+    "portions_add": [],
+    "why": "SR Legacy chosen: the Foundation record has no energy value (no 1008/2047/2048), sodium or potassium (748366).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173573,
+    "short": "Avocado oil",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171016,
+    "short": "Sesame oil",
+    "tags": [
+      "allergen-sesame"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171410,
+    "short": "Peanut oil",
+    "tags": [],
+    "portions_add": [],
+    "why": "SR Legacy chosen: the Foundation record has no energy value (no 1008/2047/2048), sodium or potassium (1750348).",
+    "tag_review": [
+      "allergen-peanut"
+    ],
+    "tag_notes": {
+      "allergen-peanut": "Highly refined peanut oil is exempt from FDA allergen labeling; cold-pressed is not."
+    }
+  },
+  {
+    "fdcId": 172338,
+    "short": "Sunflower oil, high oleic",
+    "tags": [],
+    "portions_add": [],
+    "why": "SR Legacy chosen: the Foundation record has no energy value (no 1008/2047/2048), sodium or potassium (1750349).",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172346,
+    "short": "Margarine, stick, salted",
+    "tags": [
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "allergen-milk",
+      "soy-refined-oil"
+    ]
+  },
+  {
+    "fdcId": 171009,
+    "short": "Mayonnaise",
+    "tags": [
+      "allergen-egg",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "soy-refined-oil"
+    ]
+  },
+  {
+    "fdcId": 173592,
+    "short": "Ranch dressing",
+    "tags": [
+      "allergen-egg",
+      "allergen-milk",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructan"
+    ]
+  },
+  {
+    "fdcId": 171019,
+    "short": "Italian dressing",
+    "tags": [
+      "added-sugar",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructan"
+    ]
+  },
+  {
+    "fdcId": 173469,
+    "short": "Vinegar, apple cider",
+    "tags": [
+      "histamine-fermented"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "histamine-high"
+    ]
+  },
+  {
+    "fdcId": 172237,
+    "short": "Vinegar, distilled white",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172241,
+    "short": "Vinegar, balsamic",
+    "tags": [
+      "histamine-fermented",
+      "histamine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 326698,
+    "short": "Mustard, yellow",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168556,
+    "short": "Ketchup",
+    "tags": [
+      "added-sugar",
+      "histamine-high",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "SR generic retail ketchup chosen; the Foundation record 747693 is restaurant packet ketchup.",
+    "tag_review": [
+      "fodmap-fructan"
+    ]
+  },
+  {
+    "fdcId": 174536,
+    "short": "Chicken broth, regular",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructan"
+    ]
+  },
+  {
+    "fdcId": 171609,
+    "short": "Chicken broth, low sodium",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructan"
+    ]
+  },
+  {
+    "fdcId": 171538,
+    "short": "Beef broth, regular",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172889,
+    "short": "Beef broth, reduced sodium",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171583,
+    "short": "Vegetable broth",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructan"
+    ]
+  },
+  {
+    "fdcId": 172884,
+    "short": "Chicken stock, homemade",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171192,
+    "short": "Marinara / pasta sauce, jarred",
+    "tags": [
+      "fodmap-fructan",
+      "histamine-high",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "added-sugar",
+      "vegetable"
+    ]
+  },
+  {
+    "fdcId": 746777,
+    "short": "Salsa, jarred",
+    "tags": [
+      "fodmap-fructan",
+      "histamine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171186,
+    "short": "Sriracha",
+    "tags": [
+      "added-sugar",
+      "fodmap-fructan"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174527,
+    "short": "Hot sauce",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174523,
+    "short": "Barbecue sauce",
+    "tags": [
+      "added-sugar",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructan",
+      "histamine-high"
+    ]
+  },
+  {
+    "fdcId": 171167,
+    "short": "Teriyaki sauce",
+    "tags": [
+      "added-sugar",
+      "allergen-soy",
+      "allergen-wheat",
+      "gluten",
+      "histamine-fermented",
+      "soy"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171610,
+    "short": "Worcestershire sauce",
+    "tags": [
+      "allergen-fish",
+      "histamine-fermented"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "gluten-hidden"
+    ]
+  },
+  {
+    "fdcId": 174531,
+    "short": "Fish sauce",
+    "tags": [
+      "allergen-fish",
+      "histamine-fermented",
+      "histamine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172238,
+    "short": "Capers",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169640,
+    "short": "Honey",
+    "tags": [
+      "added-sugar",
+      "fodmap-fructose"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169661,
+    "short": "Maple syrup",
+    "tags": [
+      "added-sugar"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746784,
+    "short": "Sugar, granulated",
+    "tags": [
+      "added-sugar"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168833,
+    "short": "Sugar, brown",
+    "tags": [
+      "added-sugar"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 168820,
+    "short": "Molasses",
+    "tags": [
+      "added-sugar",
+      "potassium-high-food"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170277,
+    "short": "Agave syrup",
+    "tags": [
+      "added-sugar",
+      "fodmap-fructose"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169641,
+    "short": "Jam / preserves",
+    "tags": [
+      "added-sugar"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170273,
+    "short": "Dark chocolate, 70-85%",
+    "tags": [
+      "added-sugar",
+      "caffeine",
+      "histamine-high",
+      "oxalate-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "allergen-milk",
+      "soy-lecithin"
+    ]
+  },
+  {
+    "fdcId": 167587,
+    "short": "Milk chocolate",
+    "tags": [
+      "added-sugar",
+      "allergen-milk",
+      "caffeine",
+      "histamine-high",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "oxalate-high",
+      "soy-lecithin"
+    ]
+  },
+  {
+    "fdcId": 167976,
+    "short": "Chocolate chips, semisweet",
+    "tags": [
+      "added-sugar",
+      "caffeine",
+      "histamine-high",
+      "oxalate-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "allergen-milk",
+      "soy-lecithin"
+    ]
+  },
+  {
+    "fdcId": 169593,
+    "short": "Cocoa powder, unsweetened",
+    "tags": [
+      "caffeine",
+      "histamine-high",
+      "oxalate-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170257,
+    "short": "Sucralose packets",
+    "tags": [
+      "non-nutritive-sweetener"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169657,
+    "short": "Aspartame packets",
+    "tags": [
+      "non-nutritive-sweetener"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170679,
+    "short": "Stevia extract powder",
+    "tags": [
+      "non-nutritive-sweetener"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172803,
+    "short": "Baking powder",
+    "tags": [
+      "phosphate-additive"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175040,
+    "short": "Baking soda",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169698,
+    "short": "Cornstarch",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175043,
+    "short": "Yeast, active dry",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171543,
+    "short": "Chicken noodle soup, condensed",
+    "tags": [
+      "allergen-wheat",
+      "fodmap-fructan",
+      "gluten",
+      "poultry",
+      "refined-grain",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "allergen-egg",
+      "fodmap-fructan"
+    ]
+  },
+  {
+    "fdcId": 172882,
+    "short": "Tomato soup, condensed",
+    "tags": [
+      "added-sugar",
+      "histamine-high",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "allergen-milk",
+      "allergen-wheat",
+      "gluten"
+    ]
+  },
+  {
+    "fdcId": 171155,
+    "short": "Cream of mushroom soup, condensed",
+    "tags": [
+      "allergen-milk",
+      "allergen-wheat",
+      "fodmap-mannitol",
+      "gluten",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 746775,
+    "short": "Salt, table, iodized",
+    "tags": [],
+    "portions_add": [
+      {
+        "label": "1 tsp",
+        "grams": 6
+      },
+      {
+        "label": "1/4 tsp",
+        "grams": 1.5
+      }
+    ],
+    "why": "Manual teaspoon portions added because the Foundation record has only a dash.",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170931,
+    "short": "Black pepper",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171325,
+    "short": "Garlic powder",
+    "tags": [
+      "fodmap-fructan"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171327,
+    "short": "Onion powder",
+    "tags": [
+      "fodmap-fructan"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170926,
+    "short": "Ginger, ground",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171317,
+    "short": "Basil, dried",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172232,
+    "short": "Basil, fresh",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169997,
+    "short": "Cilantro, fresh",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170416,
+    "short": "Parsley, fresh",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 172233,
+    "short": "Dill, fresh",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173473,
+    "short": "Rosemary, fresh",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 170923,
+    "short": "Cumin seed",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171320,
+    "short": "Cinnamon, ground",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171328,
+    "short": "Oregano, dried",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171329,
+    "short": "Paprika",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171319,
+    "short": "Chili powder",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "fodmap-fructan"
+    ]
+  },
+  {
+    "fdcId": 172231,
+    "short": "Turmeric, ground",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "oxalate-high"
+    ]
+  },
+  {
+    "fdcId": 173471,
+    "short": "Vanilla extract",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "alcohol"
+    ]
+  },
+  {
+    "fdcId": 171890,
+    "short": "Coffee, brewed",
+    "tags": [
+      "caffeine",
+      "coffee"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171891,
+    "short": "Espresso",
+    "tags": [
+      "caffeine",
+      "coffee"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171889,
+    "short": "Coffee, decaf, brewed",
+    "tags": [
+      "coffee"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "caffeine"
+    ]
+  },
+  {
+    "fdcId": 173227,
+    "short": "Tea, black, brewed",
+    "tags": [
+      "caffeine"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 171917,
+    "short": "Tea, green, brewed",
+    "tags": [
+      "caffeine"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174156,
+    "short": "Chamomile tea, brewed",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174852,
+    "short": "Cola, regular",
+    "tags": [
+      "added-sugar",
+      "caffeine",
+      "phosphate-additive",
+      "sugar-sweetened-beverage",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 175099,
+    "short": "Cola, diet",
+    "tags": [
+      "caffeine",
+      "non-nutritive-sweetener",
+      "phosphate-additive",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173205,
+    "short": "Lemon-lime soda",
+    "tags": [
+      "added-sugar",
+      "sugar-sweetened-beverage",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173667,
+    "short": "Lemonade, from concentrate",
+    "tags": [
+      "added-sugar",
+      "sugar-sweetened-beverage"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173647,
+    "short": "Water, tap",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174831,
+    "short": "Coconut water, bottled",
+    "tags": [],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "potassium-high-food"
+    ]
+  },
+  {
+    "fdcId": 168746,
+    "short": "Beer, regular",
+    "tags": [
+      "alcohol",
+      "gluten",
+      "histamine-fermented",
+      "histamine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 173190,
+    "short": "Wine, red",
+    "tags": [
+      "alcohol",
+      "histamine-fermented",
+      "histamine-high"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 174837,
+    "short": "Wine, white",
+    "tags": [
+      "alcohol",
+      "histamine-fermented"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": [
+      "histamine-high"
+    ]
+  },
+  {
+    "fdcId": 174815,
+    "short": "Spirits, 80 proof",
+    "tags": [
+      "alcohol"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 169677,
+    "short": "Potato chips",
+    "tags": [
+      "fried",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  },
+  {
+    "fdcId": 167558,
+    "short": "Tortilla chips",
+    "tags": [
+      "fried",
+      "ultra-processed"
+    ],
+    "portions_add": [],
+    "why": "",
+    "tag_review": []
+  }
+]

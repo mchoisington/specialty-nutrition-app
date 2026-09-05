@@ -48,7 +48,7 @@ for (const m of modList) {
     if (!Array.isArray(r.sources) || !r.sources.length) err(`rule ${r.id} has no sources`);
     for (const s of r.sources || []) if (!sourceIds.has(s)) err(`rule ${r.id} cites unknown source ${s}`);
     if ((r.kind === 'limit' || r.kind === 'target') && r.nutrient && !nutrients.has(r.nutrient)) err(`rule ${r.id} uses unknown nutrient ${r.nutrient}`);
-    if ((r.kind === 'limit' || r.kind === 'target') && r.nutrient && typeof r.value !== 'number') err(`rule ${r.id} numeric rule without numeric value`);
+    if ((r.kind === 'limit' || r.kind === 'target') && r.nutrient && r.tier !== 2 && typeof r.value !== 'number' && !(r.op === 'range' && typeof r.min === 'number')) err(`rule ${r.id} numeric rule without numeric value`);
     if ((r.kind === 'avoid' || r.kind === 'prefer') && (!Array.isArray(r.tags) || !r.tags.length)) err(`rule ${r.id} ${r.kind} without tags`);
     for (const t of r.tags || []) if (!knownTag(t)) err(`rule ${r.id} uses undeclared tag ${t}`);
     if (r.tier === 2 && !(m.tier2 || []).length) warn(`rule ${r.id} is tier 2 but module ${m.id} declares no tier2 params`);
