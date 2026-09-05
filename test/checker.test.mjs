@@ -1,0 +1,56 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { buildMatcher } from '../src/engine/dictionary.js';
+import { checkText, checkRecipe } from '../src/engine/checker.js';
+import { recipeTotals } from '../src/engine/nutrition.js';
+
+const dict = { tags: { 'allergen-milk': { label: 'Milk', hard: true }, 'allergen-wheat': { label: 'Wheat', hard: true }, gluten: { label: 'Gluten' }, 'added-sugar': { label: 'Added sugar' }, 'fodmap-fructan': { label: 'Fructans' } },
+  entries: [
+    { term: 'whey', tags: ['allergen-milk'], match: 'word' },
+    { term: 'wheat flour', tags: ['allergen-wheat', 'gluten'], match: 'phrase' },
+    { term: 'sugar', tags: ['added-sugar'], match: 'word' },
+    { term: 'garlic', tags: ['fodmap-fructan'], match: 'word' },
+    { term: 'natural flavors', tags: [], match: 'phrase', note: 'may hide allergens' },
+    { term: 'caseinate', tags: ['allergen-milk'], match: 'substring' }
+  ] };
+const matcher = buildMatcher(dict);
+
+function plan(avoid) { return { avoid, prefer: {}, limits: {}, targets: {} }; }
+
+test('word matching respects boundaries and plurals', () => {
+  const r = matcher.tagText('sugars, sugarcane juice, garlic cloves, wheat flour');
+  assert.deepEqual(r.tags['added-sugar'], ['sugar']);
+  assert.ok(r.tags['fodmap-fructan']);
+  assert.ok(r.tags['allergen-wheat']);
+  assert.ok(r.unrecognized.includes('sugarcane juice'));
+});
+
+test('hard hit fails; unknown-risk term is caution when allergens are selected', () => {
+  const p = plan({ 'allergen-milk': { hard: true, rules: [] } });
+  assert.equal(checkText('water, whey', p, matcher, { allergens: ['allergen-milk'] }).verdict, 'fail');
+  assert.equal(checkText('water, natural flavors', p, matcher, { allergens: ['allergen-milk'] }).verdict, 'caution');
+  assert.equal(checkText('water, natural flavors', p, matcher, { allergens: [] }).verdict, 'pass');
+  assert.equal(checkText('sodium caseinate', p, matcher, { allergens: ['allergen-milk'] }).verdict, 'fail');
+});
+
+test('unrecognized text is caution when allergens are selected, never silently pass', () => {
+  const p = plan({ 'allergen-milk': { hard: true, rules: [] } });
+  const r = checkText('xanthum gum, mystery powder', p, matcher, { allergens: ['allergen-milk'] });
+  assert.equal(r.verdict, 'caution');
+  assert.equal(r.unrecognized.length, 2);
+});
+
+test('recipe nutrients are summed by grams and compared to daily limits', () => {
+  const foods = new Map([
+    ['f1', { id: 'f1', name: 'Salt', per100g: { sodium_mg: 38758, kcal: 0 }, tags: [] }],
+    ['f2', { id: 'f2', name: 'Chicken', per100g: { sodium_mg: 74, kcal: 165, protein_g: 31 }, tags: ['poultry'] }]
+  ]);
+  const recipe = { id: 'r', name: 'Salty chicken', servings: 2, ingredients: [{ food: 'f1', grams: 10, display: 'salt' }, { food: 'f2', grams: 400, display: 'chicken breast' }] };
+  const t = recipeTotals(recipe, foods);
+  assert.equal(Math.round(t.perServing.sodium_mg), Math.round((38758 * 0.10 + 74 * 4) / 2));
+  const p = { avoid: {}, prefer: { poultry: { rules: [] } }, limits: { sodium_mg: { value: 1500 } }, targets: {} };
+  const c = checkRecipe(recipe, p, matcher, foods, {});
+  assert.equal(c.verdict, 'caution');
+  assert.ok(c.exceeds.some(e => e.nutrient === 'sodium_mg'));
+  assert.ok(c.preferHits.some(h => h.tag === 'poultry'));
+});
