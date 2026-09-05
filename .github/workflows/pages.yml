@@ -23,14 +23,18 @@ jobs:
       - uses: actions/upload-artifact@v4
         with: { name: single-file, path: dist/nutrition-app.html }
   deploy:
+    # Publishes to GitHub Pages. Pages must be available for the repository (public repo, or a paid plan for private repos).
+    # If it is not, this job fails while the check job above still proves the build; the single-file artifact is the fallback.
     needs: check
     runs-on: ubuntu-latest
+    continue-on-error: true
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+        with: { enablement: true }
       - uses: actions/upload-pages-artifact@v3
         with: { path: . }
       - id: deployment
