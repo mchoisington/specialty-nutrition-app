@@ -484,7 +484,11 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
 
   for (const t of tier2Missing) notices.push({ level: 'warn', code: 'tier2-missing', module: t.module, text: `${t.moduleName}: ${t.label} was not applied. The app does not set this number. Enter the value your clinician gave you.${t.consensus ? ' Published range: ' + t.consensus : ''}` });
   for (const c of conflicts) {
-    if (c.status === 'blocked') notices.push({ level: 'block', code: 'hard-conflict', text: `${c.aName} and ${c.bName} give opposite ${labelNutrient(c.param)} advice. The app will not choose. ${c.text}` });
+    if (c.status === 'blocked') {
+      const resolved = c.param && tier2Applied.some(t => firstToken(t.param) === firstToken(c.param));
+      if (resolved) { c.status = 'clinician-resolved'; notices.push({ level: 'info', code: 'hard-conflict-resolved', text: `${c.aName} and ${c.bName} give opposite ${labelNutrient(c.param)} advice. Your clinician's number is being applied instead of either guideline default.` }); }
+      else notices.push({ level: 'block', code: 'hard-conflict', text: `${c.aName} and ${c.bName} give opposite ${labelNutrient(c.param)} advice. The app will not choose. ${c.text}` });
+    }
     if (c.status === 'needs-ack') notices.push({ level: 'warn', code: 'needs-ack', ackKey: c.ackKey, text: `${c.aName} and ${c.bName}: ${c.text}` });
   }
   if (screenPositive) notices.push({ level: 'block', code: 'screen-positive', text: 'Based on your screening answers, calorie targets, weight-loss plans, and new elimination protocols are turned off. Allergen and celiac rules stay on. See the support resources on the Screening page.' });

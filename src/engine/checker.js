@@ -15,12 +15,23 @@ function evaluateTags(tagMap, plan, matcher, opts = {}) {
   return { hits, preferHits };
 }
 
-export function verdictFrom({ hits, unknownRisk, unrecognized, hasAllergens, termHits }) {
+export function verdictFrom({ hits, unknownRisk, unrecognized, hasAllergens, termHits, verifyLabel }) {
   if (hits.some(h => h.hard) || (termHits || []).some(t => t.hard)) return 'fail';
   if (hits.length || (termHits || []).length) return 'caution';
+  if (verifyLabel && verifyLabel.length) return 'caution';
   if (unknownRisk && unknownRisk.length && hasAllergens) return 'caution';
   if (unrecognized && unrecognized.length && hasAllergens) return 'caution';
   return 'pass';
+}
+
+// Ingredients that often, but not always, carry a restricted tag: the label must be checked; never counted as passing.
+function verifyLabelHits(mayContain, plan, matcher) {
+  const out = [];
+  for (const [tag, terms] of Object.entries(mayContain || {})) {
+    const av = plan.avoid && plan.avoid[tag];
+    if (av) out.push({ tag, label: matcher ? matcher.tagLabel(tag) : tag, hard: !!av.hard, terms, rules: av.rules });
+  }
+  return out;
 }
 
 export function checkText(text, plan, matcher, person = {}) {
@@ -28,8 +39,9 @@ export function checkText(text, plan, matcher, person = {}) {
   const { hits, preferHits } = evaluateTags(r.tags, plan, matcher);
   const hasAllergens = !!(person.allergens && person.allergens.length);
   const termHits = matchAvoidTerms(text, person);
-  const verdict = verdictFrom({ hits, unknownRisk: r.unknownRisk, unrecognized: r.unrecognized, hasAllergens, termHits });
-  return { verdict, hits, preferHits, termHits, unknownRisk: r.unknownRisk, unrecognized: r.unrecognized, notes: r.notes, tags: r.tags, segments: r.segments };
+  const verifyLabel = verifyLabelHits(r.mayContain, plan, matcher);
+  const verdict = verdictFrom({ hits, unknownRisk: r.unknownRisk, unrecognized: r.unrecognized, hasAllergens, termHits, verifyLabel });
+  return { verdict, hits, preferHits, termHits, verifyLabel, unknownRisk: r.unknownRisk, unrecognized: r.unrecognized, notes: r.notes, tags: r.tags, mayContain: r.mayContain, segments: r.segments };
 }
 
 function matchAvoidTerms(text, person) {
@@ -52,6 +64,7 @@ export function checkRecipe(recipe, plan, matcher, foodsById, person = {}) {
   const addTag = (tag, src) => { if (!tagMap[tag]) tagMap[tag] = []; if (!tagMap[tag].includes(src)) tagMap[tag].push(src); };
   const unknownRisk = [];
   const unrecognized = [];
+  const mayContain = {};
   for (const ing of recipe.ingredients || []) {
     const food = foodsById.get(ing.food);
     const label = ing.display || (food ? food.short || food.name : ing.food);
@@ -60,6 +73,7 @@ export function checkRecipe(recipe, plan, matcher, foodsById, person = {}) {
     if (matcher && ing.display) {
       const r = matcher.tagText(ing.display);
       for (const tag of Object.keys(r.tags)) addTag(tag, label);
+      for (const [tag, terms] of Object.entries(r.mayContain || {})) (mayContain[tag] ||= []).push(...terms);
       for (const u of r.unknownRisk) unknownRisk.push(u);
       if (!food && r.unrecognized.length) unrecognized.push(label);
     }
@@ -69,7 +83,9 @@ export function checkRecipe(recipe, plan, matcher, foodsById, person = {}) {
   const { hits, preferHits } = evaluateTags(tagMap, plan, matcher);
   const termHits = matchAvoidTerms(recipe.name + ' ' + (recipe.ingredients || []).map(i => i.display || '').join(' '), person);
   const hasAllergens = !!(person.allergens && person.allergens.length);
-  const verdict = verdictFrom({ hits, unknownRisk, unrecognized, hasAllergens, termHits });
+  for (const t of Object.keys(tagMap)) delete mayContain[t];
+  const verifyLabel = verifyLabelHits(mayContain, plan, matcher);
+  const verdict = verdictFrom({ hits, unknownRisk, unrecognized, hasAllergens, termHits, verifyLabel });
   const nut = recipeTotals(recipe, foodsById);
   const perServing = nut.perServing;
   const d = derived(perServing);
@@ -81,5 +97,5 @@ export function checkRecipe(recipe, plan, matcher, foodsById, person = {}) {
   }
   const exceeds = vsLimits.filter(x => x.exceedsInOneServing);
   const finalVerdict = exceeds.length && verdict !== 'fail' ? 'caution' : verdict;
-  return { verdict: finalVerdict, hits, preferHits, termHits, unknownRisk, unrecognized, tags: tagMap, perServing, vsLimits, exceeds, missingFoods: nut.missingFoods };
+  return { verdict: finalVerdict, hits, preferHits, termHits, verifyLabel, unknownRisk, unrecognized, tags: tagMap, perServing, vsLimits, exceeds, missingFoods: nut.missingFoods };
 }

@@ -2868,7 +2868,7 @@
       "rules": [
         {
           "id": "wm-deficit",
-          "kind": "target",
+          "kind": "behavior",
           "nutrient": "kcal",
           "op": "deficit",
           "min": 500,
@@ -2883,7 +2883,8 @@
           ],
           "gated_by": [
             "eating-disorder-screen"
-          ]
+          ],
+          "engine_note": "A calorie deficit needs an energy-needs estimate the app does not make; shown as a habit, not enforced as a number."
         },
         {
           "id": "wm-target",
@@ -4199,10 +4200,9 @@
         },
         {
           "id": "veg-b12",
-          "kind": "target",
+          "kind": "behavior",
           "nutrient": "vitamin_b12_ug",
           "op": "required",
-          "value": null,
           "per": "day",
           "variant": "vegan",
           "tier": 1,
@@ -4210,7 +4210,8 @@
           "text": "Vegans: vitamin B12 must come from fortified foods or a supplement. This is the one place the app states a supplement is required, because there is no food alternative.",
           "sources": [
             "and-vegetarian-position-2016"
-          ]
+          ],
+          "engine_note": "Supplement or fortified-food requirement; no daily food number is enforced."
         },
         {
           "id": "veg-attention-nutrients",

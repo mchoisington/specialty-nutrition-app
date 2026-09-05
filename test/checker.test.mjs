@@ -54,3 +54,34 @@ test('recipe nutrients are summed by grams and compared to daily limits', () => 
   assert.ok(c.exceeds.some(e => e.nutrient === 'sodium_mg'));
   assert.ok(c.preferHits.some(h => h.tag === 'poultry'));
 });
+
+test('except phrases: butter does not fire inside peanut butter; milk not inside coconut milk', () => {
+  const d = { tags: { 'allergen-milk': { label: 'Milk', hard: true }, 'allergen-peanut': { label: 'Peanut', hard: true }, 'allergen-tree-nut': { label: 'Tree nut', hard: true } }, entries: [
+    { term: 'butter', tags: ['allergen-milk'], except: ['peanut butter', 'almond butter'] },
+    { term: 'milk', tags: ['allergen-milk'], except: ['coconut milk', 'oat milk'] },
+    { term: 'peanut butter', tags: ['allergen-peanut'] },
+    { term: 'coconut milk', tags: ['allergen-tree-nut'] },
+    { term: 'sausage', tags: [], may_contain: ['allergen-milk'], risk: 'unknown' },
+    { term: 'berry', tags: ['fruit'] }
+  ] };
+  const m = buildMatcher(d);
+  const r1 = m.tagText('peanut butter, coconut milk');
+  assert.equal(r1.tags['allergen-milk'], undefined);
+  assert.ok(r1.tags['allergen-peanut'] && r1.tags['allergen-tree-nut']);
+  const r2 = m.tagText('butter, whole milk');
+  assert.ok(r2.tags['allergen-milk']);
+  const r3 = m.tagText('mixed berries, cranberries');
+  assert.deepEqual(r3.tags['fruit'], ['berry']);
+  assert.ok(r3.unrecognized.includes('cranberries'));
+  const p = { avoid: { 'allergen-milk': { hard: true, rules: [] } }, prefer: {}, limits: {}, targets: {} };
+  const c = checkText('pork sausage', p, m, { allergens: ['allergen-milk'] });
+  assert.equal(c.verdict, 'caution');
+  assert.ok(c.verifyLabel.some(v => v.tag === 'allergen-milk'));
+});
+
+test('hyphen and apostrophe normalization', () => {
+  const m = buildMatcher({ tags: { 'added-sugar': { label: 'Added sugar' } }, entries: [{ term: 'high-fructose corn syrup', tags: ['added-sugar'] }, { term: "confectioner's sugar", tags: ['added-sugar'] }] });
+  assert.ok(m.tagText('HIGH FRUCTOSE CORN SYRUP').tags['added-sugar']);
+  assert.ok(m.tagText('high-fructose corn syrup').tags['added-sugar']);
+  assert.ok(m.tagText("confectioners sugar").tags['added-sugar']);
+});

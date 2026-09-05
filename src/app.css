@@ -53,6 +53,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
@@ -94,6 +95,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0
 .more-sheet { position: fixed; left: 0; right: 0; bottom: calc(var(--tab-h) + env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border); box-shadow: 0 -4px 16px rgba(0,0,0,0.15); z-index: 29; padding: 0.5rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.25rem; }
 .more-sheet a { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; min-height: 44px; border-radius: 8px; text-decoration: none; color: var(--text); }
 .more-sheet a[aria-current="page"] { background: var(--surface-2); font-weight: 600; }
+.more-sheet a svg { width: 22px; height: 22px; flex: none; color: var(--muted); }
 
 @media (min-width: 800px) {
   .app { grid-template-columns: var(--nav-w) 1fr; grid-template-rows: auto 1fr; }
@@ -147,6 +149,9 @@ textarea { min-height: 120px; resize: vertical; }
 .choice .choice-body { flex: 1; min-width: 0; }
 .choice .choice-title { font-weight: 600; }
 .choice[aria-disabled="true"] { opacity: 0.6; }
+.subpanel { margin: 0.25rem 0 0.75rem 2.4rem; padding: 0.75rem 1rem; border-left: 3px solid var(--border); background: var(--surface-2); border-radius: 0 10px 10px 0; }
+.subpanel .field:last-child { margin-bottom: 0; }
+.subpanel .label { font-size: 0.95rem; }
 .seg { display: inline-flex; flex-wrap: wrap; gap: 0.25rem; }
 .seg label { display: inline-flex; align-items: center; min-height: 44px; padding: 0.4rem 0.9rem; border: 1px solid var(--border); border-radius: 999px; font-weight: 500; cursor: pointer; background: var(--surface); margin: 0; }
 .seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }

@@ -1,5 +1,5 @@
 // Plan: the merged plan for the active person, section by section, every rule with its sources.
-import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiRulesList, uiSourcesDisclosure, uiTagLabel, uiNutrientLabel, uiFmtNum, uiIsoDate, uiToday, uiModuleName, uiNoticeHTML, uiToast } from './common.js';
+import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiRulesList, uiSourcesDisclosure, uiTagLabel, uiNutrientLabel, uiFmtNum, uiIsoDate, uiToday, uiModuleName, uiNoticeHTML, uiBindNoticeActions, uiToast } from './common.js';
 
 export function renderPlanScreen(root) {
   const person = uiActivePerson();
@@ -10,10 +10,8 @@ export function renderPlanScreen(root) {
   const avoidSoft = Object.entries(plan.avoid).filter(([, v]) => !v.hard);
   const prefer = Object.entries(plan.prefer);
 
-  const numberRows = [
-    ...limits.map(([n, l]) => ({ nutrient: n, kind: 'Limit', value: `at most ${uiFmtNum(l.value, 1)}`, ideal: l.ideal != null ? `ideally ${uiFmtNum(l.ideal, 1)}` : '', per: l.per, clinician: l.clinician, rules: l.rules })),
-    ...targets.map(([n, t]) => ({ nutrient: n, kind: 'Target', value: `at least ${uiFmtNum(t.min, 1)}${t.max != null ? `, at most ${uiFmtNum(t.max, 1)}` : ''}`, ideal: '', per: t.per, clinician: t.clinician, rules: t.rules }))
-  ];
+  const numberRows = planNumberRows(limits, targets);
+  const periodic = Object.entries(plan.periodic || {}).map(([per, x]) => ({ per, rows: planNumberRows(Object.entries(x.limits || {}), Object.entries(x.targets || {})) })).filter(x => x.rows.length);
 
   root.innerHTML = `
     <h1>Plan for ${uiEsc(person.name)}</h1>
@@ -21,10 +19,9 @@ export function renderPlanScreen(root) {
     ${plan.notices.filter(n => n.level === 'block').map(n => uiNoticeHTML(n, { person })).join('')}
 
     <h2 id="plan-numbers">Numbers</h2>
-    ${numberRows.length ? `<div class="table-wrap"><table>
-      <thead><tr><th>Nutrient</th><th>Kind</th><th>Value</th><th>Ideal</th><th>Per</th><th>Set by</th></tr></thead>
-      <tbody>${numberRows.map((r, i) => `<tr><td><strong>${uiEsc(uiNutrientLabel(r.nutrient))}</strong></td><td>${r.kind}</td><td class="num">${uiEsc(r.value)}</td><td>${uiEsc(r.ideal)}</td><td>${uiEsc(r.per)}</td><td>${r.clinician ? '<span class="badge blue">clinician-set</span>' : '<span class="small muted">guideline</span>'}</td></tr>
-        <tr><td colspan="6" style="padding-top:0"><details><summary>Rules behind this (${r.rules.length})</summary>${uiRulesList(r.rules)}</details></td></tr>`).join('')}</tbody></table></div>` : '<p class="empty">No numeric limits or targets are active. Numbers appear when a module carries one, or when a clinician number is entered.</p>'}
+    <h3>Per day</h3>
+    ${numberRows.length ? planNumbersTable(numberRows) : '<p class="empty">No daily limits or targets are active. Numbers appear when a module carries one, or when a clinician number is entered.</p>'}
+    ${periodic.map(x => `<h3>Per ${uiEsc(x.per)}</h3>${planNumbersTable(x.rows)}`).join('')}
 
     <h2>Avoid</h2>
     <h3>Hard stops</h3>
@@ -80,11 +77,7 @@ export function renderPlanScreen(root) {
     <p class="small muted" style="margin-top:1.5rem">Every rule above is shown with its source. A rule marked VERIFY carries a citation that was not confirmed against a primary source and should be checked before the number is trusted.</p>
   `;
 
-  root.querySelectorAll('[data-ack]').forEach(b => b.addEventListener('click', () => {
-    person.acknowledged = person.acknowledged || [];
-    if (!person.acknowledged.includes(b.dataset.ack)) person.acknowledged.push(b.dataset.ack);
-    uiPersist(); uiState.rerender();
-  }));
+  uiBindNoticeActions(root, person);
   root.querySelectorAll('[data-phase-next]').forEach(b => b.addEventListener('click', () => {
     person.phases = person.phases || {};
     person.phases[b.dataset.phaseNext] = { phase: b.dataset.next, started: uiIsoDate(uiToday()) };
@@ -104,6 +97,19 @@ export function renderPlanScreen(root) {
     person.modes[b.dataset.module] = def.expires_days ? { mode, since: uiIsoDate(uiToday()) } : mode;
     uiPersist(); uiToast('Mode changed.'); uiState.rerender();
   }));
+}
+
+function planNumberRows(limits, targets) {
+  return [
+    ...limits.map(([n, l]) => ({ nutrient: n, kind: 'Limit', value: `at most ${uiFmtNum(l.value, 1)}${l.unit === 'percent_kcal' ? '%' : ''}`, ideal: l.ideal != null ? `ideally ${uiFmtNum(l.ideal, 1)}` : '', per: l.per, clinician: l.clinician, rules: l.rules })),
+    ...targets.map(([n, t]) => ({ nutrient: n, kind: 'Target', value: `at least ${uiFmtNum(t.min, 1)}${t.max != null ? `, at most ${uiFmtNum(t.max, 1)}` : ''}${t.unit === 'percent_kcal' ? '%' : ''}`, ideal: '', per: t.per, clinician: t.clinician, rules: t.rules }))
+  ];
+}
+function planNumbersTable(rows) {
+  return `<div class="table-wrap"><table>
+      <thead><tr><th>Nutrient</th><th>Kind</th><th>Value</th><th>Ideal</th><th>Per</th><th>Set by</th></tr></thead>
+      <tbody>${rows.map(r => `<tr><td><strong>${uiEsc(uiNutrientLabel(r.nutrient))}</strong></td><td>${r.kind}</td><td class="num">${uiEsc(r.value)}</td><td>${uiEsc(r.ideal)}</td><td>${uiEsc(r.per)}</td><td>${r.clinician ? '<span class="badge blue">clinician-set</span>' : '<span class="small muted">guideline</span>'}</td></tr>
+        <tr><td colspan="6" style="padding-top:0"><details><summary>Rules behind this (${r.rules.length})</summary>${uiRulesList(r.rules)}</details></td></tr>`).join('')}</tbody></table></div>`;
 }
 
 function planTagCard(tag, v, color) {
@@ -140,6 +146,8 @@ function planSuppressReason(s) {
     case 'hard-conflict': return `Set aside: hard conflict with ${uiModuleName(r.with)}. A clinician number resolves it.`;
     case 'feature-disabled': return `Set aside because ${String(r.feature).replace(/-/g, ' ')} is turned off for this profile.`;
     case 'winner': return `Set aside while ${uiModuleName(r.by)} rules apply.`;
+    case 'screen': return 'Set aside because of the screening result.';
+    case 'clinician-number-governs': return `Set aside: your clinician's number (${String(r.param || '').replace(/_/g, ' ')}) governs this nutrient.`;
     default: return 'Set aside.';
   }
 }

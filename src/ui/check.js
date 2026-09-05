@@ -58,10 +58,7 @@ export function renderCheckScreen(root) {
 
 export function checkResultHTML(r, person, plan, opts = {}) {
   const hasAllergens = !!(person.allergens && person.allergens.length);
-  const strict = !!(person.preferences && person.preferences.may_contain_strict);
-  const mayContain = opts.food ? false : /may contain|shared (facility|equipment)|processed in a facility|manufactured (in|on)/i.test(checkLastText);
-  let verdict = r.verdict;
-  if (strict && mayContain && verdict === 'pass') verdict = 'caution';
+  const verdict = r.verdict;
   const unrec = r.unrecognized || [];
   const headline = verdict === 'fail' ? 'Contains a hard exclusion.' : verdict === 'caution' ? (unrec.length && hasAllergens && !r.hits.length ? 'Some ingredients were not recognized.' : 'Something here needs a look.') : 'Nothing in the plan flags this.';
   return `
@@ -70,7 +67,6 @@ export function checkResultHTML(r, person, plan, opts = {}) {
       <div><strong>${uiEsc(opts.title || '')}</strong>${opts.food && opts.food.group ? ` <span class="muted small">${uiEsc(opts.food.group)}</span>` : ''}</div>
       <div>${headline}</div>
       ${unrec.length && hasAllergens ? '<div style="margin-top:.5rem"><strong>Some ingredients were not recognized.</strong> With an allergen on file, that alone is a caution.</div>' : ''}
-      ${strict && mayContain ? '<div style="margin-top:.5rem"><strong>"May contain" or shared-facility wording found.</strong> You asked to treat this as a stop.</div>' : ''}
     </div>
     ${r.hits.length ? `<h2>Matches</h2>${r.hits.map(h => `<div class="card tight">
         <div class="row"><strong>${uiEsc(h.label)}</strong> ${h.hard ? '<span class="badge red">hard stop</span>' : '<span class="badge amber">soft</span>'} ${h.terms && h.terms.length ? `<span class="small muted">matched: ${h.terms.map(uiEsc).join(', ')}</span>` : ''}</div>

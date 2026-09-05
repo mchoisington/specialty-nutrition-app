@@ -6,6 +6,7 @@ import { buildPlan, labelNutrient } from '../engine/plan.js';
 export const uiState = {
   profile: null,
   data: { sources: [], conditions: [], dictionaries: { tags: {}, entries: [] }, foods: [], recipes: [] },
+  conditionsMeta: { flags: {}, proposed_tags: [] },
   dataProblems: [],
   matcher: null,
   conditionsById: new Map(),
@@ -152,7 +153,48 @@ export function uiNoticeHTML(n, opts = {}) {
   const head = level === 'block' ? 'Stop' : level === 'warn' ? 'Caution' : 'Info';
   const ack = n.ackKey && opts.person && !(opts.person.acknowledged || []).includes(n.ackKey)
     ? `<button class="btn small" type="button" data-ack="${uiEsc(n.ackKey)}">I understand</button>` : '';
-  return `<div class="notice ${level}" role="${level === 'block' ? 'alert' : 'status'}"><div class="notice-head">${head}</div><div>${uiEsc(n.text)}</div>${ack}</div>`;
+  const confirm = n.confirmId && opts.person && !(opts.person.confirmations || []).includes(n.confirmId)
+    ? `<label class="choice" style="margin-top:.5rem;background:var(--surface)"><input type="checkbox" data-confirm="${uiEsc(n.confirmId)}"><span class="choice-body">I confirm this.</span></label>` : '';
+  return `<div class="notice ${level}" role="${level === 'block' ? 'alert' : 'status'}"><div class="notice-head">${head}</div><div>${uiEsc(n.text)}</div>${ack}${confirm}</div>`;
+}
+
+// Wires the "I understand" buttons and confirmation checkboxes that uiNoticeHTML renders.
+export function uiBindNoticeActions(root, person) {
+  root.querySelectorAll('[data-ack]').forEach(b => b.addEventListener('click', () => {
+    person.acknowledged = person.acknowledged || [];
+    if (!person.acknowledged.includes(b.dataset.ack)) person.acknowledged.push(b.dataset.ack);
+    uiPersist(); uiState.rerender();
+  }));
+  root.querySelectorAll('[data-confirm]').forEach(c => c.addEventListener('change', () => {
+    person.confirmations = person.confirmations || [];
+    if (c.checked && !person.confirmations.includes(c.dataset.confirm)) person.confirmations.push(c.dataset.confirm);
+    if (!c.checked) person.confirmations = person.confirmations.filter(x => x !== c.dataset.confirm);
+    uiPersist(); uiToast('Confirmed.'); uiState.rerender();
+  }));
+}
+
+// Fills in fields the engine expects that older profiles or store.newPerson may lack. Mutates and returns the person.
+export function uiEnsurePerson(person) {
+  if (!person) return person;
+  if (!('height_cm' in person)) person.height_cm = null;
+  if (!person.variants || typeof person.variants !== 'object') person.variants = {};
+  if (!person.flags || typeof person.flags !== 'object') person.flags = {};
+  if (!Array.isArray(person.optional_rules)) person.optional_rules = [];
+  if (!person.rule_settings || typeof person.rule_settings !== 'object') person.rule_settings = {};
+  if (!Array.isArray(person.confirmations)) person.confirmations = [];
+  if (!Array.isArray(person.acknowledged)) person.acknowledged = [];
+  if (!person.preferences) person.preferences = { avoid_tags: [], avoid_terms: [], patterns: [] };
+  person.preferences.avoid_tags = person.preferences.avoid_tags || [];
+  person.preferences.avoid_terms = person.preferences.avoid_terms || [];
+  person.preferences.patterns = person.preferences.patterns || [];
+  if (!person.medications) person.medications = {};
+  if (!person.tier2) person.tier2 = {};
+  if (!person.phases) person.phases = {};
+  if (!person.modes) person.modes = {};
+  if (!person.screen) person.screen = { scoff: [false, false, false, false, false], positive: false, completed_at: null };
+  if (!person.cooking) person.cooking = {};
+  if (typeof person.planSeed !== 'number') person.planSeed = 0;
+  return person;
 }
 
 export function uiToast(msg) {
@@ -244,6 +286,16 @@ export function uiPctClass(pct, kind) {
 
 export function uiFindPersonById(id) {
   return (uiState.profile.people || []).find(p => p.id === id) || null;
+}
+
+export function uiParamUnit(param) {
+  const p = String(param || '');
+  if (/^pediatric/.test(p)) return '';
+  const perKg = /per_kg/.test(p);
+  const m = /(kcal|_mg|_g|_ug|_iu|_ml)/.exec(p.replace(/^kcal/, 'kcal'));
+  const unit = /^kcal/.test(p) ? 'kcal' : m ? { _mg: 'mg', _g: 'g', _ug: 'mcg', _iu: 'IU', _ml: 'mL' }[m[1]] || '' : '';
+  if (!unit) return perKg ? 'per kg per day' : '';
+  return perKg ? `${unit} per kg per day` : `${unit} per day`;
 }
 
 export function uiMinutesBucket(min) {

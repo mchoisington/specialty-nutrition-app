@@ -1,6 +1,6 @@
 // Settings: export, import, clear, about.
 import { exportJSON, importJSON, clearAll, defaultProfile } from '../store.js';
-import { uiState, uiEsc, uiPersist, uiDownload, uiToast, uiNavigate, uiIsoDate, uiCopyText } from './common.js';
+import { uiState, uiEsc, uiPersist, uiDownload, uiToast, uiNavigate, uiIsoDate, uiCopyText, uiEnsurePerson } from './common.js';
 
 export function renderSettingsScreen(root) {
   const profile = uiState.profile;
@@ -56,6 +56,7 @@ export function renderSettingsScreen(root) {
         if (!window.confirm(`Replace everything on this device with this file (${n} ${n === 1 ? 'person' : 'people'}, ${(incoming.log || []).length} log entries)?`)) { e.target.value = ''; return; }
         uiState.profile = incoming;
         if (!Array.isArray(uiState.profile.log)) uiState.profile.log = [];
+        uiState.profile.people.forEach(uiEnsurePerson);
         if (!uiState.profile.activePerson && n) uiState.profile.activePerson = incoming.people[0].id;
         uiPersist();
         uiToast('Imported.');

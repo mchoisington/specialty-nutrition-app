@@ -1,7 +1,7 @@
 // People and onboarding stepper. Every change is written to the profile and saved immediately.
 import { newPerson } from '../store.js';
 import { SCOFF_ITEMS, scoreScoff, SUPPORT_TEXT } from '../engine/screen.js';
-import { uiState, uiEsc, uiPersist, uiActivePerson, uiSetActive, uiPlanFor, uiRatingBadge, uiSegmented, uiMultiPills, uiYesNo, uiNavigate, uiToast, uiModal, uiMinutesBucket, uiFindPersonById, UI_ALLERGENS, uiTagLabel, uiModuleName, uiNutrientLabel } from './common.js';
+import { uiState, uiEsc, uiPersist, uiActivePerson, uiSetActive, uiPlanFor, uiRatingBadge, uiSegmented, uiMultiPills, uiYesNo, uiNavigate, uiToast, uiModal, uiMinutesBucket, uiFindPersonById, UI_ALLERGENS, uiTagLabel, uiModuleName, uiNutrientLabel, uiEnsurePerson, uiParamUnit, uiRuleHTML } from './common.js';
 import { learnModuleHTML } from './learn.js';
 
 const PEOPLE_STEPS = [
@@ -17,12 +17,9 @@ const PEOPLE_STEPS = [
 ];
 const PEOPLE_CAREGIVER_STEPS = ['basics', 'conditions', 'allergens', 'cooking', 'review'];
 
-const PEOPLE_PATTERN_TAGS = {
-  vegetarian: ['red-meat', 'poultry', 'fish', 'processed-meat'],
-  vegan: ['red-meat', 'poultry', 'fish', 'processed-meat', 'allergen-egg', 'allergen-milk'],
-  halal: [],
-  kosher: []
-};
+// Vegetarian and vegan avoid tags come from the engine (vegetarian-vegan module variants). Halal and kosher have no module.
+const PEOPLE_PATTERN_TAGS = { vegetarian: [], vegan: [], halal: [], kosher: [] };
+const PEOPLE_MULTI_VARIANT_MODULES = ['pregnancy-gdm-breastfeeding'];
 const PEOPLE_PATTERN_TERMS = {
   halal: ['pork', 'bacon', 'ham', 'lard', 'gelatin', 'prosciutto', 'pancetta'],
   kosher: ['pork', 'bacon', 'ham', 'lard', 'gelatin', 'prosciutto', 'pancetta', 'shellfish', 'shrimp', 'prawn', 'crab', 'lobster', 'clam', 'oyster', 'mussel', 'scallop']
@@ -64,7 +61,7 @@ export function renderPeopleScreen(root, ctx) {
   const parts = ctx.route.parts;
   if (!parts.length) return peopleRenderList(root);
   if (parts[0] === 'new') return peopleRenderNew(root);
-  const person = uiFindPersonById(parts[0]);
+  const person = uiEnsurePerson(uiFindPersonById(parts[0]));
   if (!person) { root.innerHTML = '<h1>People</h1><p class="empty">That person was not found.</p><a class="btn" href="#/people">Back to people</a>'; return; }
   const steps = peopleStepsFor(person);
   const stepId = steps.some(s => s.id === parts[1]) ? parts[1] : steps[0].id;
@@ -122,7 +119,7 @@ function peopleRenderNew(root) {
     e.preventDefault();
     const name = root.querySelector('#people-new-name').value.trim();
     if (!name) return;
-    const p = newPerson(name);
+    const p = uiEnsurePerson(newPerson(name));
     uiState.profile.people.push(p);
     if (!uiState.profile.activePerson) uiState.profile.activePerson = p.id;
     uiPersist();
@@ -198,6 +195,8 @@ function peopleStepBasics(container, person) {
         <div class="field"><label for="pb-age">Age (years)</label><input id="pb-age" type="number" inputmode="numeric" min="0" max="120" value="${person.age ?? ''}"></div>
         <div class="field"><label for="pb-weight">Weight (kg), optional</label><input id="pb-weight" type="number" inputmode="decimal" min="1" max="400" step="0.1" value="${person.weight_kg ?? ''}">
           <div class="hint">Some rules are written per kilogram of body weight (for example protein in kidney disease). Without a weight those rules are shown but not turned into a daily number.</div></div>
+        <div class="field"><label for="pb-height">Height (cm), optional</label><input id="pb-height" type="number" inputmode="decimal" min="50" max="250" step="0.1" value="${person.height_cm ?? ''}">
+          <div class="hint">With weight, this gives a body mass index for the few rules that apply only when a guideline ties advice to overweight. Nothing else uses it.</div></div>
       </div>
       ${person.adult === false ? '' : `
       <div class="field"><span class="label">Pregnant?</span>${uiYesNo('pregnancy', !!person.pregnancy)}</div>
@@ -208,13 +207,16 @@ function peopleStepBasics(container, person) {
   bindText('#pb-name', v => { if (v.trim()) person.name = v.trim(); });
   bindText('#pb-age', v => { person.age = v === '' ? null : Number(v); });
   bindText('#pb-weight', v => { person.weight_kg = v === '' ? null : Number(v); });
-  peopleBindSeg(container, person, 'basics', 'adult', v => {
-    person.adult = v === 'yes';
+  bindText('#pb-height', v => { person.height_cm = v === '' ? null : Number(v); });
+  container.querySelectorAll('input[data-seg="adult"]').forEach(inp => inp.addEventListener('change', () => {
+    person.adult = inp.value === 'yes';
     if (!person.adult) {
       person.modules = (person.modules || []).filter(id => { const m = uiState.conditionsById.get(id); return m && peopleIsCaregiverModule(m); });
       person.pregnancy = false; person.breastfeeding = false;
     }
-  });
+    uiPersist();
+    uiState.rerender(); // the step list changes with this answer
+  }));
   peopleBindSeg(container, person, 'basics', 'sex', v => { person.sex = v; }, { rerender: false });
   peopleBindSeg(container, person, 'basics', 'pregnancy', v => { person.pregnancy = v === 'yes'; }, { rerender: false });
   peopleBindSeg(container, person, 'basics', 'breastfeeding', v => { person.breastfeeding = v === 'yes'; }, { rerender: false });
@@ -248,16 +250,18 @@ function peopleStepConditions(container, person) {
             <span class="row"><button type="button" class="btn link" style="min-height:auto;padding:0;font-weight:700" data-edu="${uiEsc(m.id)}">${uiEsc(m.name)}</button> ${uiRatingBadge(m.evidence && m.evidence.rating)}</span>
             <span class="small muted">${uiEsc(m.evidence && m.evidence.summary || '')}</span>
             ${auto[m.id] ? `<span class="small muted"><br>${auto[m.id]}</span>` : ''}
-          </span></label>`;
+          </span></label>${selected.has(m.id) && !locked ? peopleModulePanelHTML(m, person) : ''}`;
       }).join('')}</div>`;
-    }).join('')}`;
+    }).join('')}
+    ${peopleGlobalFlagsHTML(person)}`;
   container.querySelectorAll('[data-module]').forEach(inp => inp.addEventListener('change', () => {
     const id = inp.dataset.module;
     person.modules = person.modules || [];
     if (inp.checked && !person.modules.includes(id)) person.modules.push(id);
     if (!inp.checked) person.modules = person.modules.filter(x => x !== id);
-    uiPersist();
+    peopleRefresh(container, person, 'conditions', `[data-module="${id}"]`);
   }));
+  peopleBindModulePanels(container, person, 'conditions');
   container.querySelectorAll('[data-edu]').forEach(b => b.addEventListener('click', e => {
     e.preventDefault();
     const m = uiState.conditionsById.get(b.dataset.edu);
@@ -265,19 +269,90 @@ function peopleStepConditions(container, person) {
   }));
 }
 
+// Per-module controls: variants, flags, optional rules, configurable rules, required confirmations.
+function peopleModulePanelHTML(m, person) {
+  const parts = [];
+  const flags = uiState.conditionsMeta.flags || {};
+  if (Array.isArray(m.variants) && m.variants.length) {
+    const multi = PEOPLE_MULTI_VARIANT_MODULES.includes(m.id);
+    const stored = person.variants[m.id];
+    const chosen = Array.isArray(stored) ? stored : typeof stored === 'string' ? [stored] : [];
+    const def = m.variants.find(v => v.default) || m.variants[0];
+    const cur = chosen.length ? chosen : (multi ? [] : [def.id]);
+    const opts = m.variants.map(v => ({ value: v.id, label: v.label || v.id }));
+    parts.push(`<div class="field"><span class="label">Which applies?</span>${multi ? uiMultiPills('variant-' + m.id, opts, cur, { label: m.name + ' options' }) : uiSegmented('variant-' + m.id, opts, cur[0], { label: m.name + ' options' })}${!chosen.length && !multi ? `<div class="hint">Default: ${uiEsc(def.label || def.id)}.</div>` : ''}${m.variants.some(v => v.note) ? `<div class="hint">${m.variants.filter(v => v.note).map(v => uiEsc(v.note)).join(' ')}</div>` : ''}</div>`);
+  }
+  for (const [fid, f] of Object.entries(flags)) if (f.module === m.id) parts.push(`<div class="field"><span class="label">${uiEsc(f.label)}</span>${uiYesNo('flag-' + fid, person.flags[fid] === true ? true : person.flags[fid] === false ? false : null)}</div>`);
+  for (const r of m.rules || []) {
+    if (r.required_confirmation) {
+      const on = person.confirmations.includes(r.id);
+      parts.push(`<label class="choice" style="background:var(--surface)"><input type="checkbox" data-confirm-rule="${uiEsc(r.id)}" ${on ? 'checked' : ''}><span class="choice-body"><span class="choice-title">Confirm before this module turns on</span><span class="small">${uiEsc(r.text)}</span></span></label>`);
+    }
+    if (r.optional === true || r.default === 'off') {
+      const on = person.optional_rules.includes(r.id);
+      parts.push(`<label class="choice" style="background:var(--surface)"><input type="checkbox" data-optional-rule="${uiEsc(r.id)}" ${on ? 'checked' : ''}><span class="choice-body"><span class="choice-title">Optional rule ${on ? '(on)' : '(off)'}</span><span class="small">${uiEsc(r.text)}</span><span class="small muted"><br>Optional; evidence for blanket avoidance is limited.</span></span></label>`);
+    }
+    if (r.configurable) parts.push(peopleConfigurableRuleHTML(r, person));
+  }
+  return parts.length ? `<div class="subpanel">${parts.join('')}</div>` : '';
+}
+function peopleConfigurableRuleHTML(r, person) {
+  const def = r.default || r.default_for_allergy || (r.kind === 'avoid' ? 'exclude' : 'allow');
+  const cur = person.rule_settings[r.id] || def;
+  return `<div class="field"><span class="label">${uiEsc(r.text)}</span>${uiSegmented('setting-' + r.id, [{ value: 'allow', label: 'Allow' }, { value: 'exclude', label: 'Exclude' }], cur, { label: r.id })}<div class="hint">Default: ${def}. Your choice: ${cur}.</div></div>`;
+}
+function peopleGlobalFlagsHTML(person) {
+  const flags = Object.entries(uiState.conditionsMeta.flags || {}).filter(([, f]) => !f.module);
+  if (!flags.length) return '';
+  return `<h2>Also tell us</h2><div class="card">${flags.map(([fid, f]) => `<div class="field"><span class="label">${uiEsc(f.label)}</span>${uiYesNo('flag-' + fid, person.flags[fid] === true ? true : person.flags[fid] === false ? false : null)}</div>`).join('')}</div>`;
+}
+function peopleBindModulePanels(container, person, stepId) {
+  container.querySelectorAll('input[data-seg^="variant-"]').forEach(inp => inp.addEventListener('change', () => {
+    const mid = inp.dataset.seg.slice('variant-'.length);
+    person.variants[mid] = [inp.value];
+    peopleRefresh(container, person, stepId, `input[data-seg="${inp.dataset.seg}"][value="${inp.value}"]`);
+  }));
+  container.querySelectorAll('input[data-multi^="variant-"]').forEach(inp => inp.addEventListener('change', () => {
+    const mid = inp.dataset.multi.slice('variant-'.length);
+    const cur = new Set(person.variants[mid] || []);
+    if (inp.checked) cur.add(inp.value); else cur.delete(inp.value);
+    person.variants[mid] = [...cur];
+    uiPersist(); inp.closest('label').classList.toggle('on', inp.checked);
+  }));
+  container.querySelectorAll('input[data-seg^="flag-"]').forEach(inp => inp.addEventListener('change', () => {
+    person.flags[inp.dataset.seg.slice('flag-'.length)] = inp.value === 'yes';
+    peopleRefresh(container, person, stepId, `input[data-seg="${inp.dataset.seg}"][value="${inp.value}"]`);
+  }));
+  container.querySelectorAll('input[data-seg^="setting-"]').forEach(inp => inp.addEventListener('change', () => {
+    person.rule_settings[inp.dataset.seg.slice('setting-'.length)] = inp.value;
+    peopleRefresh(container, person, stepId, `input[data-seg="${inp.dataset.seg}"][value="${inp.value}"]`);
+  }));
+  container.querySelectorAll('[data-confirm-rule]').forEach(inp => inp.addEventListener('change', () => {
+    const id = inp.dataset.confirmRule;
+    if (inp.checked && !person.confirmations.includes(id)) person.confirmations.push(id);
+    if (!inp.checked) person.confirmations = person.confirmations.filter(x => x !== id);
+    peopleRefresh(container, person, stepId, `[data-confirm-rule="${id}"]`);
+  }));
+  container.querySelectorAll('[data-optional-rule]').forEach(inp => inp.addEventListener('change', () => {
+    const id = inp.dataset.optionalRule;
+    if (inp.checked && !person.optional_rules.includes(id)) person.optional_rules.push(id);
+    if (!inp.checked) person.optional_rules = person.optional_rules.filter(x => x !== id);
+    peopleRefresh(container, person, stepId, `[data-optional-rule="${id}"]`);
+  }));
+}
+
 // c) Allergens
 function peopleStepAllergens(container, person) {
   const sel = new Set(person.allergens || []);
-  const strict = !!(person.preferences && person.preferences.may_contain_strict);
+  const allergyModule = uiState.conditionsById.get('food-allergies');
+  const configurable = ((allergyModule && allergyModule.rules) || []).filter(r => r.configurable);
   container.innerHTML = `
     <div class="notice block"><div class="notice-head">Stop</div><div>Allergens are hard exclusions. Nothing in this app overrides them: not a preference, not a mode, not an acknowledgment. When an ingredient is not recognized, the app says so and does not assume it is safe.</div></div>
     <p>Confirmed food allergies (the nine FDA major allergens):</p>
     <div class="choice-list">
       ${UI_ALLERGENS.map(a => `<label class="choice"><input type="checkbox" data-allergen="${a.tag}" ${sel.has(a.tag) ? 'checked' : ''}><span class="choice-body"><span class="choice-title">${a.label}</span></span></label>`).join('')}
     </div>
-    <div class="card" style="margin-top:1rem">
-      <label class="choice" style="border:0;padding:0"><input type="checkbox" id="pa-strict" ${strict ? 'checked' : ''}><span class="choice-body"><span class="choice-title">Treat "may contain" and shared-facility statements as a stop</span><span class="small muted">Many people with allergies avoid these. The evidence on actual risk is mixed, so this is your call. When on, terms like "may contain" and "processed in a facility" trigger a caution even without a named allergen.</span></span></label>
-    </div>`;
+    ${configurable.length ? `<div class="card" style="margin-top:1rem"><h3>"May contain" and shared-facility labels</h3><p class="small muted">Many people with allergies avoid these. The evidence on actual risk is mixed, so this is your call. Applies when at least one allergen is listed above.</p>${configurable.map(r => peopleConfigurableRuleHTML(r, person)).join('')}</div>` : ''}`;
   container.querySelectorAll('[data-allergen]').forEach(inp => inp.addEventListener('change', () => {
     person.allergens = person.allergens || [];
     const t = inp.dataset.allergen;
@@ -285,11 +360,7 @@ function peopleStepAllergens(container, person) {
     if (!inp.checked) person.allergens = person.allergens.filter(x => x !== t);
     uiPersist();
   }));
-  container.querySelector('#pa-strict').addEventListener('change', e => {
-    person.preferences = person.preferences || { avoid_tags: [], avoid_terms: [], patterns: [] };
-    person.preferences.may_contain_strict = e.target.checked;
-    uiPersist();
-  });
+  peopleBindModulePanels(container, person, 'allergens');
 }
 
 // d) Preferences
@@ -307,8 +378,8 @@ function peopleStepPreferences(container, person) {
     <p>Preferences are soft. They lower a recipe's score and show as a caution, and you can override them any time. They never loosen an allergen or a condition rule.</p>
     <h2>Pre-built patterns</h2>
     <div class="choice-list">
-      ${[['vegetarian', 'Vegetarian', 'Avoids red meat, poultry, fish, and processed meat' + (hasVegModule ? '; turns on the vegetarian and vegan module' : '') + '.'],
-        ['vegan', 'Vegan', 'Vegetarian plus eggs and dairy as preferences (not allergies)' + (hasVegModule ? '; turns on the vegetarian and vegan module' : '') + '.'],
+      ${[['vegetarian', 'Vegetarian', hasVegModule ? 'Turns on the vegetarian and vegan module with the vegetarian option; the module adds the red meat, poultry, fish, and processed meat avoidances.' : 'No vegetarian module is loaded; stored as a pattern only.'],
+        ['vegan', 'Vegan', hasVegModule ? 'Turns on the vegetarian and vegan module with the vegan option; the module adds the animal-food avoidances. Eggs and dairy are avoided as a pattern, not as allergies.' : 'No vegetarian module is loaded; stored as a pattern only.'],
         ['halal', 'Halal', porkTag ? `Avoids pork (tag: ${uiEsc(uiTagLabel(porkTag))}).` : 'No pork tag exists in the dictionary, so pork rules are applied by name matching on ingredient text (pork, bacon, ham, lard, gelatin).'],
         ['kosher', 'Kosher', porkTag ? `Avoids pork (tag: ${uiEsc(uiTagLabel(porkTag))}) and shellfish by name matching.` : 'No pork tag exists in the dictionary, so pork and shellfish rules are applied by name matching on ingredient text.']]
         .map(([id, label, hint]) => `<label class="choice"><input type="checkbox" data-pattern="${id}" ${prefs.patterns.includes(id) ? 'checked' : ''}><span class="choice-body"><span class="choice-title">${label}</span><span class="small muted">${hint}</span></span></label>`).join('')}
@@ -323,6 +394,8 @@ function peopleStepPreferences(container, person) {
     const id = inp.dataset.pattern;
     if (inp.checked && !prefs.patterns.includes(id)) prefs.patterns.push(id);
     if (!inp.checked) prefs.patterns = prefs.patterns.filter(x => x !== id);
+    if (inp.checked && id === 'vegan') prefs.patterns = prefs.patterns.filter(x => x !== 'vegetarian');
+    if (inp.checked && id === 'vegetarian') prefs.patterns = prefs.patterns.filter(x => x !== 'vegan');
     peopleApplyPatterns(person);
     peopleRefresh(container, person, 'preferences', `[data-pattern="${id}"]`);
   }));
@@ -356,11 +429,12 @@ function peopleApplyPatterns(person) {
   for (const t of wantTags) if (!prefs.avoid_tags.includes(t)) prefs.avoid_tags.push(t);
   prefs.avoid_terms = prefs.avoid_terms.filter(t => !allPatternTerms.has(t) || wantTerms.has(t));
   for (const t of wantTerms) if (!prefs.avoid_terms.includes(t)) prefs.avoid_terms.push(t);
-  const veg = prefs.patterns.includes('vegetarian') || prefs.patterns.includes('vegan');
+  const veg = prefs.patterns.includes('vegan') ? 'vegan' : prefs.patterns.includes('vegetarian') ? 'vegetarian' : null;
   person.modules = person.modules || [];
   if (uiState.conditionsById.has('vegetarian-vegan')) {
     if (veg && !person.modules.includes('vegetarian-vegan')) person.modules.push('vegetarian-vegan');
-    if (!veg) person.modules = person.modules.filter(m => m !== 'vegetarian-vegan');
+    if (veg) person.variants['vegetarian-vegan'] = [veg];
+    if (!veg) { person.modules = person.modules.filter(m => m !== 'vegetarian-vegan'); delete person.variants['vegetarian-vegan']; }
   }
 }
 
@@ -389,7 +463,7 @@ function peopleStepClinician(container, person) {
   const plan = uiPlanFor(person);
   person.tier2 = person.tier2 || {};
   const entries = new Map();
-  const base = p => String(p).replace(/_(max|min|target|per_kg)$/, '');
+  const base = p => String(p).replace(/_(max|min|target|per_kg|treatment|gdm)/g, '');
   const covered = new Set();
   for (const t of plan.tier2.missing) { entries.set(t.param, { ...t }); covered.add(t.module + '|' + base(t.param)); }
   for (const a of plan.tier2.applied) {
@@ -411,14 +485,15 @@ function peopleStepClinician(container, person) {
   const applied = new Map(plan.tier2.applied.map(a => [a.param, a.value]));
   container.innerHTML = `
     <p>These numbers are Tier 2: the app knows the published range but does not choose a value for you. Until a number is entered, the module runs on its Tier 1 rules only and the plan says so.</p>
+    ${list.some(t => /per_kg/.test(t.param)) && !person.weight_kg ? '<div class="notice warn"><div class="notice-head">Caution</div><div>Some of these are per kilogram of body weight. Enter a weight on the first step so they can become daily numbers.</div></div>' : ''}
     ${list.length ? list.map(t => `<div class="card">
-      <label for="pt-${uiEsc(t.param)}">${uiEsc(t.label || t.param)}</label>
+      <label for="pt-${uiEsc(t.param)}">${uiEsc(t.label || t.param)}${/per_kg/.test(t.param) ? ' <span class="badge gray outline">per kilogram</span>' : ''}</label>
       <div class="small muted">${uiEsc(t.moduleName || '')}${t.when ? ` (applies when: ${uiEsc(t.when)})` : ''}</div>
       ${t.consensus ? `<div class="small"><strong>Published range:</strong> ${uiEsc(t.consensus)}</div>` : ''}
       ${t.why ? `<div class="small muted">${uiEsc(t.why)}</div>` : ''}
       <div class="row" style="margin-top:.5rem">
         <input id="pt-${uiEsc(t.param)}" type="number" inputmode="decimal" step="any" style="max-width:220px" data-tier2="${uiEsc(t.param)}" value="${typeof person.tier2[t.param] === 'number' ? person.tier2[t.param] : ''}" aria-describedby="pt-help-${uiEsc(t.param)}">
-        <span class="muted small">${uiEsc(peopleUnitFor(t.param))}</span>
+        <span class="muted small">${uiEsc(uiParamUnit(t.param))}</span>
         ${applied.has(t.param) ? '<span class="badge blue">clinician-set, applied</span>' : typeof person.tier2[t.param] === 'number' ? '<span class="badge gray">saved, not currently used</span>' : t.declaredOnly ? '<span class="badge gray">not needed right now</span>' : '<span class="badge amber">not applied</span>'}
       </div>
       <p id="pt-help-${uiEsc(t.param)}" class="small" style="margin:.5rem 0 0"><strong>Enter the number your clinician gave you. The app does not set this.</strong></p>
@@ -428,11 +503,6 @@ function peopleStepClinician(container, person) {
     if (v === '') delete person.tier2[inp.dataset.tier2]; else person.tier2[inp.dataset.tier2] = Number(v);
     peopleRefresh(container, person, 'clinician', `[data-tier2="${inp.dataset.tier2}"]`);
   }));
-}
-function peopleUnitFor(param) {
-  const m = /_(mg|g|ug|iu|ml|kcal)_(max|min)$/.exec(param) || /_(mg|g|ug|iu|ml)$/.exec(param);
-  if (!m) return param === 'kcal_max' || param === 'kcal_min' ? 'kcal per day' : '';
-  return { mg: 'mg per day', g: 'g per day', ug: 'mcg per day', iu: 'IU per day', ml: 'mL per day', kcal: 'kcal per day' }[m[1]] || '';
 }
 
 // g) Screening (SCOFF)
@@ -500,10 +570,13 @@ function peopleStepReview(container, person) {
   const kv = [
     ['Adult', person.adult === false ? 'No (caregiver mode)' : 'Yes'],
     ['Sex, age', `${person.sex || 'not set'}${person.age ? ', ' + person.age : ''}`],
-    ['Weight', person.weight_kg ? person.weight_kg + ' kg' : 'not entered'],
+    ['Weight, height', `${person.weight_kg ? person.weight_kg + ' kg' : 'weight not entered'}, ${person.height_cm ? person.height_cm + ' cm' : 'height not entered'}`],
     ['Pregnant or breastfeeding', person.pregnancy || person.breastfeeding ? 'Yes' : 'No'],
     ['Modules', plan.modules.length ? plan.modules.map(m => m.name).join(', ') : 'none'],
     ['Turned off', plan.disabledModules.length ? plan.disabledModules.map(d => `${uiEsc(uiModuleName(d.id))} (by ${uiEsc(uiModuleName(d.by))})`).join(', ') : 'none'],
+    ['Options', Object.entries(person.variants || {}).filter(([, v]) => v && v.length).map(([k, v]) => `${uiEsc(uiModuleName(k))}: ${uiEsc([].concat(v).join(', '))}`).join('; ') || 'defaults'],
+    ['Flags', Object.entries(person.flags || {}).filter(([, v]) => v).map(([k]) => uiEsc((uiState.conditionsMeta.flags[k] || { label: k }).label)).join('; ') || 'none'],
+    ['Confirmations', (person.confirmations || []).length ? person.confirmations.map(uiEsc).join(', ') : 'none'],
     ['Allergens', (person.allergens || []).length ? person.allergens.map(t => UI_ALLERGENS.find(a => a.tag === t)?.label || t).join(', ') : 'none'],
     ['Patterns', (prefs.patterns || []).join(', ') || 'none'],
     ['Soft avoid', (prefs.avoid_tags || []).map(uiTagLabel).join(', ') || 'none'],

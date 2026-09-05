@@ -1,7 +1,7 @@
 // Router and top-level state. Loads data from window.__APP_DATA__ (single-file bundle) or fetch('data/*.json') over http.
 import { load } from './store.js';
 import { buildMatcher } from './engine/dictionary.js';
-import { uiState, uiEsc, uiActivePerson, uiToast } from './ui/common.js';
+import { uiState, uiEsc, uiActivePerson, uiToast, uiEnsurePerson } from './ui/common.js';
 import { renderHomeScreen } from './ui/home.js';
 import { renderPeopleScreen } from './ui/people.js';
 import { renderPlanScreen } from './ui/plan.js';
@@ -45,8 +45,13 @@ export async function loadData() {
 }
 
 function appNormalizeData(data) {
-  // conditions.json may be an array or {modules:[...]}
-  if (data.conditions && !Array.isArray(data.conditions)) data.conditions = data.conditions.modules || [];
+  // conditions.json is { version, notes, modules, proposed_tags, flags } (or a bare array in older fixtures)
+  uiState.conditionsMeta = { flags: {}, proposed_tags: [] };
+  if (data.conditions && !Array.isArray(data.conditions)) {
+    uiState.conditionsMeta.flags = data.conditions.flags || {};
+    uiState.conditionsMeta.proposed_tags = data.conditions.proposed_tags || [];
+    data.conditions = data.conditions.modules || [];
+  }
   if (!Array.isArray(data.sources)) data.sources = [];
   if (!Array.isArray(data.foods)) data.foods = [];
   if (!Array.isArray(data.recipes)) data.recipes = [];
@@ -145,6 +150,7 @@ async function appBoot() {
   uiState.profile = load();
   if (!uiState.profile.activePerson && uiState.profile.people.length) uiState.profile.activePerson = uiState.profile.people[0].id;
   if (!Array.isArray(uiState.profile.log)) uiState.profile.log = [];
+  uiState.profile.people.forEach(uiEnsurePerson);
   const { data, problems } = await loadData();
   uiState.data = appNormalizeData(data);
   uiState.dataProblems = problems;

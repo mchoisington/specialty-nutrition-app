@@ -1,5 +1,5 @@
 // Home: who is active, the plan's notices, quick links.
-import { uiState, uiEsc, uiActivePerson, uiSetActive, uiPlanFor, uiPersist, uiNoticeHTML, uiNavigate, uiRatingBadge } from './common.js';
+import { uiState, uiEsc, uiActivePerson, uiSetActive, uiPlanFor, uiNoticeHTML, uiBindNoticeActions } from './common.js';
 
 export function renderHomeScreen(root) {
   const person = uiActivePerson();
@@ -53,10 +53,5 @@ export function renderHomeScreen(root) {
 
   const sel = root.querySelector('#home-person');
   if (sel) sel.addEventListener('change', () => { uiSetActive(sel.value); uiState.rerender(); });
-  root.querySelectorAll('[data-ack]').forEach(btn => btn.addEventListener('click', () => {
-    person.acknowledged = person.acknowledged || [];
-    if (!person.acknowledged.includes(btn.dataset.ack)) person.acknowledged.push(btn.dataset.ack);
-    uiPersist();
-    uiState.rerender();
-  }));
+  uiBindNoticeActions(root, person);
 }

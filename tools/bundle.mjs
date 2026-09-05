@@ -33,8 +33,8 @@ for (const f of [...order, ...uiFiles, appFile]) {
 }
 const dataScript = `<script>window.__APP_DATA__ = ${JSON.stringify(data).replace(/<\/script/gi, '<\\/script')};</script>`;
 let out = html
-  .replace(/<link[^>]+href="src\/app\.css"[^>]*>/, `<style>\n${css}\n</style>`)
-  .replace(/<script[^>]+type="module"[^>]+src="src\/app\.js"[^>]*><\/script>/, `${dataScript}\n<script>\n(function(){\n${js}\n})();\n</script>`)
+  .replace(/<link[^>]+href="src\/app\.css"[^>]*>/, () => `<style>\n${css}\n</style>`)
+  .replace(/<script[^>]+type="module"[^>]+src="src\/app\.js"[^>]*><\/script>/, () => `${dataScript}\n<script>\n(function(){\n${js}\n})();\n</script>`)
   .replace(/<link[^>]+rel="manifest"[^>]*>\s*/, '')
   .replace(/<script>[^<]*serviceWorker[^<]*<\/script>\s*/, '');
 fs.mkdirSync(new URL('dist/', root), { recursive: true });
