@@ -317,9 +317,7 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
       // The allergy module lists all nine allergens; only the person's confirmed allergens apply.
       if (m.id === 'food-allergies' && rule.kind === 'avoid' && Array.isArray(rule.tags) && rule.tags.some(t => t.startsWith('allergen-'))) {
         const mine = new Set(person.allergens || []);
-        const tags = rule.tags.filter(t => !t.startsWith('allergen-') || mine.has(t));
-        if (!tags.length) continue;
-        rule = { ...rule, tags };
+        if (!rule.tags.some(t => t.startsWith('allergen-') && mine.has(t))) continue;
       }
       // conflict suppression on module+param
       const nut = rule.nutrient || null;

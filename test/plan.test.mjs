@@ -134,3 +134,14 @@ test('IBD flare mode applies flare rules and expires', () => {
   assert.equal(p2.avoid['raw-vegetable'], undefined);
   assert.ok(p2.notices.some(n => n.code === 'mode-expired'));
 });
+
+test('allergy module applies only the person\'s own allergens (real content shape)', () => {
+  const conds = [{ id: 'food-allergies', name: 'Food allergies', category: 'restriction', evidence: { rating: 'strong' }, sources: ['s7'], rules: [
+    { id: 'allergen-soy', kind: 'avoid', hard: true, tags: ['allergen-soy', 'soy'], tier: 1, strength: 'must', text: 'soy', sources: ['s7'] },
+    { id: 'allergen-peanut', kind: 'avoid', hard: true, tags: ['allergen-peanut'], tier: 1, strength: 'must', text: 'peanut', sources: ['s7'] }
+  ] }];
+  const plan = buildPlan({ person: person({ allergens: ['allergen-peanut'] }), conditions: conds });
+  assert.equal(plan.avoid['allergen-peanut'].hard, true);
+  assert.equal(plan.avoid['soy'], undefined);
+  assert.equal(plan.avoid['allergen-soy'], undefined);
+});
