@@ -11,3 +11,7 @@ Items carried from Phase 1 that were not confirmed against a primary source. Eac
 | 5 | SCOFF questionnaire licensing | screen.js text | Open |
 | 6 | ACOG Practice Bulletin 190 (GDM) superseded or not | pregnancy sources | Open |
 | 7 | Academy 2014 pregnancy position paper current status | pregnancy sources | Open |
+| 8 | FDA January 2025 tree-nut list revision (coconut, chestnut) | dictionaries.json allergen-tree-nut | Open |
+| 9 | National Alliance for Eating Disorders current helpline number | screen.js SUPPORT_TEXT | Open |
+
+See also docs/DATA-REVIEW.md for judgment calls that are not citation questions.
