@@ -253,7 +253,22 @@ export function uiYesNo(name, value) {
   return uiSegmented(name, [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }], value === true ? 'yes' : value === false ? 'no' : '');
 }
 
+// Save a generated file. Inside the claude.ai artifact viewer, plain download links are inert, so the viewer's
+// downloads capability is used when it resolves; everywhere else a normal download link is used.
 export function uiDownload(filename, text, type = 'application/json') {
+  try {
+    if (window.claude && typeof window.claude.use === 'function') {
+      window.claude.use('downloads').then(dl => {
+        if (dl && typeof dl.save === 'function') return dl.save({ filename, data: text }).catch(() => {});
+        uiDownloadLink(filename, text, type);
+      }).catch(() => uiDownloadLink(filename, text, type));
+      return true;
+    }
+    return uiDownloadLink(filename, text, type);
+  } catch { return false; }
+}
+
+function uiDownloadLink(filename, text, type) {
   try {
     const blob = new Blob([text], { type });
     const url = URL.createObjectURL(blob);
