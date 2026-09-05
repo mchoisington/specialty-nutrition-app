@@ -97,6 +97,7 @@ const EXPECTED_NUTRIENT_NAMES = {
   1003: /^protein$/i,
   1005: /^carbohydrate/i,
   1079: /^fiber, total dietary$/i,
+  2033: /^total dietary fiber \(aoac 2011\.25\)$/i,
   2000: /sugars?, total|total sugars/i,
   1004: /^total lipid \(fat\)$/i,
   1258: /fatty acids, total saturated/i,
@@ -119,7 +120,7 @@ const EXPECTED_NUTRIENT_NAMES = {
   1018: /^alcohol, ethyl$/i,
 };
 const EXPECTED_UNITS = {
-  1008: 'KCAL', 2047: 'KCAL', 2048: 'KCAL', 1003: 'G', 1005: 'G', 1079: 'G', 2000: 'G', 1004: 'G',
+  1008: 'KCAL', 2047: 'KCAL', 2048: 'KCAL', 1003: 'G', 1005: 'G', 1079: 'G', 2033: 'G', 2000: 'G', 1004: 'G',
   1258: 'G', 1257: 'G', 1253: 'MG', 1093: 'MG', 1092: 'MG', 1091: 'MG', 1087: 'MG', 1089: 'MG',
   1090: 'MG', 1162: 'MG', 1110: 'IU', 1114: 'UG', 1178: 'UG', 1177: 'UG', 1190: 'UG', 1095: 'MG',
   1057: 'MG', 1018: 'G',
