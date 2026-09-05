@@ -25,6 +25,8 @@ for (const f of ['sources', 'conditions', 'dictionaries', 'foods', 'recipes']) {
   data[f] = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : (f === 'dictionaries' ? { tags: {}, entries: [] } : []);
 }
 const html = R('index.html');
+const iconSvg = fs.existsSync(new URL('icon.svg', root)) ? R('icon.svg') : '';
+const iconData = iconSvg ? 'data:image/svg+xml;utf8,' + encodeURIComponent(iconSvg) : '';
 const css = fs.existsSync(new URL('src/app.css', root)) ? R('src/app.css') : '';
 let js = '';
 for (const f of [...order, ...uiFiles, appFile]) {
@@ -36,6 +38,7 @@ let out = html
   .replace(/<link[^>]+href="src\/app\.css"[^>]*>/, () => `<style>\n${css}\n</style>`)
   .replace(/<script[^>]+type="module"[^>]+src="src\/app\.js"[^>]*><\/script>/, () => `${dataScript}\n<script>\n(function(){\n${js}\n})();\n</script>`)
   .replace(/<link[^>]+rel="manifest"[^>]*>\s*/, '')
+  .replace(/(<link[^>]+rel="(?:icon|apple-touch-icon)"[^>]+href=")[^"]+(")/g, (m, a, b) => iconData ? a + iconData + b : '')
   .replace(/<script>[^<]*serviceWorker[^<]*<\/script>\s*/, '');
 fs.mkdirSync(new URL('dist/', root), { recursive: true });
 fs.writeFileSync(new URL('dist/nutrition-app.html', root), out);
