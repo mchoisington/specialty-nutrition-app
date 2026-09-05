@@ -63,7 +63,7 @@ const NUTRIENT_KEYS = {
   kcal: [1008, 2048, 2047],
   protein_g: [1003],
   carb_g: [1005],
-  fiber_g: [1079, 2033], // 2033 = Total dietary fiber (AOAC 2011.25), used by newer Foundation records
+  fiber_g: [1079], // classic method; guideline fiber targets are built on it. 2033 (AOAC 2011.25, counts resistant starch) is a labeled last resort below.
   sugar_g: [2000],
   added_sugar_g: [], // always null for USDA SR Legacy / Foundation
   fat_g: [1004],
@@ -126,7 +126,7 @@ const EXPECTED_UNITS = {
   1057: 'MG', 1018: 'G',
 };
 
-const NEEDED_NUTRIENT_IDS = new Set(Object.values(NUTRIENT_KEYS).flat());
+const NEEDED_NUTRIENT_IDS = new Set([...Object.values(NUTRIENT_KEYS).flat(), 2033]);
 
 // ---------------------------------------------------------------------------
 // Tag vocabulary (PHASE-2 section 4.4)
@@ -395,6 +395,7 @@ for (const entry of selection) {
   for (const [key, ids] of Object.entries(NUTRIENT_KEYS)) {
     let hit = pick(m, ids);
     if (!hit && fm) { const fh = pick(fm, ids); if (fh) { hit = fh; per100gSources[key] = `fdc-${fillId}`; } }
+    if (!hit && key === 'fiber_g') { const ah = pick(m, [2033]); if (ah) { hit = ah; per100gSources[key] = 'aoac-2033'; } }
     if (!hit) { per100g[key] = null; continue; }
     let value = hit.value;
     if (key === 'kcal') kcalSource = KCAL_SOURCE[hit.id];

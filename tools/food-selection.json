@@ -8,7 +8,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169387
   },
   {
     "fdcId": 2710823,
@@ -22,7 +23,8 @@
     "tag_review": [
       "fodmap-fructan",
       "fodmap-fructose"
-    ]
+    ],
+    "fill_from": 168389
   },
   {
     "fdcId": 2346400,
@@ -33,7 +35,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169961
   },
   {
     "fdcId": 321611,
@@ -43,7 +46,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169143
   },
   {
     "fdcId": 169141,
@@ -65,7 +69,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169145
   },
   {
     "fdcId": 169966,
@@ -120,7 +125,8 @@
     "why": "",
     "tag_review": [
       "fodmap-fructan"
-    ]
+    ],
+    "fill_from": 170383
   },
   {
     "fdcId": 2685572,
@@ -131,7 +137,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170390
   },
   {
     "fdcId": 2346407,
@@ -142,7 +149,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169975
   },
   {
     "fdcId": 2346408,
@@ -153,7 +161,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169977
   },
   {
     "fdcId": 169976,
@@ -174,7 +183,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170393
   },
   {
     "fdcId": 2258587,
@@ -185,7 +195,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 168568
   },
   {
     "fdcId": 170394,
@@ -217,7 +228,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169986
   },
   {
     "fdcId": 170399,
@@ -241,7 +253,8 @@
     "why": "",
     "tag_review": [
       "fodmap-mannitol"
-    ]
+    ],
+    "fill_from": 169988
   },
   {
     "fdcId": 2685574,
@@ -252,7 +265,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170406
   },
   {
     "fdcId": 170407,
@@ -273,7 +287,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169998,
+    "fill_note": "Filled from Corn, sweet, yellow, raw; Foundation record is yellow and white kernels (white alternative 168538)"
   },
   {
     "fdcId": 169999,
@@ -307,7 +323,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 168409
   },
   {
     "fdcId": 2685577,
@@ -318,7 +335,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169228
   },
   {
     "fdcId": 169229,
@@ -360,7 +378,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 168421
   },
   {
     "fdcId": 169238,
@@ -393,7 +412,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169247
   },
   {
     "fdcId": 2346388,
@@ -404,7 +424,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169248
   },
   {
     "fdcId": 2346391,
@@ -415,7 +436,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169249
   },
   {
     "fdcId": 1999629,
@@ -427,7 +449,8 @@
     ],
     "portions_add": [],
     "why": "Newer Foundation record (2021-10) with more nutrients than 1750347.",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169251
   },
   {
     "fdcId": 2003601,
@@ -439,7 +462,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 168434
   },
   {
     "fdcId": 2003598,
@@ -451,7 +475,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169255
   },
   {
     "fdcId": 1999628,
@@ -463,7 +488,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169242,
+    "fill_note": "SR Mushrooms, shiitake, raw also lacks saturated fat, so satfat_g stays null; other missing keys filled"
   },
   {
     "fdcId": 169254,
@@ -501,7 +528,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170000,
+    "fill_note": "No raw yellow-onion SR Legacy record (170004 is sauteed); filled from generic Onions, raw"
   },
   {
     "fdcId": 790577,
@@ -513,7 +542,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170000,
+    "fill_note": "No red-onion SR Legacy record; filled from generic Onions, raw"
   },
   {
     "fdcId": 170005,
@@ -615,7 +646,8 @@
     "why": "",
     "tag_review": [
       "fodmap-gos"
-    ]
+    ],
+    "fill_from": 170015
   },
   {
     "fdcId": 170018,
@@ -648,7 +680,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170427
   },
   {
     "fdcId": 2258590,
@@ -659,7 +692,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170108
   },
   {
     "fdcId": 168576,
@@ -681,7 +715,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170027,
+    "fill_note": "SR has no russet without-skin record; filled from russet flesh and skin, raw (satfat only)"
   },
   {
     "fdcId": 2346402,
@@ -692,7 +728,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170029,
+    "fill_note": "SR has no red potato without-skin record; filled from red flesh and skin, raw (satfat only)"
   },
   {
     "fdcId": 170093,
@@ -760,7 +798,9 @@
     ],
     "portions_add": [],
     "why": "Newer Foundation record (2021-10).",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 168462,
+    "fill_note": "No baby-spinach SR Legacy record; filled from Spinach, raw"
   },
   {
     "fdcId": 168463,
@@ -855,7 +895,8 @@
     "tag_review": [
       "fodmap-gos",
       "fodmap-mannitol"
-    ]
+    ],
+    "fill_from": 169295
   },
   {
     "fdcId": 169299,
@@ -877,7 +918,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 168482
   },
   {
     "fdcId": 168483,
@@ -915,7 +957,9 @@
     "why": "Newer Foundation record (2021-10).",
     "tag_review": [
       "fodmap-fructose"
-    ]
+    ],
+    "fill_from": 170457,
+    "fill_note": "No roma/plum tomato SR Legacy record; filled from generic red ripe raw tomato"
   },
   {
     "fdcId": 170457,
@@ -943,7 +987,9 @@
     "why": "",
     "tag_review": [
       "fodmap-fructose"
-    ]
+    ],
+    "fill_from": 170457,
+    "fill_note": "No grape or cherry tomato SR Legacy record; filled from generic red ripe raw tomato"
   },
   {
     "fdcId": 333281,
@@ -955,7 +1001,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170051,
+    "fill_note": "No diced-tomato SR Legacy record; filled from canned tomatoes packed in tomato juice (170051)"
   },
   {
     "fdcId": 2685581,
@@ -967,7 +1015,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170501
   },
   {
     "fdcId": 2685578,
@@ -979,7 +1028,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170051,
+    "fill_note": "Filled from Tomatoes, red, ripe, canned, packed in tomato juice (whole peeled canned tomatoes)"
   },
   {
     "fdcId": 2685580,
@@ -991,7 +1042,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170459
   },
   {
     "fdcId": 2685579,
@@ -1003,7 +1055,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170054
   },
   {
     "fdcId": 2685582,
@@ -1015,7 +1068,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170460,
+    "fill_note": "Filled from tomato puree without salt added; 170546 with salt has identical nutrient values"
   },
   {
     "fdcId": 168567,
@@ -1040,7 +1095,8 @@
     "why": "",
     "tag_review": [
       "vegetable"
-    ]
+    ],
+    "fill_from": 170458
   },
   {
     "fdcId": 2710824,
@@ -1053,7 +1109,9 @@
     "why": "",
     "tag_review": [
       "fodmap-sorbitol"
-    ]
+    ],
+    "fill_from": 171705,
+    "fill_note": "Filled from Avocados, raw, all commercial varieties; Hass-specific alternative is 171706 California (same satfat)"
   },
   {
     "fdcId": 168558,
@@ -1148,7 +1206,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 171688,
+    "fill_note": "No Honeycrisp SR Legacy record; filled from generic Apples, raw, with skin"
   },
   {
     "fdcId": 1750341,
@@ -1161,7 +1221,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 171688,
+    "fill_note": "SR Gala record 168204 has no saturated fat; filled from generic Apples, raw, with skin"
   },
   {
     "fdcId": 2346414,
@@ -1173,7 +1235,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 167772
   },
   {
     "fdcId": 2710815,
@@ -1184,7 +1247,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 171697
   },
   {
     "fdcId": 173941,
@@ -1209,7 +1273,8 @@
     "why": "Foundation banana record with the most nutrients (54 vs 43 for 790991).",
     "tag_review": [
       "fodmap-fructan"
-    ]
+    ],
+    "fill_from": 173944
   },
   {
     "fdcId": 173944,
@@ -1243,7 +1308,8 @@
     ],
     "portions_add": [],
     "why": "Newer Foundation record (2022-10).",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 171711
   },
   {
     "fdcId": 173950,
@@ -1263,7 +1329,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169092
   },
   {
     "fdcId": 2346399,
@@ -1275,7 +1342,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 171719
   },
   {
     "fdcId": 168195,
@@ -1333,7 +1401,8 @@
     "tag_review": [
       "fodmap-fructan",
       "fodmap-fructose"
-    ]
+    ],
+    "fill_from": 174665
   },
   {
     "fdcId": 174673,
@@ -1354,7 +1423,8 @@
     ],
     "portions_add": [],
     "why": "Newer Foundation record (2022-10).",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 174683
   },
   {
     "fdcId": 2710831,
@@ -1364,7 +1434,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 168153
   },
   {
     "fdcId": 167746,
@@ -1417,7 +1488,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169910,
+    "fill_note": "Filled from Mangos, raw (no Tommy Atkins-specific SR record)"
   },
   {
     "fdcId": 2710816,
@@ -1427,7 +1500,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169911
   },
   {
     "fdcId": 327357,
@@ -1450,7 +1524,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169917
   },
   {
     "fdcId": 2003597,
@@ -1461,7 +1536,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169100,
+    "fill_note": "Filled from Orange juice, chilled, includes from concentrate; alternative 169098 Orange juice, raw (values nearly identical)"
   },
   {
     "fdcId": 325430,
@@ -1472,7 +1549,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169928
   },
   {
     "fdcId": 169930,
@@ -1496,7 +1574,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169118,
+    "fill_note": "SR green Anjou record 167779 has no saturated fat; filled from generic Pears, raw"
   },
   {
     "fdcId": 746773,
@@ -1509,7 +1589,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169118,
+    "fill_note": "SR Bartlett record 167776 has no saturated fat; filled from generic Pears, raw"
   },
   {
     "fdcId": 2346398,
@@ -1519,7 +1601,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169124,
+    "fill_note": "Filled from Pineapple, raw, all varieties (variety-specific SR records lack saturated fat)"
   },
   {
     "fdcId": 2710837,
@@ -1530,7 +1614,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169949,
+    "fill_note": "Filled from Plums, raw (no black plum-specific SR record)"
   },
   {
     "fdcId": 168162,
@@ -1576,7 +1662,8 @@
     ],
     "portions_add": [],
     "why": "Newer Foundation record (2022-10).",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 167755
   },
   {
     "fdcId": 2346409,
@@ -1587,7 +1674,8 @@
     ],
     "portions_add": [],
     "why": "Newest of four Foundation strawberry records.",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 167762
   },
   {
     "fdcId": 168173,
@@ -1623,7 +1711,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 167771
   },
   {
     "fdcId": 170174,
@@ -1645,7 +1734,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 173904,
+    "fill_note": "Filled from Cereals, oats, regular and quick, not fortified, dry (rolled oats); alternative 169705 Oats"
   },
   {
     "fdcId": 2346397,
@@ -1657,7 +1748,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169705,
+    "fill_note": "No steel-cut SR Legacy record; filled from Oats (whole grain)"
   },
   {
     "fdcId": 173905,
@@ -1689,7 +1782,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169703
   },
   {
     "fdcId": 169704,
@@ -1709,7 +1803,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169756
   },
   {
     "fdcId": 168878,
@@ -1729,7 +1824,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169726
   },
   {
     "fdcId": 168897,
@@ -1800,7 +1896,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170688
   },
   {
     "fdcId": 170287,
@@ -1827,7 +1924,8 @@
     "why": "",
     "tag_review": [
       "whole-grain"
-    ]
+    ],
+    "fill_note": "no SR Legacy equivalent (farro/emmer not in SR Legacy)"
   },
   {
     "fdcId": 169699,
@@ -1863,7 +1961,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169702
   },
   {
     "fdcId": 2512378,
@@ -1873,7 +1972,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170286
   },
   {
     "fdcId": 169697,
@@ -1893,7 +1993,9 @@
     "why": "",
     "tag_review": [
       "whole-grain"
-    ]
+    ],
+    "fill_from": 169696,
+    "fill_note": "Filled from Corn flour, masa, unenriched, white (169694 enriched has identical macronutrients)"
   },
   {
     "fdcId": 171672,
@@ -2016,7 +2118,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 168936
   },
   {
     "fdcId": 790085,
@@ -2029,7 +2132,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 168893
   },
   {
     "fdcId": 790146,
@@ -2042,7 +2146,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 168896
   },
   {
     "fdcId": 2003587,
@@ -2055,7 +2160,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169745,
+    "fill_note": "No spelt-flour SR Legacy record; filled from Spelt, uncooked (whole grain, same fat level)"
   },
   {
     "fdcId": 2261420,
@@ -2067,7 +2174,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170568,
+    "fill_note": "No almond-flour SR Legacy record; filled from Nuts, almonds, blanched (almond flour is ground blanched almonds; fat 52.5 vs 50.2 g)"
   },
   {
     "fdcId": 2261421,
@@ -2078,7 +2187,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169705,
+    "fill_note": "No whole-grain oat flour SR record; filled from Oats (whole grain, fat 6.9 vs 6.3 g); alternative 169741 Oat flour, partially debranned is not whole grain"
   },
   {
     "fdcId": 790214,
@@ -2088,7 +2199,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169714
   },
   {
     "fdcId": 173884,
@@ -2565,7 +2677,9 @@
     "tag_review": [],
     "tag_notes": {
       "fodmap-gos": "Canned, drained and rinsed beans are lower in GOS than home-cooked."
-    }
+    },
+    "fill_from": 175238,
+    "fill_note": "Only canned black bean SR record is low sodium, solids and liquids; satfat unaffected by sodium"
   },
   {
     "fdcId": 175238,
@@ -2613,7 +2727,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 175201,
+    "fill_note": "SR pinto drained-rinsed record 173797 lacks fiber and satfat; filled from pinto canned, solids and liquids"
   },
   {
     "fdcId": 175200,
@@ -2638,7 +2754,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 175243
   },
   {
     "fdcId": 173740,
@@ -2664,7 +2781,8 @@
     "tag_review": [],
     "tag_notes": {
       "fodmap-gos": "Low FODMAP at 1/4 cup canned, drained."
-    }
+    },
+    "fill_from": 173801
   },
   {
     "fdcId": 173757,
@@ -2686,7 +2804,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 173756
   },
   {
     "fdcId": 2644286,
@@ -2698,7 +2817,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 173747
   },
   {
     "fdcId": 173746,
@@ -2722,7 +2842,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 175204,
+    "fill_note": "No cannellini SR Legacy record; filled from Beans, white, mature seeds, canned"
   },
   {
     "fdcId": 175203,
@@ -2746,7 +2868,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 175192
   },
   {
     "fdcId": 2644283,
@@ -2758,7 +2881,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 172420
   },
   {
     "fdcId": 172421,
@@ -2793,7 +2917,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 173760
   },
   {
     "fdcId": 174253,
@@ -3059,7 +3184,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170569
   },
   {
     "fdcId": 2515374,
@@ -3074,7 +3200,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170162
   },
   {
     "fdcId": 2515375,
@@ -3087,7 +3214,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170581
   },
   {
     "fdcId": 2515378,
@@ -3100,7 +3228,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170178
   },
   {
     "fdcId": 2346395,
@@ -3124,7 +3253,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170591
   },
   {
     "fdcId": 2515379,
@@ -3139,7 +3269,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170184
   },
   {
     "fdcId": 2346394,
@@ -3177,7 +3308,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170554
   },
   {
     "fdcId": 2262075,
@@ -3208,7 +3340,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170556
   },
   {
     "fdcId": 2515381,
@@ -3219,7 +3352,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170562
   },
   {
     "fdcId": 170150,
@@ -3272,7 +3406,8 @@
     ],
     "portions_add": [],
     "why": "Newer Foundation re-release (2019-12) of 322892.",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 171265
   },
   {
     "fdcId": 746778,
@@ -3287,7 +3422,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 171267
   },
   {
     "fdcId": 746772,
@@ -3302,7 +3438,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170872
   },
   {
     "fdcId": 746776,
@@ -3317,7 +3454,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 171269
   },
   {
     "fdcId": 170879,
@@ -3352,7 +3490,8 @@
     "tag_review": [
       "fermented-live-culture",
       "histamine-fermented"
-    ]
+    ],
+    "fill_from": 170874
   },
   {
     "fdcId": 2259793,
@@ -3370,7 +3509,8 @@
     "why": "",
     "tag_review": [
       "histamine-high"
-    ]
+    ],
+    "fill_from": 171284
   },
   {
     "fdcId": 2647437,
@@ -3388,7 +3528,8 @@
     "why": "",
     "tag_review": [
       "histamine-high"
-    ]
+    ],
+    "fill_from": 170887
   },
   {
     "fdcId": 2259794,
@@ -3409,7 +3550,8 @@
     ],
     "tag_notes": {
       "fodmap-lactose": "Low FODMAP at small servings (about 25 g); high at a full cup."
-    }
+    },
+    "fill_from": 171304
   },
   {
     "fdcId": 330137,
@@ -3427,7 +3569,8 @@
     "why": "",
     "tag_review": [
       "histamine-high"
-    ]
+    ],
+    "fill_from": 170894
   },
   {
     "fdcId": 170904,
@@ -3459,7 +3602,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 173414
   },
   {
     "fdcId": 329370,
@@ -3474,7 +3618,8 @@
     "tag_review": [
       "full-fat-dairy",
       "low-fat-dairy"
-    ]
+    ],
+    "fill_from": 171244
   },
   {
     "fdcId": 170845,
@@ -3502,7 +3647,9 @@
     ],
     "portions_add": [],
     "why": "Newer Foundation parmesan (2022-04).",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170848,
+    "fill_note": "Filled from Cheese, parmesan, hard; SR grated record 171247 is the shelf-stable product (13.9 g carb) and does not match refrigerated grated"
   },
   {
     "fdcId": 746767,
@@ -3517,7 +3664,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 171251
   },
   {
     "fdcId": 2259796,
@@ -3532,7 +3680,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 173420
   },
   {
     "fdcId": 2647438,
@@ -3547,7 +3696,8 @@
     "why": "",
     "tag_review": [
       "histamine-aged"
-    ]
+    ],
+    "fill_from": 170844
   },
   {
     "fdcId": 2647440,
@@ -3562,7 +3712,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170850
   },
   {
     "fdcId": 172175,
@@ -3635,7 +3786,8 @@
     "why": "",
     "tag_review": [
       "lactose-low"
-    ]
+    ],
+    "fill_from": 172223
   },
   {
     "fdcId": 2346384,
@@ -3650,7 +3802,8 @@
     "tag_review": [
       "lactose-high",
       "lactose-low"
-    ]
+    ],
+    "fill_from": 172179
   },
   {
     "fdcId": 328841,
@@ -3665,7 +3818,8 @@
     "tag_review": [
       "lactose-high",
       "lactose-low"
-    ]
+    ],
+    "fill_from": 172182
   },
   {
     "fdcId": 746766,
@@ -3681,7 +3835,8 @@
     "tag_review": [
       "lactose-high",
       "lactose-low"
-    ]
+    ],
+    "fill_from": 170851
   },
   {
     "fdcId": 2346385,
@@ -3693,7 +3848,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 173418
   },
   {
     "fdcId": 2647439,
@@ -3708,7 +3864,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 171289,
+    "fill_note": "Filled from Cheese product, pasteurized process, American, vitamin D fortified (fat 23.1/carb 8.9 vs 23.9/8.2; Foundation already carries its own vitamin D)"
   },
   {
     "fdcId": 173410,
@@ -3744,7 +3902,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 170859
   },
   {
     "fdcId": 171255,
@@ -3772,7 +3931,8 @@
     "tag_review": [
       "fermented-live-culture",
       "histamine-fermented"
-    ]
+    ],
+    "fill_from": 171257
   },
   {
     "fdcId": 167575,
@@ -3802,7 +3962,9 @@
     "tag_review": [
       "calcium-rich",
       "ultra-processed"
-    ]
+    ],
+    "fill_from": 174832,
+    "fill_note": "Filled from almond milk, unsweetened, shelf stable (no refrigerated SR record)"
   },
   {
     "fdcId": 2257046,
@@ -3815,7 +3977,8 @@
     "tag_review": [
       "calcium-rich",
       "ultra-processed"
-    ]
+    ],
+    "fill_note": "no SR Legacy equivalent"
   },
   {
     "fdcId": 171287,
@@ -3872,7 +4035,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 171077
   },
   {
     "fdcId": 171477,
@@ -3894,7 +4058,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 173627
   },
   {
     "fdcId": 172388,
@@ -3916,7 +4081,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 172852
   },
   {
     "fdcId": 173630,
@@ -3940,7 +4106,8 @@
     "why": "",
     "tag_review": [
       "phosphate-additive"
-    ]
+    ],
+    "fill_from": 171116
   },
   {
     "fdcId": 171117,
@@ -3986,7 +4153,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 172850
   },
   {
     "fdcId": 746785,
@@ -3997,7 +4165,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 172851
   },
   {
     "fdcId": 172941,
@@ -4039,7 +4208,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 174600
   },
   {
     "fdcId": 171639,
@@ -4074,7 +4244,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 174030
   },
   {
     "fdcId": 171796,
@@ -4096,7 +4267,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 174036
   },
   {
     "fdcId": 174031,
@@ -4140,7 +4312,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 173393
   },
   {
     "fdcId": 746759,
@@ -4151,7 +4324,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 174010
   },
   {
     "fdcId": 173119,
@@ -4184,7 +4358,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 174006
   },
   {
     "fdcId": 2646173,
@@ -4197,7 +4372,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 173983,
+    "fill_note": "Filled from top round roast, boneless, lean and fat, 0\" trim (fat 3.8 vs 5.7 g); alternative 169532 top round steak 1/8\" trim (fat 8.2 g)"
   },
   {
     "fdcId": 2646174,
@@ -4210,7 +4387,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 168668,
+    "fill_note": "Generic chuck roast: filled from chuck arm pot roast, lean and fat, 1/8\" trim (fat 18.6 vs 17.8 g); alternatives 168661 chuck eye roast (12.0 g), 170814 under blade pot roast (13.9 g)"
   },
   {
     "fdcId": 170615,
@@ -4271,7 +4450,8 @@
     "why": "",
     "tag_review": [
       "phosphate-additive"
-    ]
+    ],
+    "fill_from": 173862
   },
   {
     "fdcId": 172012,
@@ -4352,7 +4532,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 167818,
+    "fill_note": "Filled from Pork, fresh, loin, whole, separable lean and fat, raw (fat 12.6 vs 9.5 g); alternative 168314 top loin roasts, boneless, lean and fat (fat 8.3 g)"
   },
   {
     "fdcId": 2646169,
@@ -4363,7 +4545,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 168312
   },
   {
     "fdcId": 168250,
@@ -4396,7 +4579,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 167902
   },
   {
     "fdcId": 167903,
@@ -4453,7 +4637,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 168322,
+    "fill_note": "Filled from bacon, pre-sliced, cooked, pan-fried (closest fat level, 35.1 vs 36.5 g); alternatives 167914 baked, 168321 microwaved"
   },
   {
     "fdcId": 167871,
@@ -4479,7 +4665,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 173863
   },
   {
     "fdcId": 746780,
@@ -4490,7 +4677,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 174586
   },
   {
     "fdcId": 172971,
@@ -4528,7 +4716,9 @@
     "why": "",
     "tag_review": [
       "histamine-high"
-    ]
+    ],
+    "fill_from": 173859,
+    "fill_note": "No cooked chorizo SR Legacy record; filled from raw chorizo 173859 (fiber 0 either way; other filled keys not adjusted for cooking loss)"
   },
   {
     "fdcId": 174370,
@@ -4585,7 +4775,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 175167
   },
   {
     "fdcId": 175168,
@@ -4622,7 +4813,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 173691
   },
   {
     "fdcId": 173692,
@@ -4675,7 +4867,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 171955
   },
   {
     "fdcId": 171956,
@@ -4700,7 +4893,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 175176
   },
   {
     "fdcId": 175177,
@@ -4725,7 +4919,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 173709
   },
   {
     "fdcId": 175158,
@@ -4973,7 +5168,9 @@
     "tag_review": [
       "purine-high",
       "purine-moderate"
-    ]
+    ],
+    "fill_from": 175179,
+    "fill_note": "Filled from Crustaceans, shrimp, raw (plain record); it lacks fiber so fiber_g stays null; alternative 174210 mixed species (may contain additives) has fiber 0 and higher satfat"
   },
   {
     "fdcId": 171971,
@@ -5018,7 +5215,9 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 171966,
+    "fill_note": "No pasteurized lump crab SR record; filled from Crustaceans, crab, blue, canned (pasteurized crab is a canned product; same values as cooked 174205)"
   },
   {
     "fdcId": 174209,
@@ -5105,7 +5304,8 @@
     "tags": [],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 171412
   },
   {
     "fdcId": 172370,
@@ -5340,7 +5540,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 174524
   },
   {
     "fdcId": 171186,
@@ -5452,7 +5653,8 @@
     ],
     "portions_add": [],
     "why": "",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 169655
   },
   {
     "fdcId": 168833,
@@ -5684,7 +5886,9 @@
       }
     ],
     "why": "Manual teaspoon portions added because the Foundation record has only a dash.",
-    "tag_review": []
+    "tag_review": [],
+    "fill_from": 173468,
+    "fill_note": "Filled from Salt, table (non-iodized); iodine is not a tracked nutrient"
   },
   {
     "fdcId": 170931,
