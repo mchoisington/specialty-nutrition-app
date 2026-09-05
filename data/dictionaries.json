@@ -20,7 +20,8 @@
     "Per-entry 'sources' are given for the evidence-sensitive families (FODMAP, histamine, oxalate, purine, potassium, mercury, pregnancy). Where an entry has no 'sources', the tag declaration's sources apply.",
     "Words that are ambiguous between an allergen and an unrelated food are handled by the except list, not by weakening the tag: 'kidney' (organ) versus 'kidney bean', 'egg' versus 'eggplant' (word boundary), 'butternut' is not in the dictionary at all because it is not a common food ingredient and would collide with butternut squash.",
     "Brand names are included only where they are used as generic ingredient words in US recipes (Splenda, Truvia, Velveeta, Spam, Tums, Marmite, Vegemite, Kahlua, Cointreau, Grand Marnier, Frappuccino, Sunbutter).",
-    "Sept 5, 2026: declared the 14 tags used by conditions.json rules (may-contain, GERD and migraine optional triggers, tea, iron-rich, vitamin-c-rich, emulsifier-additive, smoked-seafood-refrigerated) and added entries. Trigger tags drive optional toggles only; they are never default exclusions. Lecithin, xanthan gum, guar gum and maltodextrin carry emulsifier-additive only as label markers for the IBD remission ultra-processed guidance."
+    "Sept 5, 2026: declared the 14 tags used by conditions.json rules (may-contain, GERD and migraine optional triggers, tea, iron-rich, vitamin-c-rich, emulsifier-additive, smoked-seafood-refrigerated) and added entries. Trigger tags drive optional toggles only; they are never default exclusions. Lecithin, xanthan gum, guar gum and maltodextrin carry emulsifier-additive only as label markers for the IBD remission ultra-processed guidance.",
+    "Sept 5, 2026: added basic-ingredient tag so common pantry words (salt, water, spices, starches, plain oils) are recognized rather than reported as unknown. Vinegars keep their fermented tag."
   ],
   "tags": {
     "allergen-milk": {
@@ -881,6 +882,14 @@
       "description": "Lox, nova, kippered, jerky-style smoked fish sold refrigerated; avoid in pregnancy unless cooked.",
       "sources": [
         "fda-pregnancy-food-safety"
+      ]
+    },
+    "basic-ingredient": {
+      "label": "Plain ingredient",
+      "family": "pattern",
+      "description": "A recognized everyday ingredient that carries no restriction tag on its own (salt, water, spices, plain starches, common oils). Sodium and other nutrients still count through the food database; this tag only tells the checker the word is known.",
+      "sources": [
+        "phase1-partc"
       ]
     }
   },
@@ -10606,8 +10615,7 @@
         "may-contain"
       ],
       "match": "phrase",
-      "note": "advisory label statement; Phase 1 Part C says the user configures whether advisory statements exclude a product",
-      "risk": "unknown"
+      "note": "advisory label statement; Phase 1 Part C says the user configures whether advisory statements exclude a product"
     },
     {
       "term": "mayo",
@@ -13317,8 +13325,7 @@
         "may-contain"
       ],
       "match": "phrase",
-      "note": "shared-facility advisory statement; user-configurable per Phase 1 Part C",
-      "risk": "unknown"
+      "note": "shared-facility advisory statement; user-configurable per Phase 1 Part C"
     },
     {
       "term": "processed meat",
@@ -15064,8 +15071,7 @@
         "may-contain"
       ],
       "match": "phrase",
-      "note": "advisory statement; user-configurable per Phase 1 Part C",
-      "risk": "unknown"
+      "note": "advisory statement; user-configurable per Phase 1 Part C"
     },
     {
       "term": "shark",
@@ -19188,6 +19194,503 @@
       "term": "kippered",
       "tags": [
         "smoked-seafood-refrigerated"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "salt",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "sea salt",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "kosher salt",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "table salt",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "iodized salt",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "water",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "black pepper",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "pepper",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "white pepper",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "baking soda",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "baking powder",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "vanilla extract",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "vanilla",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "cornstarch",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "corn starch",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "canola oil",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "sunflower oil",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "safflower oil",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "palm oil",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "avocado oil",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "grapeseed oil",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "cumin",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "paprika",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "smoked paprika",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "cinnamon",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "oregano",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "basil",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "parsley",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "cilantro",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "ginger",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "fresh ginger",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "turmeric",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "thyme",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "rosemary",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "dill",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "bay leaf",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "nutmeg",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "cloves",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "cardamom",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "coriander",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "yeast",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "active dry yeast",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "citric acid",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "ascorbic acid",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "sodium benzoate",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "potassium sorbate",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "gelatin",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "pectin",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "ice",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "gluten free flour",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "gluten free all purpose flour",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "rice flour",
+      "tags": [
+        "basic-ingredient",
+        "refined-grain"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "tapioca starch",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "tapioca flour",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "arrowroot",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "potato starch",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "cream of tartar",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "lemon zest",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "lime zest",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "white vinegar",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "distilled vinegar",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": ""
+    },
+    {
+      "term": "cooking spray",
+      "tags": [
+        "basic-ingredient"
       ],
       "match": "word",
       "note": ""
