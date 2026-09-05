@@ -63,7 +63,7 @@ const NUTRIENT_KEYS = {
   kcal: [1008, 2048, 2047],
   protein_g: [1003],
   carb_g: [1005],
-  fiber_g: [1079],
+  fiber_g: [1079, 2033], // 2033 = Total dietary fiber (AOAC 2011.25), used by newer Foundation records
   sugar_g: [2000],
   added_sugar_g: [], // always null for USDA SR Legacy / Foundation
   fat_g: [1004],
@@ -260,6 +260,10 @@ for (const entry of selection) {
 }
 if (errors.length) { console.error(errors.join('\n')); process.exit(1); }
 const selectedIds = new Set(selection.map((e) => String(e.fdcId)));
+// fill_from: an SR Legacy (or Foundation) record whose values fill ONLY the nutrient keys the primary record lacks.
+// Every filled value is annotated in per100g_sources so it stays traceable to its own FDC id.
+const fillIds = new Set(selection.filter((e) => e.fill_from).map((e) => String(e.fill_from)));
+const neededIds = new Set([...selectedIds, ...fillIds]);
 
 // ---------------------------------------------------------------------------
 // Load reference tables and foods per dataset
@@ -297,7 +301,7 @@ for (const ds of DATASETS) {
   readCSV(path.join(ds.dir, 'food.csv'), (f, h) => {
     if (!ds.foodFilter(f[indexOf(h, 'data_type')])) return;
     const id = f[indexOf(h, 'fdc_id')];
-    if (!selectedIds.has(id)) return;
+    if (!neededIds.has(id)) return;
     if (foodInfo.has(id)) return; // Foundation is loaded first and wins
     foodInfo.set(id, {
       dataset: ds.key,
@@ -380,11 +384,16 @@ for (const entry of selection) {
   const m = nutrientsByFood.get(fdcId) || new Map();
 
   const per100g = {};
+  const per100gSources = {};
+  const fillId = entry.fill_from ? String(entry.fill_from) : null;
+  const fm = fillId ? (nutrientsByFood.get(fillId) || null) : null;
+  if (fillId && !foodInfo.has(fillId)) errors.push(`fdcId ${fdcId}: fill_from ${fillId} not found in any dataset`);
   let kcalSource = null;
   let folateSource = null;
   let vitDSource = null;
   for (const [key, ids] of Object.entries(NUTRIENT_KEYS)) {
-    const hit = pick(m, ids);
+    let hit = pick(m, ids);
+    if (!hit && fm) { const fh = pick(fm, ids); if (fh) { hit = fh; per100gSources[key] = `fdc-${fillId}`; } }
     if (!hit) { per100g[key] = null; continue; }
     let value = hit.value;
     if (key === 'kcal') kcalSource = KCAL_SOURCE[hit.id];
@@ -417,6 +426,7 @@ for (const entry of selection) {
     id: `fdc-${fdcId}`,
     fdcId: entry.fdcId,
     dataset: info.dataset,
+    fill_from: fillId ? { id: `fdc-${fillId}`, name: foodInfo.get(fillId) ? foodInfo.get(fillId).name : null, keys: Object.keys(per100gSources) } : undefined,
     name: info.name,
     short: entry.short,
     group: info.group,

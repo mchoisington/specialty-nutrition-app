@@ -85,3 +85,12 @@ test('hyphen and apostrophe normalization', () => {
   assert.ok(m.tagText('high-fructose corn syrup').tags['added-sugar']);
   assert.ok(m.tagText("confectioners sugar").tags['added-sugar']);
 });
+
+test('quantity and prep words alone are not reported as unrecognized', () => {
+  const m = buildMatcher({ tags: { legume: { label: 'Legume' } }, entries: [{ term: 'black bean', tags: ['legume'] }] });
+  const r = m.tagText('1 can (15 oz) black beans, rinsed and drained');
+  assert.ok(r.tags['legume']);
+  assert.deepEqual(r.unrecognized, []);
+  const r2 = m.tagText('2 cups mystery powder, diced');
+  assert.deepEqual(r2.unrecognized, ['2 cups mystery powder']);
+});

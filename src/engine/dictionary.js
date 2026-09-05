@@ -48,6 +48,14 @@ export function segmentText(text) {
   return t.split(/[,;.]+/).map(s => normalizeText(s)).filter(Boolean);
 }
 
+// Quantity, unit, and preparation words that carry no ingredient meaning. A segment made only of these is not "unrecognized".
+const NOISE = new Set(('cup cups tbsp tablespoon tablespoons tsp teaspoon teaspoons oz ounce ounces lb lbs pound pounds g gram grams kg ml l liter liters quart quarts pint pints can cans jar jars package packages pkg bag bags box boxes bunch bunches head heads clove cloves slice slices piece pieces stalk stalks sprig sprigs pinch dash handful large medium small extra ' +
+  'diced chopped minced sliced cubed shredded grated crushed rinsed drained cooked uncooked raw fresh frozen canned dried dry ripe peeled seeded halved quartered trimmed thawed softened melted divided packed heaping level rounded thinly thickly finely coarsely roughly about approximately plus or to taste optional for serving garnish garnishing of and with in into at room temperature warm cold hot boiling').split(' '));
+function isNoiseOnly(segment) {
+  const tokens = segment.split(' ').filter(Boolean);
+  return tokens.length > 0 && tokens.every(t => NOISE.has(t) || /^[\d.,\/½¼¾⅓⅔x×-]+$/.test(t) || /^\d+(g|ml|oz|lb|kg|l)$/.test(t));
+}
+
 export function buildMatcher(dictionaries) {
   const tagDefs = dictionaries.tags || {};
   const entries = (dictionaries.entries || []).map(e => {
@@ -116,7 +124,7 @@ export function buildMatcher(dictionaries) {
     const notes = [];
     for (const seg of segments) {
       const r = matchSegment(seg);
-      if (r.matchedTerms.length === 0) unrecognized.push(seg);
+      if (r.matchedTerms.length === 0 && !isNoiseOnly(seg)) unrecognized.push(seg);
       for (const u of r.unknownRisk) unknownRisk.push({ ...u, segment: seg });
       for (const [tag, terms] of r.tags) { if (!tags.has(tag)) tags.set(tag, new Set()); for (const t of terms) tags.get(tag).add(t); }
       for (const [tag, terms] of r.mayContain) { if (tags.has(tag)) continue; if (!mayContain.has(tag)) mayContain.set(tag, new Set()); for (const t of terms) mayContain.get(tag).add(t); }
