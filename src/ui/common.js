@@ -231,7 +231,7 @@ export function uiModal(html, opts = {}) {
   };
   uiState.modalClose = close;
   const onKey = e => { if (e.key === 'Escape') close(); };
-  backdrop.addEventListener('click', e => { if (e.target.dataset.close) close(); });
+  backdrop.addEventListener('click', e => { const t = e.target.closest ? e.target.closest('[data-close]') : null; if (t && backdrop.contains(t)) close(); });
   backdrop.querySelector('.modal-back').addEventListener('click', () => close());
   document.addEventListener('keydown', onKey);
   const first = backdrop.querySelector('.modal-body button, .modal-body input, .modal-body [tabindex]') || backdrop.querySelector('button');
