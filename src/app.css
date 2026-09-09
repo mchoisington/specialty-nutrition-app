@@ -860,3 +860,7 @@ td.num, th.num { text-align: right; white-space: nowrap; }
   .print-sheet p { max-width: none; }
   a { color: #000; text-decoration: none; }
 }
+
+/* About button beside each condition or diet on the Conditions step */
+.choice .about-btn { margin-left: .25rem; padding: .15rem .55rem; font-size: .85em; }
+.choice .rating-open { padding: 0; border: 0; background: none; }

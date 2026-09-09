@@ -1,6 +1,7 @@
 // Plan: the merged plan for the active person, section by section, every rule with its sources.
 import { energyTarget } from '../engine/energy.js';
 import { emptyTotals, addTotals, compareToPlan, NUTRIENT_KEYS } from '../engine/nutrition.js';
+import { learnArticleHTML } from './learn.js';
 import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiRulesList, uiSourcesDisclosure, uiTagLabel, uiNutrientLabel, uiFmtNum, uiIsoDate, uiToday, uiModuleName, uiNoticeHTML, uiBindNoticeActions, uiToast, uiEnsureUserDefinedSource, uiUserDefinedBadge, uiPageHeader, uiSection, uiChip, uiIcon, uiMeter, uiModal, uiEmptyState, uiRatingBadge } from './common.js';
 
 // Today's logged totals for the active person, so each number can be shown as "so far today" against its limit or target.
@@ -51,7 +52,7 @@ export function renderPlanScreen(root) {
   const tagChip = (tag, v, tone) => { planSheetRules['tag:' + tag] = { title: uiTagLabel(tag), rules: v.rules, tag, tone }; return `<button type="button" class="chip ${tone}" data-sheet="tag:${uiEsc(tag)}">${uiEsc(uiTagLabel(tag))}</button>`; };
 
   root.innerHTML = `
-    ${uiPageHeader(`Plan for ${uiEsc(person.name)}`, `${plan.modules.length ? plan.modules.map(m => uiEsc(m.name)).join(', ') : 'No modules selected'}.${plan.disabledModules.length ? ` Turned off: ${plan.disabledModules.map(d => uiEsc(uiModuleName(d.id))).join(', ')}.` : ''} Every rule below shows its source.`, `<button type="button" class="btn small" id="plan-print">${uiIcon('print')}Print</button><a class="btn small" href="#/people/${uiEsc(person.id)}/conditions">${uiIcon('edit')}Edit</a>`)}
+    ${uiPageHeader(`Plan for ${uiEsc(person.name)}`, `${plan.modules.length ? plan.modules.map(m => `<button type="button" class="btn link module-name" data-edu="${uiEsc(m.id)}" aria-label="About ${uiEsc(m.name)}">${uiEsc(m.name)}</button>`).join(', ') : 'No modules selected'}.${plan.disabledModules.length ? ` Turned off: ${plan.disabledModules.map(d => uiEsc(uiModuleName(d.id))).join(', ')}.` : ''} Every rule below shows its source.`, `<button type="button" class="btn small" id="plan-print">${uiIcon('print')}Print</button><a class="btn small" href="#/people/${uiEsc(person.id)}/conditions">${uiIcon('edit')}Edit</a>`)}
     ${plan.notices.filter(n => n.level === 'block').length ? `<div class="stack">${plan.notices.filter(n => n.level === 'block').map(n => uiNoticeHTML(n, { person })).join('')}</div>` : ''}
     ${!person.setup_complete ? `<div class="notice warn">${uiIcon('alert', { cls: 'notice-icon' })}<div class="notice-head">Caution</div><div class="notice-body"><div>Setup for ${uiEsc(person.name)} is not finished, so this plan may be missing steps.</div><a class="btn small" href="#/people/${uiEsc(person.id)}/basics">Finish setup</a></div></div>` : ''}
     ${customModules.length ? uiSection('Your own diets', `<div class="stack-2">${customModules.map(m => planCustomCard(m, customDefs.get(m.id), plan)).join('')}</div>`, { id: 'plan-custom-h' }) : ''}
@@ -98,6 +99,10 @@ export function renderPlanScreen(root) {
   root.classList.add('print-sheet');
 
   uiBindNoticeActions(root, person);
+  root.querySelectorAll('[data-edu]').forEach(b => b.addEventListener('click', () => {
+    const m = uiState.conditionsById.get(b.getAttribute('data-edu')) || (plan.modules.find(x => x.id === b.getAttribute('data-edu')) ? { id: b.getAttribute('data-edu'), name: b.textContent, education: {}, evidence: { rating: 'user-defined' } } : null);
+    if (m) uiModal(`<div class="article-modal">${learnArticleHTML(m)}<p class="small"><a href="#/learn/${uiEsc(m.id)}">Open the full article on the Learn screen</a></p></div>`, { title: m.name, label: 'About ' + m.name });
+  }));
   root.querySelector('#plan-print').addEventListener('click', () => window.print());
   root.querySelectorAll('[data-sheet]').forEach(b => b.addEventListener('click', () => {
     const s = planSheetRules[b.dataset.sheet];

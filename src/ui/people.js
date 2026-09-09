@@ -372,7 +372,7 @@ function peopleStepConditions(container, person) {
         return `<label class="choice" ${locked ? 'aria-disabled="true"' : ''}>
           <input type="checkbox" data-module="${uiEsc(m.id)}" ${selected.has(m.id) ? 'checked' : ''} ${locked ? 'disabled' : ''}>
           <span class="choice-body">
-            <span class="row"><button type="button" class="btn link module-name" data-edu="${uiEsc(m.id)}" aria-label="Read about ${uiEsc(m.name)}">${uiEsc(m.name)}</button> ${uiRatingBadge(m.evidence && m.evidence.rating)}</span>
+            <span class="row"><button type="button" class="btn link module-name" data-edu="${uiEsc(m.id)}" aria-label="Read about ${uiEsc(m.name)}">${uiEsc(m.name)}</button> <button type="button" class="btn link rating-open" data-edu="${uiEsc(m.id)}" aria-label="Evidence for ${uiEsc(m.name)}">${uiRatingBadge(m.evidence && m.evidence.rating)}</button> <button type="button" class="btn small about-btn" data-edu="${uiEsc(m.id)}" aria-label="About ${uiEsc(m.name)}">${uiIcon('book')}About</button></span>
             <span class="small muted">${uiEsc(m.evidence && m.evidence.summary || '')}</span>
             ${auto[m.id] ? `<span class="small muted"><br>${auto[m.id]}</span>` : ''}
           </span></label>${selected.has(m.id) && !locked ? peopleModulePanelHTML(m, person) : ''}`;
