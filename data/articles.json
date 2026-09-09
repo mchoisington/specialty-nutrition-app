@@ -306,7 +306,7 @@
         "heading": "Common mistakes and myths",
         "paragraphs": [
           "Calling coconut oil heart-healthy. It is mostly saturated fat. The app does not treat it as heart-healthy, whatever the label says.",
-          "Believing the saturated fat question is settled the other way. The debate is loud online and shows up in the 2025-2030 Dietary Guidelines graphics, but the clinical guideline position has not changed: saturated fat raises LDL, and LDL causes atherosclerosis. The app follows the guideline.",
+          "Believing the saturated fat question is settled the other way. The debate is loud online, but the clinical guideline position has not changed: saturated fat raises LDL, and LDL causes atherosclerosis. The app follows the AHA/ACC guideline.",
           "Following a low-cholesterol diet in the old sense. Avoiding eggs and shrimp while eating butter and bacon misses the point. Dietary cholesterol no longer has a specific numeric limit; saturated fat does.",
           "Treating sterol products as required. They work, but they are an option with the evidence attached, not something the app pushes."
         ]
@@ -370,11 +370,6 @@
         "id": "predimed-2018",
         "citation": "Estruch R et al. Primary Prevention of Cardiovascular Disease with a Mediterranean Diet Supplemented with Extra-Virgin Olive Oil or Nuts (PREDIMED, corrected re-analysis). NEJM 2018;378:e34.",
         "url": "https://doi.org/10.1056/NEJMoa1800389"
-      },
-      {
-        "id": "dga-2025-2030",
-        "citation": "Dietary Guidelines for Americans 2025-2030 (released January 2026). Cited only where it agrees with professional society guidance (saturated fat under 10 percent of calories).",
-        "url": "https://www.dietaryguidelines.gov"
       }
     ]
   },
@@ -1010,7 +1005,7 @@
       {
         "heading": "What the evidence says",
         "paragraphs": [
-          "The evidence rating for this module is STRONG. The governing sources are the American Heart Association scientific statement on dietary sugars (Johnson et al., Circulation 2009; a children's statement followed in 2016), which sets the 25 g and 36 g daily limits; the WHO guideline on sugars intake for adults and children (2015), which recommends free sugars under 10 percent of calories and suggests a further cut to under 5 percent; the 2025-2030 Dietary Guidelines for Americans, which retain the under-10-percent limit (one of the non-contested parts of that document); and the FDA Nutrition Facts label rule (2016) that created the Added Sugars line.",
+          "The evidence rating for this module is STRONG. The governing sources are the American Heart Association scientific statement on dietary sugars (Johnson et al., Circulation 2009; a children's statement followed in 2016), which sets the 25 g and 36 g daily limits; the WHO guideline on sugars intake for adults and children (2015), which recommends free sugars under 10 percent of calories and suggests a further cut to under 5 percent; and the FDA Nutrition Facts label rule (2016) that created the Added Sugars line.",
           "For non-nutritive sweeteners, the WHO 2023 guideline advises against using them for weight control or to reduce the risk of diet-related disease, based on long-term observational data. Short-term use as a bridge away from sugar is acceptable. The app presents both positions."
         ]
       },
@@ -1037,7 +1032,7 @@
         "heading": "Numbers that matter",
         "paragraphs": [
           "Added sugar: under 25 g a day for women, under 36 g a day for men (AHA). That is 6 and 9 teaspoons. One 12 oz can of regular soda carries about a day's worth on its own.",
-          "Free sugars: under 10 percent of calories, ideally under 5 percent (WHO). On a 2,000 calorie day, 10 percent is 50 g and 5 percent is 25 g. The Dietary Guidelines for Americans 2025-2030 keep the 10 percent limit.",
+          "Free sugars: under 10 percent of calories, ideally under 5 percent (WHO). On a 2,000 calorie day, 10 percent is 50 g and 5 percent is 25 g.",
           "0 g: the Added Sugars line on plain, whole foods.",
           "No numbers in this module require a clinician. If you have diabetes, the diabetes module adds its own rules, and the two agree."
         ]
@@ -1100,11 +1095,6 @@
         "id": "who-sugars-2015",
         "citation": "WHO Guideline: Sugars intake for adults and children. Geneva: World Health Organization; 2015.",
         "url": "https://www.who.int/publications/i/item/9789241549028"
-      },
-      {
-        "id": "dga-2025-2030",
-        "citation": "Dietary Guidelines for Americans 2025-2030 (released January 2026). Cited only where it agrees with professional society guidance (added sugar under 10 percent of calories).",
-        "url": "https://www.dietaryguidelines.gov"
       },
       {
         "id": "fda-added-sugars-label-2016",
@@ -2752,7 +2742,7 @@
         "heading": "What the evidence says",
         "paragraphs": [
           "The evidence rating is strong for the core pregnancy nutrition rules, strong for GDM medical nutrition therapy, and moderate for breastfeeding-specific guidance.",
-          "The sources are society guidelines and government agencies: ACOG practice bulletins, including Bulletin 230 on obesity in pregnancy (2021) and Bulletin 190 on gestational diabetes (2018), which a newer bulletin may have replaced (VERIFY); the ADA Standards of Care 2026, Section 15 on diabetes in pregnancy; the Institute of Medicine 2009 weight-gain guidelines; the FDA and EPA 2021 fish advice; the Academy of Nutrition and Dietetics 2014 pregnancy position, whose current status is unconfirmed (VERIFY); and the pregnancy and lactation chapter of the 2025-2030 Dietary Guidelines."
+          "The sources are society guidelines and government agencies: ACOG practice bulletins, including Bulletin 230 on obesity in pregnancy (2021) and Bulletin 190 on gestational diabetes (2018), which a newer bulletin may have replaced (VERIFY); the ADA Standards of Care 2026, Section 15 on diabetes in pregnancy; the Institute of Medicine 2009 weight-gain guidelines; the FDA and EPA 2021 fish advice; and the Academy of Nutrition and Dietetics 2014 pregnancy position, whose current status is unconfirmed (VERIFY)."
         ]
       },
       {
@@ -2870,11 +2860,6 @@
         "citation": "Procter SB, Campbell CG. Position of the Academy of Nutrition and Dietetics: Nutrition and Lifestyle for a Healthy Pregnancy Outcome. J Acad Nutr Diet 2014;114:1099-1103. (VERIFY: current status.)",
         "url": "https://doi.org/10.1016/j.jand.2014.05.005",
         "verify": true
-      },
-      {
-        "id": "dga-2025-2030",
-        "citation": "U.S. Departments of Agriculture and Health and Human Services. Dietary Guidelines for Americans, 2025-2030 (released January 2026). Cited only where it agrees with professional society guidance, including the pregnancy and lactation chapter.",
-        "url": "https://www.dietaryguidelines.gov"
       },
       {
         "id": "ata-iodine-statement",
@@ -3764,11 +3749,6 @@
         "id": "aap-and-infant-feeding",
         "citation": "American Academy of Pediatrics and Academy of Nutrition and Dietetics positions on infant and toddler feeding.",
         "url": "https://www.aap.org"
-      },
-      {
-        "id": "usda-wic-materials",
-        "citation": "USDA Food and Nutrition Service, WIC (Special Supplemental Nutrition Program for Women, Infants, and Children) materials.",
-        "url": "https://www.fns.usda.gov/wic"
       }
     ]
   },
