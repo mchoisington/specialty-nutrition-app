@@ -19,7 +19,7 @@ import { renderRecipesScreen } from './ui/recipes.js';
 import { renderOwnerScreen } from './ui/owner.js';
 import { getDb, ensureDeviceIdentity, registerDevice, readOwner, isOwner } from './engine/sync.js';
 
-const APP_DATA_FILES = ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'recipes-open', 'articles'];
+const APP_DATA_FILES = ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'recipes-open', 'recipes-usda', 'articles'];
 
 function appEmptyFor(name) {
   return name === 'dictionaries' ? { tags: {}, entries: [] } : name === 'articles' ? {} : [];
@@ -62,8 +62,7 @@ function appNormalizeData(data) {
   if (!Array.isArray(data.sources)) data.sources = [];
   if (!Array.isArray(data.foods)) data.foods = [];
   if (!Array.isArray(data.recipes)) data.recipes = [];
-  if (Array.isArray(data['recipes-open'])) { const seen = new Set(data.recipes.map(r => r.id)); for (const r of data['recipes-open']) if (!seen.has(r.id)) data.recipes.push(r); }
-  delete data['recipes-open'];
+  for (const extra of ['recipes-open', 'recipes-usda']) { if (Array.isArray(data[extra])) { const seen = new Set(data.recipes.map(r => r.id)); for (const r of data[extra]) if (!seen.has(r.id)) { data.recipes.push(r); seen.add(r.id); } } delete data[extra]; }
   if (!data.articles || typeof data.articles !== 'object' || Array.isArray(data.articles)) data.articles = {};
   if (!data.dictionaries || typeof data.dictionaries !== 'object') data.dictionaries = { tags: {}, entries: [] };
   if (!data.dictionaries.tags) data.dictionaries.tags = {};
@@ -213,11 +212,20 @@ export function appRender() {
 // The recipe pool = shipped recipes, with any ingredient links the household added to imported recipes
 // (profile.recipe_links[recipeId] = [{food, grams, display}]), plus recipes the household wrote (profile.custom_recipes).
 // Call uiState.refreshRecipes() after editing either.
+export const APP_COLLECTION_OF_SOURCE = { 'NHS website': 'nhs', 'Wikibooks Cookbook': 'wikibooks', 'USDA MyPlate Kitchen': 'usda' };
+export function appCollectionCounts() {
+  const counts = { nhs: 0, wikibooks: 0, usda: 0 };
+  for (const r of uiState.baseRecipes || []) { const k = APP_COLLECTION_OF_SOURCE[r.source]; if (k) counts[k]++; }
+  return counts;
+}
 function appAssembleRecipes() {
   const profile = uiState.profile || {};
   const links = profile.recipe_links || {};
+  const on = Object.assign({ nhs: false, wikibooks: true, usda: false }, profile.recipe_collections || {});
   const out = [];
   for (const r of uiState.baseRecipes || []) {
+    const coll = APP_COLLECTION_OF_SOURCE[r.source];
+    if (coll && !on[coll]) continue;
     const linked = links[r.id];
     if (Array.isArray(linked) && linked.length) out.push({ ...r, ingredients: linked, linked_by_household: true });
     else out.push(r);

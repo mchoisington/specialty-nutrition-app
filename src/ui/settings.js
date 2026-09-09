@@ -1,5 +1,6 @@
 // Settings: appearance (theme, large text), export, import, guests, clear, about.
 import { exportJSON, importJSON, clearAll, defaultProfile } from '../store.js';
+import { appCollectionCounts } from '../app.js';
 import { uiState, uiEsc, uiPersist, uiDownload, uiToast, uiNavigate, uiIsoDate, uiCopyText, uiEnsurePerson, uiPageHeader, uiSection, uiSwitch, uiSegmented, uiChip, uiIcon, uiLoadUiPrefs, uiSaveUiPrefs, uiNoticeHTML, uiModal } from './common.js';
 import { claimOwner, registerDevice, sealOwnerBackup, restoreOwnerBackup, forgetDeviceIdentity, removePerson } from '../engine/sync.js';
 import { sharingState, sharingLocalHTML, sharingPendingHTML, sharingSafe, sharingPublishIfShared, sharingShortFingerprint } from './sharing.js';
@@ -24,6 +25,7 @@ export function renderSettingsScreen(root) {
       <label for="set-import" class="btn">Choose a file to import</label>
       <input id="set-import" type="file" accept="application/json,.json" class="visually-hidden">
     </div>`, { id: 'set-import-h' })}
+    ${uiSection('Recipe collections', settingsCollectionsHTML(profile), { id: 'set-coll-h' })}
     ${uiSection('Guests', `<p class="small muted">Guests are profiles other people shared with you (Together screen). They can be picked when cooking together and removed here.</p>
       ${guests.length ? `<div class="list boxed">${guests.map(g => `<div class="list-row"><div class="list-main"><div class="list-title">${uiEsc(g.name)} ${uiChip('Guest', 'plum')}</div><div class="list-sub">${(g.allergens || []).length ? 'allergens: ' + g.allergens.length : 'no allergens'}, ${(g.modules || []).length} module${(g.modules || []).length === 1 ? '' : 's'}</div></div><div class="list-actions"><button class="btn small danger" type="button" data-remove-guest="${uiEsc(g.id)}">Remove</button></div></div>`).join('')}</div>` : '<p class="small muted">No guests. Add one on the Together screen by pasting a shared profile or choosing a file.</p>'}`, { id: 'set-guests-h' })}
     ${uiSection('Calendar export', `<p class="small">"Add to calendar (.ics)" on the Grocery and Together screens saves a standard calendar file with one all-day event per day listing that day's meals. Import it into Google Calendar (Settings, Import and export), Apple Calendar, Outlook, or a Skylight calendar. There is no direct Google Keep or Skylight list integration; use Share or Copy for the grocery list itself.</p>`, { id: 'set-cal-h' })}
@@ -89,6 +91,7 @@ export function renderSettingsScreen(root) {
     reader.readAsText(file);
   });
   settingsBindSharing(root, profile);
+  settingsBindCollections(root, profile);
   root.querySelector('#set-clear').addEventListener('click', () => {
     if (!window.confirm('Clear all data on this device? This cannot be undone.')) return;
     clearAll();
@@ -212,5 +215,42 @@ function settingsRestoreModal(text) {
     uiToast('Owner key restored. Reconnecting to the shared store...');
     if (uiState.syncRefresh) await uiState.syncRefresh();
     uiState.rerender();
+  });
+}
+
+
+// ---- Recipe collections: each imported library is a choice. Peace Meal's own recipes and yours are always on. ----
+const SETTINGS_USDA_NOTICE = 'Please note that RFK Jr\'s racoon-dick brain may have somehow overseen or influenced these so-called nutritional "facts" from this USDA recipe directory. No raccoon dicks or bear cub meat should be included as ingredient options, but it doesn\'t hurt to double check because he is the second largest and clinically insane turd of the century. Proceed with caution - have a peaceful meal!';
+function settingsCollectionsHTML(profile) {
+  const on = Object.assign({ nhs: false, wikibooks: true, usda: false }, profile.recipe_collections || {});
+  const n = appCollectionCounts();
+  return `<div class="card">
+    <p class="small">Tick a collection to include its recipes in search, the week plan, and Pantry. Untick it to leave all of them out. Recipes written for Peace Meal and your own are always included.</p>
+    ${uiSwitch('coll-wikibooks', `Wikibooks Cookbook (${n.wikibooks.toLocaleString()} recipes)`, 'Community recipes from around the world under a Creative Commons licence. No nutrition data until you link ingredients.', on.wikibooks)}
+    ${uiSwitch('coll-nhs', `NHS recipes, United Kingdom (${n.nhs.toLocaleString()} recipes)`, 'Dietitian-written family recipes with calories, fat, sugar, and salt per serving. British dishes and measures.', on.nhs)}
+    ${uiSwitch('coll-usda', `USDA MyPlate Kitchen, United States (${n.usda.toLocaleString()} recipes)`, n.usda ? 'American home cooking with per-serving nutrition. Public domain.' : 'Not loaded in this build.', on.usda)}
+  </div>`;
+}
+function settingsBindCollections(root, profile) {
+  const setColl = (key, value) => {
+    profile.recipe_collections = Object.assign({ nhs: false, wikibooks: true, usda: false }, profile.recipe_collections || {}, { [key]: value });
+    uiPersist();
+    if (typeof uiState.refreshRecipes === 'function') uiState.refreshRecipes();
+    uiToast(value ? 'Collection included.' : 'Collection left out.');
+    if (typeof uiState.rerender === 'function') uiState.rerender();
+  };
+  for (const key of ['wikibooks', 'nhs']) {
+    const el = root.querySelector('#coll-' + key);
+    if (el) el.addEventListener('change', () => setColl(key, el.checked));
+  }
+  const usda = root.querySelector('#coll-usda');
+  if (usda) usda.addEventListener('change', () => {
+    if (!usda.checked) { setColl('usda', false); return; }
+    usda.checked = false;
+    const m = uiModal(`<p class="notice-text" style="font-size:1.05em;line-height:1.5">${uiEsc(SETTINGS_USDA_NOTICE)}</p>
+      <div class="row gap" style="margin-top:1rem"><button class="btn primary" type="button" id="coll-usda-yes">Include them</button><button class="btn" type="button" id="coll-usda-no">Leave them out</button></div>`, { title: 'Before you include the USDA recipes' });
+    const yes = document.getElementById('coll-usda-yes'), no = document.getElementById('coll-usda-no');
+    if (yes) yes.addEventListener('click', () => { if (uiState.modalClose) uiState.modalClose(); setColl('usda', true); });
+    if (no) no.addEventListener('click', () => { if (uiState.modalClose) uiState.modalClose(); });
   });
 }

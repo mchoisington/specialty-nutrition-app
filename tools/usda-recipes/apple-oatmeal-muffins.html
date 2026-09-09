@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Personalized-health routes (M1 privacy-by-route, owner-approved):
+       /my, /my/*, /account, /account/* and /auth/* hold a signed-in person's
+       diet/weight/dose data. This first script computes ONE path verdict and
+       splits it into TWO lanes, because the two third-party stacks now answer
+       to different rules (owner ruling 2026-09-05, mp-hhqz.9):
+
+         __adsBlocked        — ad tech (Journey). True on every health-private
+                               path, exactly as before. A later wave opens this
+                               lane for free accounts; nothing here moves yet.
+         __analyticsBlocked  — usage analytics (the Google tag, and PostHog for
+                               session replay + product analytics). True on
+                               /auth always, true under Global Privacy Control
+                               always, and true on /my + /account until the
+                               account holder answers yes, which is what the
+                               first-party mp_ax cookie records.
+
+       Why a cookie and not a fetch: this runs before React, before any network
+       call, on the FIRST paint. An answer the head cannot read is an answer we
+       cannot honor in time, and a script that loads before we check has already
+       collected. Both laws that shape this — the FTC Health Breach Notification
+       Rule and the Washington/Nevada consumer health data acts — bite at the
+       moment the vendor receives the data, so the gate has to be the LOAD.
+
+       __healthPrivate stays as the raw path verdict. Pinterest, Ahrefs and
+       Statcounter are staying out of the signed-in area for good, so all three
+       check it directly and neither lane can ever let them back in. Microsoft
+       Clarity used to be the fourth: its Terms of Use forbid use with
+       health-care content, which consent cannot cure, so it never entered the
+       signed-in area, and on 2026-09-07 the owner removed it from the public
+       pages too once PostHog had proven itself (mp-7is9.7). PostHog is the one
+       replay tool on every surface.
+
+       These are a SEPARATE, ADDITIVE layer to __eduSafe below (edu-safe drops
+       ads + replay but keeps GA/Ahrefs/Statcounter).
+
+       Load-time check: signed-in visits LAND on these paths, and every SPA
+       navigation that crosses this boundary is forced to a full document load
+       (crossesPrivacyBoundary in src/lib/navigation.ts) so this head gate
+       re-runs — which is also how a fresh answer takes effect. Keep the regex
+       in sync with HEALTH_PRIVATE_PATHS, the two-segment regex with
+       SIGNED_IN_AREA_PATHS, and the cookie test with ANALYTICS_CONSENT_YES_RE,
+       all in src/lib/ads/config.ts (tests assert all three).
+       The (/|$) suffix makes "my" cover every /my/* child while leaving the
+       public /myplan and /myplate-* pages OUTSIDE the gate. -->
+  <script>
+    window.__healthPrivate = /^\/(my|account|auth)(\/|$)/.test(location.pathname);
+    window.__adsBlocked = window.__healthPrivate;
+    window.__analyticsBlocked =
+      !!navigator.globalPrivacyControl ||
+      (window.__healthPrivate &&
+        !(/^\/(my|account)(\/|$)/.test(location.pathname) &&
+          /(?:^|;\s*)mp_ax=1(?:\s*;|\s*$)/.test(document.cookie)));
+  </script>
+
+  <!-- Ahrefs Analytics — loaded via a guard (was a bare tag) so it NEVER runs
+       on health-private routes, or when the visitor sends Global Privacy
+       Control (GPC). Edu-safe behavior is unchanged: it still loads on edu-safe
+       surfaces (only the health-private + GPC skips are added here).
+       __healthPrivate, not __adsBlocked: Ahrefs stays out of the signed-in area
+       permanently, so it must not follow the ads lane when that lane opens. -->
+  <script>
+    (function () {
+      if (window.__adsBlocked || window.__healthPrivate || navigator.globalPrivacyControl) return;
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://analytics.ahrefs.com/analytics.js";
+      s.setAttribute("data-key", "ArLMQajY3Zwc6nRWIMbhGA");
+      document.head.appendChild(s);
+    })();
+  </script>
+
+  <!-- Google tag (gtag.js) — gated on __analyticsBlocked: never on /auth, never
+       under Global Privacy Control (GPC), and on /my + /account only once the
+       account holder has said yes. On every other route (incl. edu-safe) GA
+       loads exactly as before. Wrapped in a guarded IIFE so the loader tag AND
+       the config page_view are gated together; window.gtag is assigned only
+       when it actually loads. -->
+  <script>
+    (function () {
+      if (window.__analyticsBlocked || navigator.globalPrivacyControl) return;
+      var g = document.createElement("script");
+      g.async = true;
+      g.src = "https://www.googletagmanager.com/gtag/js?id=G-F677CE22S0";
+      document.head.appendChild(g);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      window.gtag = gtag;
+      // Consent Mode v2 defaults — MUST precede the `config` call (which fires the
+      // first page_view) so consent state is declared on every event of every
+      // page. Undeclared/unpropagated consent is one of Google's documented GA4
+      // "(not set)" causes. Display ads are LIVE via Journey by Mediavine
+      // (2026-07-06, guarded loader below); Journey ships its own CMP (TCF) that
+      // governs ad requests in consent regions, so these gtag ad_* defaults stay
+      // denied as the correct pre-consent posture — Journey's CMP is the consent
+      // authority for the ad stack. See docs/monetization-readiness.md.
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'granted',
+        functionality_storage: 'granted',
+        security_storage: 'granted',
+      });
+      gtag('js', new Date());
+      // Inside the signed-in area the URL is the one place a food name, a dose
+      // or a search term could ride out to Google, so the first page_view is
+      // sent with the query string stripped off BOTH the page and the referrer
+      // (SPA route changes go through trackPageView in src/lib/analytics.ts,
+      // which strips the same way). Everywhere else the call is untouched.
+      if (/^\/(my|account)(\/|$)/.test(location.pathname)) {
+        var ref = "";
+        try {
+          if (document.referrer) {
+            var r = new URL(document.referrer);
+            ref = r.origin + r.pathname;
+          }
+        } catch (e) {
+          ref = "";
+        }
+        gtag('config', 'G-F677CE22S0', {
+          page_location: location.origin + location.pathname,
+          page_path: location.pathname,
+          page_referrer: ref,
+        });
+      } else {
+        gtag('config', 'G-F677CE22S0');
+      }
+    })();
+  </script>
+
+  <!-- Education-safe surfaces (classroom pledge, owner-approved 2026-07-07):
+       on these paths NO ad stack and NO session-replay loads — behavioral
+       ads/tracking around minors is the COPPA line that makes district
+       approval impossible, and the pledge on those pages must be TRUE.
+       Load-time check: classroom visits LAND on these paths (shared links),
+       which is the case that matters; every navigation that crosses this
+       boundary is forced to a full document load (crossesEduSafeBoundary in
+       src/lib/navigation.ts), so this head gate re-runs and neither the ad
+       stack nor session replay leaks across it. Keep in sync with
+       EDU_SAFE_PATHS in src/lib/ads/config.ts (test asserts both).
+       Scope since 2026-09-01 (mp-13d.23): only the pages where STUDENTS are
+       on the page — the teacher and professional hubs are adult surfaces and
+       carry the ad stack. -->
+  <script>
+    window.__eduSafe = /^\/(quizzes|es\/quizzes|ko\/quizzes|schools|build-a-day|es\/arma-tu-dia|fr\/compose-ta-journee|de\/tag-zusammenstellen|ko\/하루-식단-만들기|ko\/%ED%95%98%EB%A3%A8-%EC%8B%9D%EB%8B%A8-%EB%A7%8C%EB%93%A4%EA%B8%B0)(\/|$)/
+      .test(location.pathname);
+  </script>
+
+  <!-- Journey by Mediavine (Grow) — display ads, auto-placed by their script.
+       Loaded via a guard instead of a bare tag so the ad stack NEVER runs:
+       (a) inside any iframe (incl. our /embed/* widget on partner sites),
+       (b) on the /embed/* routes themselves,
+       (c) off the production domain (dev servers, CI smoke runs),
+       (d) on education-safe surfaces (__eduSafe above),
+       (e) on the ads lane's blocked surfaces (__adsBlocked above — /my,
+           /account, /auth get no ad stack), or
+       (f) when the visitor sends Global Privacy Control (an opt-out signal we
+           honor everywhere for the ad stack).
+       Attributes preserved from Mediavine's snippet: data-noptimize (HTML
+       optimizers must not touch it), data-cfasync=false (Rocket Loader skip). -->
+  <script>
+    (function () {
+      if (window.__eduSafe || window.__adsBlocked || navigator.globalPrivacyControl) return;
+      if (window.top !== window) return;
+      if (location.pathname.indexOf("/embed/") === 0) return;
+      if (!/(^|\.)myplate\.food$/.test(location.hostname)) return;
+      // SETTLE GATE (2026-07-17): don't let Journey's auto-inserter measure the
+      // page until our layout has settled. The prerendered shell is a crawler
+      // fallback the React app REPLACES client-side, and the conversion banner
+      // mounts after hydration — if Journey measures before those, its
+      // auto-insertion re-places units mid-reflow and glitches (stuck spinner,
+      // adhesion shade over content, "[object HTMLDivElement]" text nodes —
+      // owner screenshot 7/17). The app dispatches "myplate:layout-settled"
+      // once its first render has painted (src/App.tsx); we add one idle beat,
+      // then load. Fallback: if the signal never comes (app JS error), load
+      // 8s after window load anyway — ads must not be held hostage.
+      var loaded = false;
+      function load() {
+        if (loaded) return;
+        loaded = true;
+        var s = document.createElement("script");
+        s.async = true;
+        s.src = "//scripts.scriptwrapper.com/tags/2855f7da-ecf5-4e1e-b9ef-209fd6473940.js";
+        s.setAttribute("data-noptimize", "1");
+        s.setAttribute("data-cfasync", "false");
+        document.head.appendChild(s);
+      }
+      window.addEventListener(
+        "myplate:layout-settled",
+        function () {
+          if ("requestIdleCallback" in window) {
+            requestIdleCallback(load, { timeout: 2000 });
+          } else {
+            setTimeout(load, 300);
+          }
+        },
+        { once: true },
+      );
+      window.addEventListener("load", function () {
+        setTimeout(load, 8000);
+      });
+    })();
+  </script>
+
+  <!-- PostHog — session replay + product analytics, for the SIGNED-IN AREA ONLY
+       (owner ruling 2026-09-05, mp-hhqz.9). This is the tool that answers
+       "where do people get stuck on /my", which nothing has been able to answer
+       since third-party analytics left these routes in July.
+
+       THREE conditions, all required, in this order:
+         1. a project key exists. Empty key = nothing loads, ever. A half-wired
+            analytics vendor must collect nothing rather than collect under a
+            placeholder. Keep PH_KEY identical to POSTHOG_KEY in
+            src/lib/ads/config.ts — a test asserts it.
+         2. __analyticsBlocked is false: on a public page that only means the
+            visitor is not sending Global Privacy Control (the same lane Google
+            Analytics runs in); on /my and /account it also needs the mp_ax
+            cookie to say yes. Owner ruling 2026-09-06: PostHog runs everywhere
+            the analytics lane runs, and the consent gate applies to the
+            signed-in surfaces only.
+         3. GPC re-checked directly, same belt-and-braces as every loader here.
+
+       TWO SURFACES, ONE LOADER (mp-7is9.10). Everything a reader might expect
+       to differ between the public site and the signed-in area differs in ONE
+       place: the `isPrivate` switch below, read from window.__healthPrivate.
+
+         public pages   — inputs masked, page text visible (it is our own copy),
+                          autocapture on, heatmaps on, surveys on, PostHog's own
+                          error capture on.
+         /my, /account  — every input AND every text node masked, autocapture
+                          off, heatmaps off, surveys off, error capture off.
+                          Nothing but the event NAME (plus a closed enum where
+                          one is declared) ever leaves these screens.
+
+       Why the split is safe: a signed-in screen shows what someone eats,
+       weighs and takes. A public calculator page shows what we wrote. Text
+       masking is the difference between the two, and a survey answer or an
+       autocaptured click on /my could carry free text that no masking reaches,
+       so those stay off there rather than being masked. capture_exceptions is
+       in the same bucket: an exception MESSAGE is free text we do not control.
+
+       Load-time, not render-time: every navigation that crosses the boundary
+       is a full document load (crossesPrivacyBoundary), so this script re-runs
+       and the right half of the switch is always the one in force. The
+       autocapture url_ignorelist is the second lock on the same door.
+
+       WHAT IT NEVER SEES, ON EITHER SURFACE. capture_pageview is off because
+       we send our own query-stripped page view from src/lib/analytics.ts.
+       person_profiles is "identified_only" and we NEVER call the person-naming
+       call, so no person profile is ever created and no Clerk user id is ever
+       sent. Copied text is never captured.
+
+       sanitize_properties is the URL backstop: PostHog stamps $current_url and
+       $referrer onto events it raises itself, a heatmap event keys its data by
+       URL, and an exception carries the script URL that threw — a query string
+       is the one place a food name or a search term could leave the site, so
+       every property that can hold a URL is cut back to origin + path before
+       send. -->
+  <script>
+    (function () {
+      var PH_KEY = "phc_zw4pjtzRB7YvPX8Yj7uGhTkVYK82ixTAjyEkAnyqQv6i";
+      if (!PH_KEY) return;
+      if (window.__analyticsBlocked || navigator.globalPrivacyControl) return;
+
+      // PostHog's array.js loader stub: queue calls made before the library
+      // arrives, then let it replay them. Written out rather than pasted
+      // minified so the next reader can see what it does.
+      var ph = window.posthog || [];
+      if (!ph.__SV) {
+        window.posthog = ph;
+        ph._i = [];
+        ph.init = function (key, config, name) {
+          var target = ph;
+          if (name !== undefined) target = ph[name] = [];
+          else name = "posthog";
+          target.people = target.people || [];
+          var methods = ("init capture register register_once unregister opt_in_capturing" +
+            " opt_out_capturing has_opted_in_capturing has_opted_out_capturing" +
+            " clear_opt_in_out_capturing startSessionRecording stopSessionRecording" +
+            " sessionRecordingStarted get_session_id get_distinct_id reset identify" +
+            " setPersonProperties group alias set_config debug getFeatureFlag" +
+            " isFeatureEnabled reloadFeatureFlags onFeatureFlags captureException").split(" ");
+          for (var i = 0; i < methods.length; i++) {
+            (function (method) {
+              target[method] = function () {
+                target.push([method].concat(Array.prototype.slice.call(arguments, 0)));
+              };
+            })(methods[i]);
+          }
+          ph._i.push([key, config, name]);
+          var s = document.createElement("script");
+          s.type = "text/javascript";
+          s.crossOrigin = "anonymous";
+          s.async = true;
+          s.src = "https://us-assets.i.posthog.com/static/array.js";
+          var first = document.getElementsByTagName("script")[0];
+          first.parentNode.insertBefore(s, first);
+        };
+        ph.__SV = 1;
+      }
+
+      // Cut every URL-bearing property back to origin + path. Runs on OUR
+      // events and on the ones PostHog raises by itself.
+      function stripUrl(value) {
+        if (typeof value !== "string") return value;
+        try {
+          var u = new URL(value);
+          return u.origin + u.pathname;
+        } catch (e) {
+          return value.split("#")[0].split("?")[0];
+        }
+      }
+
+      function isArray(v) {
+        return Object.prototype.toString.call(v) === "[object Array]";
+      }
+
+      // The one switch. True on /my, /account and /auth (PostHog never loads on
+      // /auth at all — __analyticsBlocked is true there whatever the answer).
+      var isPrivate = !!window.__healthPrivate;
+      // The classroom pledge (edu-safe surfaces above): no session replay and
+      // no behavioural capture around students. Page views and error reports
+      // still count, as Google Analytics does there. With Microsoft Clarity
+      // gone (2026-09-07, mp-7is9.7) this switch is what keeps the pledge true;
+      // tests/smoke/edu-safe.spec.ts reads it back through the init config.
+      var isEdu = !!window.__eduSafe;
+
+      // PH_FILTER_START
+      // Third-party exceptions never reach the error feed (mp-7is9.12). This is
+      // the rule the first-party js_error path applies in src/lib/analytics.ts
+      // (isFirstPartyScriptUrl, THIRD_PARTY_REJECTION_SIGNATURES), written a
+      // second time here because this script runs before any module does; the
+      // two lists are kept identical by tests/scripts/posthog-exception-filter
+      // .test.mjs. Without it the feed was the ad chain's own failures (the
+      // UID2 loader timing out under ad blockers on /food-groups, 2026-09-07)
+      // and the browser's ResizeObserver notice, and a first-party regression
+      // sat under them. An exception nobody can attribute stays in.
+      var THIRD_PARTY_SIGNATURES = [
+        "Failed parsing identifiers",
+        "window.optable",
+        "UID2 SDK",
+        "$adManagementConfig",
+        "[object XMLHttpRequest]",
+        "Failed validating event",
+        "ResizeObserver loop",
+      ];
+      function isFirstPartyScriptUrl(url) {
+        try {
+          var u = new URL(url, location.href);
+          if (u.protocol !== "http:" && u.protocol !== "https:") return false;
+          return (
+            u.hostname === location.hostname ||
+            u.hostname === "myplate.food" ||
+            /\.myplate\.food$/.test(u.hostname)
+          );
+        } catch (e) {
+          return true;
+        }
+      }
+      function isThirdPartyException(properties) {
+        if (!properties) return false;
+        var messages = [];
+        var urls = [];
+        var list = properties.$exception_list;
+        if (isArray(list)) {
+          for (var i = 0; i < list.length; i++) {
+            var item = list[i] || {};
+            if (typeof item.value === "string") messages.push(item.value);
+            var frames = item.stacktrace && item.stacktrace.frames;
+            if (!isArray(frames)) continue;
+            for (var f = 0; f < frames.length; f++) {
+              var name = frames[f] && frames[f].filename;
+              if (typeof name === "string" && name) urls.push(name);
+            }
+          }
+        }
+        if (typeof properties.$exception_message === "string") messages.push(properties.$exception_message);
+        if (typeof properties.$exception_source === "string" && properties.$exception_source) {
+          urls.push(properties.$exception_source);
+        }
+        for (var m = 0; m < messages.length; m++) {
+          for (var s = 0; s < THIRD_PARTY_SIGNATURES.length; s++) {
+            if (messages[m].indexOf(THIRD_PARTY_SIGNATURES[s]) !== -1) return true;
+          }
+        }
+        if (urls.length === 0) return false;
+        for (var k = 0; k < urls.length; k++) {
+          if (isFirstPartyScriptUrl(urls[k])) return false;
+        }
+        return true;
+      }
+      // PH_FILTER_END
+
+      window.posthog.init(PH_KEY, {
+        // The filter above, applied to every exception PostHog raises itself.
+        before_send: function (event) {
+          if (event && event.event === "$exception" && isThirdPartyException(event.properties)) {
+            return null;
+          }
+          return event;
+        },
+        api_host: "https://us.i.posthog.com",
+        person_profiles: "identified_only",
+        capture_pageview: false,
+        // Page LEAVE stays on: it is what turns two page views into a time on
+        // screen, which is the whole question this lane exists to answer. It is
+        // safe only because sanitize_properties below rewrites the $current_url
+        // PostHog stamps on it — that event is raised by the library, not by us,
+        // so it would otherwise carry the raw URL we are careful never to send.
+        capture_pageleave: true,
+        // Clicks, form submits and change events on the public site — this is
+        // what replaced Microsoft Clarity's heatmaps (Clarity itself went on
+        // 2026-09-07). Never in the signed-in
+        // area: a click on a food row is a record of what someone eats.
+        autocapture: isPrivate || isEdu
+          ? false
+          : {
+              // A copy of page text is a copy of whatever was selected, and a
+              // selection can include text a person typed.
+              capture_copied_text: false,
+              // Belt to the load-time switch's braces: even if this config were
+              // ever in force on a signed-in URL, nothing would be captured.
+              url_ignorelist: [/^https?:\/\/[^/]+\/(my|account|auth)(\/|$)/],
+              // Element attributes ride along on an autocaptured click. These
+              // two are the only ones that can hold what someone typed or the
+              // hint we showed them; the rest are our own markup.
+              element_attribute_ignorelist: ["value", "placeholder"],
+            },
+        enable_heatmaps: !isPrivate && !isEdu,
+        disable_surveys: isPrivate || isEdu,
+        disable_session_recording: isEdu,
+        // PostHog's own uncaught-error capture. Public pages only: an exception
+        // MESSAGE is free text nobody wrote a rule for, and on a signed-in
+        // screen it could quote a food, a dose or a note. Those screens keep
+        // the first-party js_error path in src/lib/analytics.ts instead, which
+        // sends a name-only count and never the text.
+        capture_exceptions: !isPrivate,
+        // Flags must never hold up a render. Three seconds, then the caller's
+        // safe default wins (src/lib/flags.ts).
+        feature_flag_request_timeout_ms: 3000,
+        session_recording: isPrivate
+          ? // Every input and every text node. The masking is config here
+            // rather than an attribute on our DOM, so it cannot be defeated by
+            // a component that forgets to carry a marker.
+            { maskAllInputs: true, maskTextSelector: "*" }
+          : // Public pages: what a visitor types is masked, what we wrote is
+            // visible — a replay of a blanked-out calculator answers nothing.
+            // .ph-mask is the opt-in hook for any public text that should join
+            // the masked side later.
+            { maskAllInputs: true, maskTextSelector: ".ph-mask" },
+        sanitize_properties: function (properties) {
+          if (!properties) return properties;
+          var urlKeys = ["$current_url", "$referrer", "$initial_current_url", "$initial_referrer"];
+          for (var i = 0; i < urlKeys.length; i++) {
+            if (properties[urlKeys[i]]) properties[urlKeys[i]] = stripUrl(properties[urlKeys[i]]);
+          }
+          if (properties.$pathname) properties.$pathname = stripUrl(properties.$pathname);
+          // A heatmap event keys its click map by the URL the clicks happened
+          // on, so the query string hides in the KEY rather than in a value.
+          // Two URLs that differ only by query string collapse into one entry,
+          // which is the right answer for a heatmap anyway.
+          var heat = properties.$heatmap_data;
+          if (heat && typeof heat === "object") {
+            var merged = {};
+            for (var key in heat) {
+              if (Object.prototype.hasOwnProperty.call(heat, key)) {
+                var clean = stripUrl(key);
+                merged[clean] = isArray(merged[clean])
+                  ? merged[clean].concat(heat[key])
+                  : heat[key];
+              }
+            }
+            properties.$heatmap_data = merged;
+          }
+          // An exception carries the URL of the script that threw, once per
+          // stack frame, plus a link back to the person's profile we never
+          // want minted in the first place.
+          var list = properties.$exception_list;
+          if (isArray(list)) {
+            for (var j = 0; j < list.length; j++) {
+              var frames = list[j] && list[j].stacktrace && list[j].stacktrace.frames;
+              if (!isArray(frames)) continue;
+              for (var k = 0; k < frames.length; k++) {
+                if (frames[k] && frames[k].filename) {
+                  frames[k].filename = stripUrl(frames[k].filename);
+                }
+              }
+            }
+          }
+          if (properties.$exception_source) {
+            properties.$exception_source = stripUrl(properties.$exception_source);
+          }
+          delete properties.$exception_personURL;
+          return properties;
+        },
+      });
+    })();
+  </script>
+
+  <!-- Pinterest Tag — visitor analytics for the claimed Pinterest business
+       account. Same guards as the ad stack: never on education-safe surfaces
+       (no ad-tech around students), never on health-private surfaces (/my,
+       /account, /auth — checked directly, because Pinterest stays out of the
+       signed-in area permanently and must not follow the ads lane when it
+       opens), never when the visitor sends Global Privacy Control,
+       never in iframes or /embed/*, production hostname only. Enhanced-match
+       (em) deliberately OMITTED — we do not share user emails with Pinterest.
+       No <noscript> pixel: it can't honor the edu-safe gate and would fire for
+       the no-JS crawlers we pledge not to track. SPA route changes fire
+       pintrk('page') via trackPageView in src/lib/analytics.ts. -->
+  <script>
+    (function () {
+      if (window.__eduSafe || window.__adsBlocked || window.__healthPrivate || navigator.globalPrivacyControl) return;
+      if (window.top !== window) return;
+      if (location.pathname.indexOf("/embed/") === 0) return;
+      if (!/(^|\.)myplate\.food$/.test(location.hostname)) return;
+      !function(e){if(!window.pintrk){window.pintrk = function () {
+      window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var
+        n=window.pintrk;n.queue=[],n.version="3.0";var
+        t=document.createElement("script");t.async=!0,t.src=e;var
+        r=document.getElementsByTagName("script")[0];
+        r.parentNode.insertBefore(t,r)}}("https://s.pinimg.com/ct/core.js");
+      window.pintrk('load', '2612456533260');
+      window.pintrk('page');
+    })();
+  </script>
+
+  <meta charset="UTF-8" />
+  <!-- viewport-fit=cover so env(safe-area-inset-*) resolves to real values in
+       the tracker's standalone PWA shell; on every other surface the insets are
+       0 and all existing safe-area uses are max()-guarded, so layouts are
+       unchanged. -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
+
+  <!-- Site verification (Impact / Instacart affiliate — uses value=, not content=) -->
+  <meta name="impact-site-verification" value="602918d3-0ef7-40f1-9e16-136c26885f9a" />
+
+  <!-- Pinterest domain claim (business account, added 2026-07-07) -->
+  <meta name="p:domain_verify" content="c8fb574862a4793e9bdf0c7959756c55" />
+
+  <!-- Primary Meta Tags -->
+  <title>Apple Oatmeal Muffins, 231 calories | MyPlate Kitchen</title>
+  <meta name="title" content="Apple Oatmeal Muffins, 231 calories | MyPlate Kitchen" />
+  <meta name="description"
+    content="Buy apples while they are in season and on sale and make batches of these muffins to put in the freezer for later. 231 calories a serving, makes 6 muffins." />
+  <meta name="author" content="myplate.food" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="canonical" href="https://myplate.food/recipes/apple-oatmeal-muffins" />
+  <link rel="alternate" hreflang="en" href="https://myplate.food/recipes/apple-oatmeal-muffins" />
+  <link rel="alternate" hreflang="es" href="https://myplate.food/es/recipes/muffins-de-manzana-y-avena" />
+  <link rel="alternate" hreflang="ko" href="https://myplate.food/ko/recipes/사과-오트밀-머핀" />
+  <link rel="alternate" hreflang="fr" href="https://myplate.food/fr/recipes/muffins-aux-pommes-et-a-l-avoine" />
+  <link rel="alternate" hreflang="de" href="https://myplate.food/de/recipes/apfel-haferflocken-muffins" />
+  <link rel="alternate" hreflang="x-default" href="https://myplate.food/recipes/apple-oatmeal-muffins" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico" sizes="32x32" />
+  <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://myplate.food/recipes/apple-oatmeal-muffins" />
+  <meta property="og:title" content="Apple Oatmeal Muffins, 231 calories | MyPlate Kitchen" />
+  <meta property="og:description"
+    content="Buy apples while they are in season and on sale and make batches of these muffins to put in the freezer for later. 231 calories a serving, makes 6 muffins." />
+  <meta property="og:image" content="https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg" />
+  <meta property="og:image:width" content="800" />
+  <meta property="og:image:height" content="516" />
+  <meta property="og:site_name" content="MyPlate.food" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://myplate.food/recipes/apple-oatmeal-muffins" />
+  <meta property="twitter:title" content="Apple Oatmeal Muffins, 231 calories | MyPlate Kitchen" />
+  <meta property="twitter:description"
+    content="Buy apples while they are in season and on sale and make batches of these muffins to put in the freezer for later. 231 calories a serving, makes 6 muffins." />
+  <meta property="twitter:image" content="https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg" />
+
+  <!-- Theme -->
+  <meta name="theme-color" content="#10B981" />
+
+  <!-- Crawler-fallback content inside #root is for non-JS crawlers
+       (GPTBot, ClaudeBot, link unfurlers, etc.). Hide it visually so
+       humans don't see the unstyled-flash-of-fallback before React
+       mounts; the DOM text stays parseable for crawlers. React's
+       createRoot wipes the children of #root on first commit, so
+       this rule has no impact once the app has mounted. -->
+  <style>[data-fallback]{display:none}</style>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet" />
+  <script type="module" crossorigin src="/assets/index-Bh3e4Jez.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/vendor-react-DOW9amNY.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-clerk-DMd1QEUH.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-radix-CSb74HUv.js">
+  <link rel="stylesheet" crossorigin href="/assets/index-By5Gg9BK.css">
+  <link rel="modulepreload" href="/assets/home-Dm2kKGKb.js" />
+  <link rel="modulepreload" href="/assets/en-DwaIzTJe.js" />
+  <!--mpf-prerendered-->
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"MyPlate.food","url":"https://myplate.food","logo":"https://myplate.food/logo.png","description":"An independent nutrition platform preserving the USDA MyPlate format after USDA retired the MyPlate.gov website in January 2026 and replaced MyPlate with a different visual framework in the 2025–2030 edition. Offers free MyPlate Plan and DRI calculators, the preserved 1,072-recipe MyPlate Kitchen library, calorie-level meal plans, food-group guides, quizzes, and printables — plus calculators for other national dietary guidelines — built on the USDA Dietary Guidelines for Americans (2020–2025) and National Academies DRI methodology.","sameAs":["https://www.instagram.com/myplate.food/","https://www.tiktok.com/@myplate.food"],"contactPoint":{"@type":"ContactPoint","contactType":"customer support","url":"https://myplate.food","availableLanguage":["English","Spanish","Korean","French","German"]},"parentOrganization":{"@type":"Organization","name":"Reindex Ventures LLC","url":"https://reindexventures.com","subOrganization":[{"@type":"Organization","name":"MyPlate.food","url":"https://myplate.food"},{"@type":"Organization","name":"Presidential Fitness Test","url":"https://presidentialtest.fitness"},{"@type":"Organization","name":"Areacode","url":"https://areacode.fyi"}]},"citation":[{"@type":"CreativeWork","name":"Dietary Guidelines for Americans, 2020–2025","url":"https://www.dietaryguidelines.gov/sites/default/files/2021-03/Dietary_Guidelines_for_Americans-2020-2025.pdf"},{"@type":"CreativeWork","name":"Dietary Reference Intakes (DRI)","publisher":"National Academies of Sciences, Engineering, and Medicine","url":"https://nap.nationalacademies.org/topic/383/dietary-reference-intakes"},{"@type":"CreativeWork","name":"Dietary Guidelines for Americans, 2025–2030","url":"https://cdn.realfood.gov/DGA.pdf"},{"@type":"CreativeWork","name":"RealFood.gov","url":"https://realfood.gov"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Recipe","name":"Apple Oatmeal Muffins","description":"Buy apples while they are in season and on sale and make batches of these muffins to put in the freezer for later. You can also substitute whole wheat flour to make your muffins heartier and more nutritious.","image":["https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg"],"url":"https://myplate.food/recipes/apple-oatmeal-muffins","author":{"@type":"Organization","name":"USDA Center for Nutrition Policy and Promotion","url":"https://www.myplate.gov/"},"publisher":{"@type":"Organization","name":"MyPlate.food","url":"https://myplate.food"},"recipeYield":"6 Muffins","recipeIngredient":["1/2 cup milk, non-fat","1/3 cup applesauce, unsweetened","1/2 cup all-purpose flour","1/2 cup quick-cooking oats, uncooked","1 cup sugar","1/2 tablespoon baking powder","1/2 teaspoon ground cinnamon","1 tart apple, cored & chopped"],"recipeInstructions":[{"@type":"HowToStep","name":"Wash hands with soap and water.","text":"Wash hands with soap and water.","url":"https://myplate.food/recipes/apple-oatmeal-muffins#step-1","image":"https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg"},{"@type":"HowToStep","name":"Preheat oven to 400 °F.","text":"Preheat oven to 400 °F. Place 6 cupcake holders in baking tin.","url":"https://myplate.food/recipes/apple-oatmeal-muffins#step-2","image":"https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg"},{"@type":"HowToStep","name":"In a mixing bowl, add milk and applesauce.","text":"In a mixing bowl, add milk and applesauce.","url":"https://myplate.food/recipes/apple-oatmeal-muffins#step-3","image":"https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg"},{"@type":"HowToStep","name":"Stir until blended.","text":"Stir until blended.","url":"https://myplate.food/recipes/apple-oatmeal-muffins#step-4","image":"https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg"},{"@type":"HowToStep","name":"Stir in flour, oats, sugar, baking powder, and…","text":"Stir in flour, oats, sugar, baking powder, and cinnamon.","url":"https://myplate.food/recipes/apple-oatmeal-muffins#step-5","image":"https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg"},{"@type":"HowToStep","name":"Mix until moistened (do not over mix).","text":"Mix until moistened (do not over mix).","url":"https://myplate.food/recipes/apple-oatmeal-muffins#step-6","image":"https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg"},{"@type":"HowToStep","name":"Gently stir in the chopped apples.","text":"Gently stir in the chopped apples.","url":"https://myplate.food/recipes/apple-oatmeal-muffins#step-7","image":"https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg"},{"@type":"HowToStep","name":"Spoon into cupcake holders.","text":"Spoon into cupcake holders.","url":"https://myplate.food/recipes/apple-oatmeal-muffins#step-8","image":"https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg"},{"@type":"HowToStep","name":"Bake for 15-20 minutes or until an inserted…","text":"Bake for 15-20 minutes or until an inserted toothpick comes out clean.","url":"https://myplate.food/recipes/apple-oatmeal-muffins#step-9","image":"https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg"},{"@type":"HowToStep","name":"Cool in pan 5 minutes before serving.","text":"Cool in pan 5 minutes before serving.","url":"https://myplate.food/recipes/apple-oatmeal-muffins#step-10","image":"https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg"},{"@type":"HowToStep","name":"Store unused portions in an airtight container.","text":"Store unused portions in an airtight container.","url":"https://myplate.food/recipes/apple-oatmeal-muffins#step-11","image":"https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg"}],"nutrition":{"@type":"NutritionInformation","calories":"231 calories","fatContent":"0.73 g","saturatedFatContent":"0.11 g","cholesterolContent":"0.61 mg","sodiumContent":"131.47 mg","carbohydrateContent":"53.61 g","fiberContent":"1.92 g","sugarContent":"39.69 g","proteinContent":"2.74 g","servingSize":"1 muffin"},"aggregateRating":{"@type":"AggregateRating","ratingValue":3.97,"ratingCount":330,"bestRating":5,"worstRating":1},"isAccessibleForFree":true,"license":"https://creativecommons.org/publicdomain/mark/1.0/","usageInfo":"https://myplate.food/partners#recipe-licensing","isBasedOn":"https://www.myplate.gov/recipes/apple-oatmeal-muffins","keywords":"Fruit, Grains, USDA Recipes, MyPlate Kitchen, MyPlate Recipes","sourceOrganization":{"@type":"Organization","name":"Simple Healthy Recipes — Oklahoma Nutrition Information and Education - ONIE Project"},"datePublished":"2025-08-26","recipeCategory":"Bread"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://myplate.food/"},{"@type":"ListItem","position":2,"name":"Recipes","item":"https://myplate.food/recipes"},{"@type":"ListItem","position":3,"name":"Apple Oatmeal Muffins","item":"https://myplate.food/recipes/apple-oatmeal-muffins"}]}</script>
+</head>
+
+<body>
+  <!-- Journey/Grow ad-unit blocklist (pairs with the dashboard toggles;
+       their script reads this div ONCE per document load — so this is a
+       per-device axis, never per-page: SPA swaps would carry the landing
+       page's decision across routes). Site-wide because index.html is the
+       shell for every route: no interstitials, no auto-insert sticky, no
+       GumGum skins, no ZergNet. Universal Player (outstream video, the
+       highest-CPM unit) runs on DESKTOP only (mp-nduk, owner 2026-08-22);
+       mobile stays blocked — the small viewport already carries the
+       adhesion unit, and the calculator flows are the conversion surface.
+       Adhesion, leaderboard, sidebar, in-content, recipe ads, Chicory stay
+       allowed. Outside #root so React never touches it. -->
+  <div id="ad-management-config-settings" data-blocklist-auto-insert-sticky="1" data-blocklist-zergnet="1" data-blocklist-interstitial-mobile="1" data-blocklist-interstitial-desktop="1" data-blocklist-universal-player-mobile="1" data-blocklist-gumgum-skins="1"></div>
+
+  <div id="root">
+    <article class="entry-content">
+    <h1>Apple Oatmeal Muffins</h1>
+    <p>Buy apples while they are in season and on sale and make batches of these muffins to put in the freezer for later. You can also substitute whole wheat flour to make your muffins heartier and more nutritious.</p>
+    <img src="https://storage.googleapis.com/peppermint-cdn/myplate.food-recipe-images/apple-oatmeal-muffins.jpg" alt="Apple Oatmeal Muffins" width="800" />
+    <dl>
+      <dt>Yield</dt><dd>6 Muffins</dd>
+      <dt>Serving size</dt><dd>1 muffin</dd>
+      <dt>Rating</dt><dd>3.97 of 5 (330 ratings collected on MyPlate Kitchen before 2026)</dd>
+    </dl>
+    <h2>Food groups</h2>
+    <ul>
+      <li>Fruit: 1/4 cups</li>
+      <li>Grains: 1 ounces</li>
+    </ul>
+    <h2>Ingredients</h2>
+    <ul>
+      <li>1/2 cup milk, non-fat</li>
+      <li>1/3 cup applesauce, unsweetened</li>
+      <li>1/2 cup all-purpose flour</li>
+      <li>1/2 cup quick-cooking oats, uncooked</li>
+      <li>1 cup sugar</li>
+      <li>1/2 tablespoon baking powder</li>
+      <li>1/2 teaspoon ground cinnamon</li>
+      <li>1 tart apple, cored &amp; chopped</li>
+    </ul>
+    <h2>Directions</h2>
+    <ol>
+      <li>Wash hands with soap and water.</li>
+      <li>Preheat oven to 400 °F. Place 6 cupcake holders in baking tin.</li>
+      <li>In a mixing bowl, add milk and applesauce.</li>
+      <li>Stir until blended.</li>
+      <li>Stir in flour, oats, sugar, baking powder, and cinnamon.</li>
+      <li>Mix until moistened (do not over mix).</li>
+      <li>Gently stir in the chopped apples.</li>
+      <li>Spoon into cupcake holders.</li>
+      <li>Bake for 15-20 minutes or until an inserted toothpick comes out clean.</li>
+      <li>Cool in pan 5 minutes before serving.</li>
+      <li>Store unused portions in an airtight container.</li>
+    </ol>
+    <h2>Nutrition per serving</h2>
+    <table>
+      <thead><tr><th>Nutrient</th><th>Amount</th></tr></thead>
+      <tbody>
+        <tr><td>Total Calories</td><td>230.9</td></tr>
+        <tr><td>Total Fat</td><td>0.73 g</td></tr>
+        <tr><td>Saturated Fat</td><td>0.11 g</td></tr>
+        <tr><td>Monounsaturated Fat</td><td>0 g</td></tr>
+        <tr><td>Polyunsaturated Fat</td><td>0 g</td></tr>
+        <tr><td>Linoleic Acid</td><td>0 g</td></tr>
+        <tr><td>α-Linolenic Acid</td><td>0 g</td></tr>
+        <tr><td>Omega 3 - EPA</td><td>0 g</td></tr>
+        <tr><td>Omega 3 - DHA</td><td>0 g</td></tr>
+        <tr><td>Cholesterol</td><td>0.61 mg</td></tr>
+        <tr><td>Carbohydrates</td><td>53.61 g</td></tr>
+        <tr><td>Dietary Fiber</td><td>1.92 g</td></tr>
+        <tr><td>Total Sugars</td><td>39.69 g</td></tr>
+        <tr><td>Added Sugars included</td><td>33 g</td></tr>
+        <tr><td>Protein</td><td>2.74 g</td></tr>
+        <tr><td>Calcium</td><td>104 mg</td></tr>
+        <tr><td>Potassium</td><td>116 mg</td></tr>
+        <tr><td>Sodium</td><td>131.47 mg</td></tr>
+        <tr><td>Copper</td><td>0 mg</td></tr>
+        <tr><td>Iron</td><td>1 mg</td></tr>
+        <tr><td>Magnesium</td><td>16 mg</td></tr>
+        <tr><td>Phosphorus</td><td>89 mg</td></tr>
+        <tr><td>Selenium</td><td>6 mg</td></tr>
+        <tr><td>Zinc</td><td>0 mg</td></tr>
+        <tr><td>Vitamin A</td><td>14 mcg</td></tr>
+        <tr><td>Vitamin B6</td><td>0 mg</td></tr>
+        <tr><td>Vitamin B12</td><td>0.1 mcg</td></tr>
+        <tr><td>Vitamin C</td><td>2 mg</td></tr>
+        <tr><td>Vitamin D</td><td>0 mcg</td></tr>
+        <tr><td>Vitamin E</td><td>0 mg</td></tr>
+        <tr><td>Vitamin K</td><td>1 mcg</td></tr>
+        <tr><td>Folate</td><td>33 mcg</td></tr>
+        <tr><td>Thiamin</td><td>0.1 mg</td></tr>
+        <tr><td>Riboflavin</td><td>0.1 mg</td></tr>
+        <tr><td>Niacin</td><td>1 mg</td></tr>
+        <tr><td>Choline</td><td>9 mg</td></tr>
+      </tbody>
+    </table>
+    <h2>Notes</h2>
+    <p data-noprose>Optional toppings: raisins, walnuts.</p>
+
+    <h2>Recipes you may also like</h2>
+    <ul>
+      <li><a href="/recipes/potato-soup-0">Potato Soup</a></li>
+      <li><a href="/recipes/italian-broccoli-and-pasta">Italian Broccoli and Pasta</a></li>
+      <li><a href="/recipes/red-potato-salad">Red Potato Salad</a></li>
+      <li><a href="/recipes/blue-corn-pan-bread">Blue Corn Pan Bread</a></li>
+      <li><a href="/recipes/black-bean-soup">Black Bean Soup</a></li>
+      <li><a href="/recipes/peanutty-stew">Peanutty Stew</a></li>
+      <li><a href="/recipes/broccoli-baked-potatoes">Broccoli Baked Potatoes</a></li>
+      <li><a href="/recipes/pizza-eggburger">Pizza Eggburger</a></li>
+    </ul>
+
+    <h2>Source</h2>
+    <p><strong>Recipe by:</strong> Simple Healthy Recipes — Oklahoma Nutrition Information and Education - ONIE Project</p>
+    <p><strong>Published by:</strong> the U.S. Department of Agriculture (Center for Nutrition Policy and Promotion / SNAP-Ed) on MyPlate Kitchen at <a href="https://www.myplate.gov/recipes/apple-oatmeal-muffins">https://www.myplate.gov/recipes/apple-oatmeal-muffins</a>. Federal works are public domain in the United States.</p>
+    <p><strong>This edition:</strong> preserved and enhanced by MyPlate.food — cleaned and completed data, structured nutrition and food-group amounts, images remastered from the USDA originals, and translations into Spanish, French, Korean, and German. The original USDA recipe is public domain; this enhanced edition is free to cite and reuse with credit to MyPlate.food. Custom licensing: <a href="/partners#recipe-licensing">myplate.food/partners</a>.</p>
+    <section>
+      <h2>Keep exploring</h2>
+      <a href="/meal-plans">Ready-Made Meal Plans</a>
+      <a href="/quizzes">Quizzes</a>
+      <a href="/printables">Printables</a>
+      <a href="/food-diary-template">Food Diary Template</a>
+      <a href="/serving-up-myplate">Serving Up MyPlate</a>
+      <a href="/calculator">Calculator</a>
+      <a href="/food-groups">Food Groups</a>
+      <a href="/nutrition-statistics">Nutrition Statistics</a>
+      <a href="/myplate-for-older-adults">MyPlate for Older Adults</a>
+      <a href="/myplate-for-pregnancy">MyPlate for Pregnancy</a>
+    </section>
+    <nav aria-label="Site navigation">
+      <a href="/">Home</a>
+      <a href="/recipes">All Recipes</a>
+      <a href="/calculator">MyPlate Calculator</a>
+      <a href="/food-groups">Food Groups</a>
+    </nav>
+  </article>
+  </div>
+  </div>
+
+  <!-- Statcounter — loaded via a guard (was a bare tag) so it NEVER runs on
+       health-private routes (__healthPrivate, set in <head> — checked directly,
+       because Statcounter stays out of the signed-in area permanently and must
+       not follow the ads lane when it opens) or under Global
+       Privacy Control (GPC). Edu-safe behavior is unchanged: it still loads on
+       edu-safe surfaces (only the health-private + GPC skips are added). The
+       counter.js reads the sc_* globals, so they're set on the same guarded
+       path. Its <noscript> pixel was REMOVED (not kept like a plain counter
+       would): a noscript img can't honor the health-private/GPC gates, and the
+       privacy policy's "Statcounter does not load or run on /my" claim must be
+       true absolutely — same rationale as the omitted Pinterest noscript pixel. -->
+  <script type="text/javascript">
+    (function () {
+      if (window.__adsBlocked || window.__healthPrivate || navigator.globalPrivacyControl) return;
+      window.sc_project = 13211394;
+      window.sc_invisible = 1;
+      window.sc_security = "34feadd2";
+      var s = document.createElement("script");
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://www.statcounter.com/counter/counter.js";
+      document.body.appendChild(s);
+    })();
+  </script>
+  <div data-fallback>
+      <nav aria-label="Site directory">
+        <a href="/dri-calculator">Dri Calculator</a>
+        <a href="/bmr-calculator">Bmr Calculator</a>
+        <a href="/tdee-calculator">Tdee Calculator</a>
+        <a href="/calorie-deficit-calculator">Deficit Calculator</a>
+        <a href="/macro-calculator">Macro Calculator</a>
+        <a href="/protein-calculator">Protein Calculator</a>
+        <a href="/ideal-weight-calculator">Ideal Weight Calculator</a>
+        <a href="/bmi-calculator">BMI Calculator</a>
+        <a href="/body-fat-calculator">Body Fat Calculator</a>
+        <a href="/ffmi-calculator">Ffmi Calculator</a>
+        <a href="/lean-body-mass-calculator">Lean Body Mass Calculator</a>
+        <a href="/waist-to-height-ratio-calculator">Waist To Height Ratio Calculator</a>
+        <a href="/waist-to-hip-ratio-calculator">Waist To Hip Ratio Calculator</a>
+        <a href="/water-intake-calculator">Water Intake Calculator</a>
+        <a href="/weight-loss-percentage-calculator">Weight Loss Percentage Calculator</a>
+        <a href="/one-rep-max-calculator">One Rep Max Calculator</a>
+        <a href="/glp-1-protein-calculator">GLP-1 Protein Calculator</a>
+        <a href="/calculators">Calculators</a>
+        <a href="/meal-planner">Meal Planner</a>
+        <a href="/calorie-tracker">Calorie Tracker</a>
+        <a href="/build-a-day">Build A Day</a>
+        <a href="/fitness-tools">Fitness Tools</a>
+        <a href="/for-professionals">For Professionals</a>
+        <a href="/partners">Partners</a>
+        <a href="/for-teachers">For Teachers</a>
+        <a href="/es/para-maestros">Para Maestros</a>
+        <a href="/supporters">Supporters</a>
+        <a href="/what-is-myplate">What Is MyPlate</a>
+        <a href="/myplate-for-older-adults">MyPlate for Older Adults</a>
+        <a href="/myplate-for-pregnancy">MyPlate for Pregnancy &amp; Breastfeeding</a>
+        <a href="/nutrition-statistics">Nutrition Statistics</a>
+        <a href="/pro-kit">Clinic &amp; Classroom Kit</a>
+        <a href="/guideline-watch">Guideline Watch</a>
+        <a href="/whats-new">What&#39;s New</a>
+        <a href="/glp-1">GLP-1 Diet Guide</a>
+        <a href="/glp-1/foods">GLP-1 Food List</a>
+        <a href="/glp-1/protein">Muscle Loss on GLP-1s</a>
+        <a href="/glp-1-companion">GLP-1 Companion</a>
+        <a href="/glp-1/meal-plan">GLP-1 Meal Plan</a>
+        <a href="/food-groups/fruits">Fruits Food Group</a>
+        <a href="/food-groups/vegetables">Vegetables Food Group</a>
+        <a href="/food-groups/grains">Grains Food Group</a>
+        <a href="/food-groups/protein-foods">Protein Foods Food Group</a>
+        <a href="/food-groups/dairy">Dairy Food Group</a>
+        <a href="/recipes">Recipes</a>
+        <a href="/meal-plans">Ready-Made Meal Plans</a>
+        <a href="/meal-prep">Meal Prep</a>
+        <a href="/healthy-breakfast-ideas">Healthy breakfast ideas</a>
+        <a href="/high-protein-meal-prep">High-protein meal prep</a>
+        <a href="/sunday-dinner-ideas">Sunday dinner ideas</a>
+        <a href="/family-dinner-ideas">Family dinner ideas</a>
+        <a href="/healthy-snacks-for-kids">Healthy snacks for kids</a>
+        <a href="/freezer-meals">Freezer meals</a>
+        <a href="/cheap-healthy-meals">Cheap healthy meals</a>
+        <a href="/vegan-recipes">Vegan recipes</a>
+        <a href="/foods">Grocery Picks</a>
+        <a href="/quizzes">Quizzes</a>
+        <a href="/es/quizzes">Cuestionarios (español)</a>
+        <a href="/printables">Printables</a>
+        <a href="/es/printables">Imprimibles (español)</a>
+        <a href="/ko/quizzes">퀴즈 (한국어)</a>
+        <a href="/ko/printables">인쇄물 (한국어)</a>
+        <a href="/food-diary-template">Food Diary Template</a>
+        <a href="/myplate-worksheets">MyPlate Worksheets</a>
+        <a href="/myfitnesspal-alternative">MyFitnessPal Alternative</a>
+        <a href="/meal-planner-template">Meal Planning Template</a>
+        <a href="/">myplate home</a>
+        <a href="/calculator">myplate calculator</a>
+        <a href="/food-groups">myplate food-groups</a>
+        <a href="/portions">myplate portions</a>
+        <a href="/methodology">myplate methodology</a>
+        <a href="/realfood-gov">myplate realfood-gov</a>
+        <a href="/plato/en">plato home</a>
+        <a href="/plato">plato home es</a>
+        <a href="/plato/en/calculator">plato calculator</a>
+        <a href="/plato/calculadora">plato calculator es</a>
+        <a href="/plato/en/food-groups">plato food-groups</a>
+        <a href="/plato/grupos-alimenticios">plato food-groups es</a>
+        <a href="/plato/en/portions">plato portions</a>
+        <a href="/plato/porciones">plato portions es</a>
+        <a href="/plato/en/methodology">plato methodology</a>
+        <a href="/plato/metodologia">plato methodology es</a>
+        <a href="/plato/en/jarra-del-buen-beber">plato jarra-del-buen-beber</a>
+        <a href="/plato/jarra-del-buen-beber">plato jarra-del-buen-beber es</a>
+        <a href="/plato/en/sellos">plato sellos</a>
+        <a href="/plato/sellos">plato sellos es</a>
+        <a href="/plato/en/recommendations-2023">plato recomendaciones-2023</a>
+        <a href="/plato/recomendaciones-2023">plato recomendaciones-2023 es</a>
+        <a href="/canada">canada home</a>
+        <a href="/canada/calculator">canada calculator</a>
+        <a href="/canada/food-groups">canada food-groups</a>
+        <a href="/canada/methodology">canada methodology</a>
+        <a href="/canada/plant-proteins">canada plant-proteins</a>
+        <a href="/canada/healthy-habits">canada healthy-habits</a>
+        <a href="/canada/water">canada water</a>
+        <a href="/canada/warning-symbols">canada fop-symbols</a>
+        <a href="/canada/indigenous-foodways">canada indigenous-foodways</a>
+        <a href="/korea">korea home</a>
+        <a href="/korea/calculator">korea calculator</a>
+        <a href="/korea/food-groups">korea food-groups</a>
+        <a href="/korea/methodology">korea methodology</a>
+        <a href="/korea/korean-meal-structure">korea korean-meal</a>
+        <a href="/korea/fermented-foods">korea fermented-foods</a>
+        <a href="/korea/sodium">korea sodium</a>
+        <a href="/korea/nine-guidelines">korea nine-guidelines</a>
+        <a href="/korea/food-labeling">korea food-labeling</a>
+        <a href="/planetary">eatlancet home</a>
+        <a href="/planetary/calculator">eatlancet calculator</a>
+        <a href="/planetary/reference-diet">eatlancet food-groups</a>
+        <a href="/planetary/methodology">eatlancet methodology</a>
+        <a href="/planetary/planetary-boundaries">eatlancet planetary-boundaries</a>
+        <a href="/planetary/great-food-transformation">eatlancet great-food-transformation</a>
+        <a href="/planetary/cultural-adaptation">eatlancet cultural-adaptation</a>
+        <a href="/planetary/debate">eatlancet phd-controversy</a>
+        <a href="/planetary/vs-national-guidelines">eatlancet phd-vs-national</a>
+        <a href="/diabetes">diabetes home</a>
+        <a href="/diabetes/food-groups">diabetes food-groups</a>
+        <a href="/diabetes/portions">diabetes portions</a>
+        <a href="/diabetes/methodology">diabetes methodology</a>
+        <a href="/diabetes/eating-patterns">diabetes eating-patterns</a>
+        <a href="/diabetes/beverages">diabetes beverages</a>
+        <a href="/australia">australia home</a>
+        <a href="/australia/calculator">australia calculator</a>
+        <a href="/australia/food-groups">australia food-groups</a>
+        <a href="/australia/methodology">australia methodology</a>
+        <a href="/australia/healthy-eating-pyramid">australia healthy-eating-pyramid</a>
+        <a href="/ernaehrungspyramide/en">dach home</a>
+        <a href="/ernaehrungspyramide">dach home de</a>
+        <a href="/ernaehrungspyramide/en/portion-calculator">dach calculator</a>
+        <a href="/ernaehrungspyramide/portionsrechner">dach calculator de</a>
+        <a href="/ernaehrungspyramide/en/food-groups">dach food-groups</a>
+        <a href="/ernaehrungspyramide/lebensmittelgruppen">dach food-groups de</a>
+        <a href="/ernaehrungspyramide/en/energy-requirements">dach methodology</a>
+        <a href="/ernaehrungspyramide/energiebedarf">dach methodology de</a>
+        <a href="/ernaehrungspyramide/en/dge-nutrition-circle">dach ernaehrungskreis</a>
+        <a href="/ernaehrungspyramide/ernaehrungskreis">dach ernaehrungskreis de</a>
+        <a href="/ernaehrungspyramide/en/dge-recommendations">dach dge-empfehlungen</a>
+        <a href="/ernaehrungspyramide/dge-empfehlungen">dach dge-empfehlungen de</a>
+        <a href="/ernaehrungspyramide/en/austrian-food-pyramid">dach oesterreich</a>
+        <a href="/ernaehrungspyramide/oesterreichische-ernaehrungspyramide">dach oesterreich de</a>
+        <a href="/ernaehrungspyramide/en/swiss-food-pyramid">dach schweiz</a>
+        <a href="/ernaehrungspyramide/schweizer-lebensmittelpyramide">dach schweiz de</a>
+        <a href="/about">About</a>
+        <a href="/ko/accessibility">접근성 안내 (한국어)</a>
+        <a href="/myplan">MyPlan Account</a>
+        <a href="/api">API</a>
+        <a href="/mcp">MCP Server</a>
+        <a href="/press">Press</a>
+        <a href="/editorial-policy">Editorial Policy</a>
+        <a href="/serving-up-myplate">Serving Up MyPlate</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/privacy/health-data">Consumer Health Data Privacy</a>
+        <a href="/terms">Terms</a>
+      </nav>
+  </div>
+<script id="recipe-data" type="application/json" data-slug="apple-oatmeal-muffins">{"slug":"apple-oatmeal-muffins","usda_recipe_id":"320219","url":"https://www.myplate.gov/recipes/apple-oatmeal-muffins","name":"Apple Oatmeal Muffins","description":"Buy apples while they are in season and on sale and make batches of these muffins to put in the freezer for later. You can also substitute whole wheat flour to make your muffins heartier and more nutritious.","date_published":"Tue, 08/26/2025 - 12:09","rating_value":3.97,"rating_count":330,"image_url":"https://myplate-prod.azureedge.us/sites/default/files/styles/large/public/2021-10/appple%20muffin.jpg?itok=o6VUiy14","image_file":"apple-oatmeal-muffins.jpg","serving_size":"1 muffin","ingredients":[{"text":"1/2 cup milk, non-fat","note":null},{"text":"1/3 cup applesauce, unsweetened","note":null},{"text":"1/2 cup all-purpose flour","note":null},{"text":"1/2 cup quick-cooking oats, uncooked","note":null},{"text":"1 cup sugar","note":null},{"text":"1/2 tablespoon baking powder","note":null},{"text":"1/2 teaspoon ground cinnamon","note":null},{"text":"1 tart apple, cored & chopped","note":null}],"directions":"Wash hands with soap and water. Preheat oven to 400 °F. Place 6 cupcake holders in baking tin. In a mixing bowl, add milk and applesauce. Stir until blended. Stir in flour, oats, sugar, baking powder, and cinnamon. Mix until moistened (do not over mix). Gently stir in the chopped apples. Spoon into cupcake holders. Bake for 15-20 minutes or until an inserted toothpick comes out clean. Cool in pan 5 minutes before serving. Store unused portions in an airtight container.","notes":"Optional toppings: raisins, walnuts.","notes_links":[{"label":"Apples","url":"https://snaped.fns.usda.gov/seasonal-produce-guide/apples"}],"source":"Simple Healthy Recipes — Oklahoma Nutrition Information and Education - ONIE Project","nutrition":[{"name":"Total Calories","key":"total_calories","amount":230.9,"unit":null,"group":null,"indent":0},{"name":"Total Fat","key":"total_fat","amount":0.73,"unit":"g","group":null,"indent":0},{"name":"Saturated Fat","key":"saturated_fat","amount":0.11,"unit":"g","group":null,"indent":2},{"name":"Monounsaturated Fat","key":"monounsaturated_fat","amount":0,"unit":"g","group":null,"indent":2},{"name":"Polyunsaturated Fat","key":"polyunsaturated_fat","amount":0,"unit":"g","group":null,"indent":2},{"name":"Linoleic Acid","key":"linoleic_acid","amount":0,"unit":"g","group":null,"indent":2},{"name":"α-Linolenic Acid","key":"a_linoleic_acid","amount":0,"unit":"g","group":null,"indent":2},{"name":"Omega 3 - EPA","key":"omega_3_epa","amount":0,"unit":"g","group":null,"indent":2},{"name":"Omega 3 - DHA","key":"omega_3_dha","amount":0,"unit":"g","group":null,"indent":2},{"name":"Cholesterol","key":"cholesterol","amount":0.61,"unit":"mg","group":null,"indent":0},{"name":"Carbohydrates","key":"carbohydrates","amount":53.61,"unit":"g","group":null,"indent":0},{"name":"Dietary Fiber","key":"dietary_fiber","amount":1.92,"unit":"g","group":null,"indent":2},{"name":"Total Sugars","key":"total_sugars","amount":39.69,"unit":"g","group":null,"indent":2},{"name":"Added Sugars included","key":"added_sugars","amount":33,"unit":"g","group":null,"indent":3},{"name":"Protein","key":"protein","amount":2.74,"unit":"g","group":null,"indent":0},{"name":"Calcium","key":"calcium","amount":104,"unit":"mg","group":"Minerals","indent":0},{"name":"Potassium","key":"potassium","amount":116,"unit":"mg","group":"Minerals","indent":0},{"name":"Sodium","key":"sodium","amount":131.47,"unit":"mg","group":"Minerals","indent":0},{"name":"Copper","key":"copper","amount":0,"unit":"mg","group":"Minerals","indent":0},{"name":"Iron","key":"iron","amount":1,"unit":"mg","group":"Minerals","indent":0},{"name":"Magnesium","key":"magnesium","amount":16,"unit":"mg","group":"Minerals","indent":0},{"name":"Phosphorus","key":"phosphorus","amount":89,"unit":"mg","group":"Minerals","indent":0},{"name":"Selenium","key":"selenium","amount":6,"unit":"mg","group":"Minerals","indent":0},{"name":"Zinc","key":"zinc","amount":0,"unit":"mg","group":"Minerals","indent":0},{"name":"Vitamin A","key":"vitamin_a","amount":14,"unit":"mcg","group":"Vitamins","indent":0},{"name":"Vitamin B6","key":"vitamin_b6","amount":0,"unit":"mg","group":"Vitamins","indent":0},{"name":"Vitamin B12","key":"vitamin_b12","amount":0.1,"unit":"mcg","group":"Vitamins","indent":0},{"name":"Vitamin C","key":"vitamin_c","amount":2,"unit":"mg","group":"Vitamins","indent":0},{"name":"Vitamin D","key":"vitamin_d","amount":0,"unit":"mcg","group":"Vitamins","indent":0},{"name":"Vitamin E","key":"vitamin_e","amount":0,"unit":"mg","group":"Vitamins","indent":0},{"name":"Vitamin K","key":"vitamin_k","amount":1,"unit":"mcg","group":"Vitamins","indent":0},{"name":"Folate","key":"folate","amount":33,"unit":"mcg","group":"Vitamins","indent":0},{"name":"Thiamin","key":"thiamin","amount":0.1,"unit":"mg","group":"Vitamins","indent":0},{"name":"Riboflavin","key":"riboflavin","amount":0.1,"unit":"mg","group":"Vitamins","indent":0},{"name":"Niacin","key":"niacin","amount":1,"unit":"mg","group":"Vitamins","indent":0},{"name":"Choline","key":"choline","amount":9,"unit":"mg","group":"Vitamins","indent":0}],"food_groups":[{"key":"fruits","label":"Fruit","amount":0.25,"unit":"cups","amount_text":"1/4 cups"},{"key":"grains","label":"Grains","amount":1,"unit":"ounces","amount_text":"1 ounces"}],"usda_related_slugs":["potato-soup-0","italian-broccoli-and-pasta","red-potato-salad","blue-corn-pan-bread","black-bean-soup","peanutty-stew","broccoli-baked-potatoes","pizza-eggburger"],"yield":"6 Muffins"}</script>
+</body>
+
+</html>

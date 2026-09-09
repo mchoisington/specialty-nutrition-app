@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Personalized-health routes (M1 privacy-by-route, owner-approved):
+       /my, /my/*, /account, /account/* and /auth/* hold a signed-in person's
+       diet/weight/dose data. This first script computes ONE path verdict and
+       splits it into TWO lanes, because the two third-party stacks now answer
+       to different rules (owner ruling 2026-09-05, mp-hhqz.9):
+
+         __adsBlocked        — ad tech (Journey). True on every health-private
+                               path, exactly as before. A later wave opens this
+                               lane for free accounts; nothing here moves yet.
+         __analyticsBlocked  — usage analytics (the Google tag, and PostHog for
+                               session replay + product analytics). True on
+                               /auth always, true under Global Privacy Control
+                               always, and true on /my + /account until the
+                               account holder answers yes, which is what the
+                               first-party mp_ax cookie records.
+
+       Why a cookie and not a fetch: this runs before React, before any network
+       call, on the FIRST paint. An answer the head cannot read is an answer we
+       cannot honor in time, and a script that loads before we check has already
+       collected. Both laws that shape this — the FTC Health Breach Notification
+       Rule and the Washington/Nevada consumer health data acts — bite at the
+       moment the vendor receives the data, so the gate has to be the LOAD.
+
+       __healthPrivate stays as the raw path verdict. Pinterest, Ahrefs and
+       Statcounter are staying out of the signed-in area for good, so all three
+       check it directly and neither lane can ever let them back in. Microsoft
+       Clarity used to be the fourth: its Terms of Use forbid use with
+       health-care content, which consent cannot cure, so it never entered the
+       signed-in area, and on 2026-09-07 the owner removed it from the public
+       pages too once PostHog had proven itself (mp-7is9.7). PostHog is the one
+       replay tool on every surface.
+
+       These are a SEPARATE, ADDITIVE layer to __eduSafe below (edu-safe drops
+       ads + replay but keeps GA/Ahrefs/Statcounter).
+
+       Load-time check: signed-in visits LAND on these paths, and every SPA
+       navigation that crosses this boundary is forced to a full document load
+       (crossesPrivacyBoundary in src/lib/navigation.ts) so this head gate
+       re-runs — which is also how a fresh answer takes effect. Keep the regex
+       in sync with HEALTH_PRIVATE_PATHS, the two-segment regex with
+       SIGNED_IN_AREA_PATHS, and the cookie test with ANALYTICS_CONSENT_YES_RE,
+       all in src/lib/ads/config.ts (tests assert all three).
+       The (/|$) suffix makes "my" cover every /my/* child while leaving the
+       public /myplan and /myplate-* pages OUTSIDE the gate. -->
+  <script>
+    window.__healthPrivate = /^\/(my|account|auth)(\/|$)/.test(location.pathname);
+    window.__adsBlocked = window.__healthPrivate;
+    window.__analyticsBlocked =
+      !!navigator.globalPrivacyControl ||
+      (window.__healthPrivate &&
+        !(/^\/(my|account)(\/|$)/.test(location.pathname) &&
+          /(?:^|;\s*)mp_ax=1(?:\s*;|\s*$)/.test(document.cookie)));
+  </script>
+
+  <!-- Ahrefs Analytics — loaded via a guard (was a bare tag) so it NEVER runs
+       on health-private routes, or when the visitor sends Global Privacy
+       Control (GPC). Edu-safe behavior is unchanged: it still loads on edu-safe
+       surfaces (only the health-private + GPC skips are added here).
+       __healthPrivate, not __adsBlocked: Ahrefs stays out of the signed-in area
+       permanently, so it must not follow the ads lane when that lane opens. -->
+  <script>
+    (function () {
+      if (window.__adsBlocked || window.__healthPrivate || navigator.globalPrivacyControl) return;
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://analytics.ahrefs.com/analytics.js";
+      s.setAttribute("data-key", "ArLMQajY3Zwc6nRWIMbhGA");
+      document.head.appendChild(s);
+    })();
+  </script>
+
+  <!-- Google tag (gtag.js) — gated on __analyticsBlocked: never on /auth, never
+       under Global Privacy Control (GPC), and on /my + /account only once the
+       account holder has said yes. On every other route (incl. edu-safe) GA
+       loads exactly as before. Wrapped in a guarded IIFE so the loader tag AND
+       the config page_view are gated together; window.gtag is assigned only
+       when it actually loads. -->
+  <script>
+    (function () {
+      if (window.__analyticsBlocked || navigator.globalPrivacyControl) return;
+      var g = document.createElement("script");
+      g.async = true;
+      g.src = "https://www.googletagmanager.com/gtag/js?id=G-F677CE22S0";
+      document.head.appendChild(g);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      window.gtag = gtag;
+      // Consent Mode v2 defaults — MUST precede the `config` call (which fires the
+      // first page_view) so consent state is declared on every event of every
+      // page. Undeclared/unpropagated consent is one of Google's documented GA4
+      // "(not set)" causes. Display ads are LIVE via Journey by Mediavine
+      // (2026-07-06, guarded loader below); Journey ships its own CMP (TCF) that
+      // governs ad requests in consent regions, so these gtag ad_* defaults stay
+      // denied as the correct pre-consent posture — Journey's CMP is the consent
+      // authority for the ad stack. See docs/monetization-readiness.md.
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'granted',
+        functionality_storage: 'granted',
+        security_storage: 'granted',
+      });
+      gtag('js', new Date());
+      // Inside the signed-in area the URL is the one place a food name, a dose
+      // or a search term could ride out to Google, so the first page_view is
+      // sent with the query string stripped off BOTH the page and the referrer
+      // (SPA route changes go through trackPageView in src/lib/analytics.ts,
+      // which strips the same way). Everywhere else the call is untouched.
+      if (/^\/(my|account)(\/|$)/.test(location.pathname)) {
+        var ref = "";
+        try {
+          if (document.referrer) {
+            var r = new URL(document.referrer);
+            ref = r.origin + r.pathname;
+          }
+        } catch (e) {
+          ref = "";
+        }
+        gtag('config', 'G-F677CE22S0', {
+          page_location: location.origin + location.pathname,
+          page_path: location.pathname,
+          page_referrer: ref,
+        });
+      } else {
+        gtag('config', 'G-F677CE22S0');
+      }
+    })();
+  </script>
+
+  <!-- Education-safe surfaces (classroom pledge, owner-approved 2026-07-07):
+       on these paths NO ad stack and NO session-replay loads — behavioral
+       ads/tracking around minors is the COPPA line that makes district
+       approval impossible, and the pledge on those pages must be TRUE.
+       Load-time check: classroom visits LAND on these paths (shared links),
+       which is the case that matters; every navigation that crosses this
+       boundary is forced to a full document load (crossesEduSafeBoundary in
+       src/lib/navigation.ts), so this head gate re-runs and neither the ad
+       stack nor session replay leaks across it. Keep in sync with
+       EDU_SAFE_PATHS in src/lib/ads/config.ts (test asserts both).
+       Scope since 2026-09-01 (mp-13d.23): only the pages where STUDENTS are
+       on the page — the teacher and professional hubs are adult surfaces and
+       carry the ad stack. -->
+  <script>
+    window.__eduSafe = /^\/(quizzes|es\/quizzes|ko\/quizzes|schools|build-a-day|es\/arma-tu-dia|fr\/compose-ta-journee|de\/tag-zusammenstellen|ko\/하루-식단-만들기|ko\/%ED%95%98%EB%A3%A8-%EC%8B%9D%EB%8B%A8-%EB%A7%8C%EB%93%A4%EA%B8%B0)(\/|$)/
+      .test(location.pathname);
+  </script>
+
+  <!-- Journey by Mediavine (Grow) — display ads, auto-placed by their script.
+       Loaded via a guard instead of a bare tag so the ad stack NEVER runs:
+       (a) inside any iframe (incl. our /embed/* widget on partner sites),
+       (b) on the /embed/* routes themselves,
+       (c) off the production domain (dev servers, CI smoke runs),
+       (d) on education-safe surfaces (__eduSafe above),
+       (e) on the ads lane's blocked surfaces (__adsBlocked above — /my,
+           /account, /auth get no ad stack), or
+       (f) when the visitor sends Global Privacy Control (an opt-out signal we
+           honor everywhere for the ad stack).
+       Attributes preserved from Mediavine's snippet: data-noptimize (HTML
+       optimizers must not touch it), data-cfasync=false (Rocket Loader skip). -->
+  <script>
+    (function () {
+      if (window.__eduSafe || window.__adsBlocked || navigator.globalPrivacyControl) return;
+      if (window.top !== window) return;
+      if (location.pathname.indexOf("/embed/") === 0) return;
+      if (!/(^|\.)myplate\.food$/.test(location.hostname)) return;
+      // SETTLE GATE (2026-07-17): don't let Journey's auto-inserter measure the
+      // page until our layout has settled. The prerendered shell is a crawler
+      // fallback the React app REPLACES client-side, and the conversion banner
+      // mounts after hydration — if Journey measures before those, its
+      // auto-insertion re-places units mid-reflow and glitches (stuck spinner,
+      // adhesion shade over content, "[object HTMLDivElement]" text nodes —
+      // owner screenshot 7/17). The app dispatches "myplate:layout-settled"
+      // once its first render has painted (src/App.tsx); we add one idle beat,
+      // then load. Fallback: if the signal never comes (app JS error), load
+      // 8s after window load anyway — ads must not be held hostage.
+      var loaded = false;
+      function load() {
+        if (loaded) return;
+        loaded = true;
+        var s = document.createElement("script");
+        s.async = true;
+        s.src = "//scripts.scriptwrapper.com/tags/2855f7da-ecf5-4e1e-b9ef-209fd6473940.js";
+        s.setAttribute("data-noptimize", "1");
+        s.setAttribute("data-cfasync", "false");
+        document.head.appendChild(s);
+      }
+      window.addEventListener(
+        "myplate:layout-settled",
+        function () {
+          if ("requestIdleCallback" in window) {
+            requestIdleCallback(load, { timeout: 2000 });
+          } else {
+            setTimeout(load, 300);
+          }
+        },
+        { once: true },
+      );
+      window.addEventListener("load", function () {
+        setTimeout(load, 8000);
+      });
+    })();
+  </script>
+
+  <!-- PostHog — session replay + product analytics, for the SIGNED-IN AREA ONLY
+       (owner ruling 2026-09-05, mp-hhqz.9). This is the tool that answers
+       "where do people get stuck on /my", which nothing has been able to answer
+       since third-party analytics left these routes in July.
+
+       THREE conditions, all required, in this order:
+         1. a project key exists. Empty key = nothing loads, ever. A half-wired
+            analytics vendor must collect nothing rather than collect under a
+            placeholder. Keep PH_KEY identical to POSTHOG_KEY in
+            src/lib/ads/config.ts — a test asserts it.
+         2. __analyticsBlocked is false: on a public page that only means the
+            visitor is not sending Global Privacy Control (the same lane Google
+            Analytics runs in); on /my and /account it also needs the mp_ax
+            cookie to say yes. Owner ruling 2026-09-06: PostHog runs everywhere
+            the analytics lane runs, and the consent gate applies to the
+            signed-in surfaces only.
+         3. GPC re-checked directly, same belt-and-braces as every loader here.
+
+       TWO SURFACES, ONE LOADER (mp-7is9.10). Everything a reader might expect
+       to differ between the public site and the signed-in area differs in ONE
+       place: the `isPrivate` switch below, read from window.__healthPrivate.
+
+         public pages   — inputs masked, page text visible (it is our own copy),
+                          autocapture on, heatmaps on, surveys on, PostHog's own
+                          error capture on.
+         /my, /account  — every input AND every text node masked, autocapture
+                          off, heatmaps off, surveys off, error capture off.
+                          Nothing but the event NAME (plus a closed enum where
+                          one is declared) ever leaves these screens.
+
+       Why the split is safe: a signed-in screen shows what someone eats,
+       weighs and takes. A public calculator page shows what we wrote. Text
+       masking is the difference between the two, and a survey answer or an
+       autocaptured click on /my could carry free text that no masking reaches,
+       so those stay off there rather than being masked. capture_exceptions is
+       in the same bucket: an exception MESSAGE is free text we do not control.
+
+       Load-time, not render-time: every navigation that crosses the boundary
+       is a full document load (crossesPrivacyBoundary), so this script re-runs
+       and the right half of the switch is always the one in force. The
+       autocapture url_ignorelist is the second lock on the same door.
+
+       WHAT IT NEVER SEES, ON EITHER SURFACE. capture_pageview is off because
+       we send our own query-stripped page view from src/lib/analytics.ts.
+       person_profiles is "identified_only" and we NEVER call the person-naming
+       call, so no person profile is ever created and no Clerk user id is ever
+       sent. Copied text is never captured.
+
+       sanitize_properties is the URL backstop: PostHog stamps $current_url and
+       $referrer onto events it raises itself, a heatmap event keys its data by
+       URL, and an exception carries the script URL that threw — a query string
+       is the one place a food name or a search term could leave the site, so
+       every property that can hold a URL is cut back to origin + path before
+       send. -->
+  <script>
+    (function () {
+      var PH_KEY = "phc_zw4pjtzRB7YvPX8Yj7uGhTkVYK82ixTAjyEkAnyqQv6i";
+      if (!PH_KEY) return;
+      if (window.__analyticsBlocked || navigator.globalPrivacyControl) return;
+
+      // PostHog's array.js loader stub: queue calls made before the library
+      // arrives, then let it replay them. Written out rather than pasted
+      // minified so the next reader can see what it does.
+      var ph = window.posthog || [];
+      if (!ph.__SV) {
+        window.posthog = ph;
+        ph._i = [];
+        ph.init = function (key, config, name) {
+          var target = ph;
+          if (name !== undefined) target = ph[name] = [];
+          else name = "posthog";
+          target.people = target.people || [];
+          var methods = ("init capture register register_once unregister opt_in_capturing" +
+            " opt_out_capturing has_opted_in_capturing has_opted_out_capturing" +
+            " clear_opt_in_out_capturing startSessionRecording stopSessionRecording" +
+            " sessionRecordingStarted get_session_id get_distinct_id reset identify" +
+            " setPersonProperties group alias set_config debug getFeatureFlag" +
+            " isFeatureEnabled reloadFeatureFlags onFeatureFlags captureException").split(" ");
+          for (var i = 0; i < methods.length; i++) {
+            (function (method) {
+              target[method] = function () {
+                target.push([method].concat(Array.prototype.slice.call(arguments, 0)));
+              };
+            })(methods[i]);
+          }
+          ph._i.push([key, config, name]);
+          var s = document.createElement("script");
+          s.type = "text/javascript";
+          s.crossOrigin = "anonymous";
+          s.async = true;
+          s.src = "https://us-assets.i.posthog.com/static/array.js";
+          var first = document.getElementsByTagName("script")[0];
+          first.parentNode.insertBefore(s, first);
+        };
+        ph.__SV = 1;
+      }
+
+      // Cut every URL-bearing property back to origin + path. Runs on OUR
+      // events and on the ones PostHog raises by itself.
+      function stripUrl(value) {
+        if (typeof value !== "string") return value;
+        try {
+          var u = new URL(value);
+          return u.origin + u.pathname;
+        } catch (e) {
+          return value.split("#")[0].split("?")[0];
+        }
+      }
+
+      function isArray(v) {
+        return Object.prototype.toString.call(v) === "[object Array]";
+      }
+
+      // The one switch. True on /my, /account and /auth (PostHog never loads on
+      // /auth at all — __analyticsBlocked is true there whatever the answer).
+      var isPrivate = !!window.__healthPrivate;
+      // The classroom pledge (edu-safe surfaces above): no session replay and
+      // no behavioural capture around students. Page views and error reports
+      // still count, as Google Analytics does there. With Microsoft Clarity
+      // gone (2026-09-07, mp-7is9.7) this switch is what keeps the pledge true;
+      // tests/smoke/edu-safe.spec.ts reads it back through the init config.
+      var isEdu = !!window.__eduSafe;
+
+      // PH_FILTER_START
+      // Third-party exceptions never reach the error feed (mp-7is9.12). This is
+      // the rule the first-party js_error path applies in src/lib/analytics.ts
+      // (isFirstPartyScriptUrl, THIRD_PARTY_REJECTION_SIGNATURES), written a
+      // second time here because this script runs before any module does; the
+      // two lists are kept identical by tests/scripts/posthog-exception-filter
+      // .test.mjs. Without it the feed was the ad chain's own failures (the
+      // UID2 loader timing out under ad blockers on /food-groups, 2026-09-07)
+      // and the browser's ResizeObserver notice, and a first-party regression
+      // sat under them. An exception nobody can attribute stays in.
+      var THIRD_PARTY_SIGNATURES = [
+        "Failed parsing identifiers",
+        "window.optable",
+        "UID2 SDK",
+        "$adManagementConfig",
+        "[object XMLHttpRequest]",
+        "Failed validating event",
+        "ResizeObserver loop",
+      ];
+      function isFirstPartyScriptUrl(url) {
+        try {
+          var u = new URL(url, location.href);
+          if (u.protocol !== "http:" && u.protocol !== "https:") return false;
+          return (
+            u.hostname === location.hostname ||
+            u.hostname === "myplate.food" ||
+            /\.myplate\.food$/.test(u.hostname)
+          );
+        } catch (e) {
+          return true;
+        }
+      }
+      function isThirdPartyException(properties) {
+        if (!properties) return false;
+        var messages = [];
+        var urls = [];
+        var list = properties.$exception_list;
+        if (isArray(list)) {
+          for (var i = 0; i < list.length; i++) {
+            var item = list[i] || {};
+            if (typeof item.value === "string") messages.push(item.value);
+            var frames = item.stacktrace && item.stacktrace.frames;
+            if (!isArray(frames)) continue;
+            for (var f = 0; f < frames.length; f++) {
+              var name = frames[f] && frames[f].filename;
+              if (typeof name === "string" && name) urls.push(name);
+            }
+          }
+        }
+        if (typeof properties.$exception_message === "string") messages.push(properties.$exception_message);
+        if (typeof properties.$exception_source === "string" && properties.$exception_source) {
+          urls.push(properties.$exception_source);
+        }
+        for (var m = 0; m < messages.length; m++) {
+          for (var s = 0; s < THIRD_PARTY_SIGNATURES.length; s++) {
+            if (messages[m].indexOf(THIRD_PARTY_SIGNATURES[s]) !== -1) return true;
+          }
+        }
+        if (urls.length === 0) return false;
+        for (var k = 0; k < urls.length; k++) {
+          if (isFirstPartyScriptUrl(urls[k])) return false;
+        }
+        return true;
+      }
+      // PH_FILTER_END
+
+      window.posthog.init(PH_KEY, {
+        // The filter above, applied to every exception PostHog raises itself.
+        before_send: function (event) {
+          if (event && event.event === "$exception" && isThirdPartyException(event.properties)) {
+            return null;
+          }
+          return event;
+        },
+        api_host: "https://us.i.posthog.com",
+        person_profiles: "identified_only",
+        capture_pageview: false,
+        // Page LEAVE stays on: it is what turns two page views into a time on
+        // screen, which is the whole question this lane exists to answer. It is
+        // safe only because sanitize_properties below rewrites the $current_url
+        // PostHog stamps on it — that event is raised by the library, not by us,
+        // so it would otherwise carry the raw URL we are careful never to send.
+        capture_pageleave: true,
+        // Clicks, form submits and change events on the public site — this is
+        // what replaced Microsoft Clarity's heatmaps (Clarity itself went on
+        // 2026-09-07). Never in the signed-in
+        // area: a click on a food row is a record of what someone eats.
+        autocapture: isPrivate || isEdu
+          ? false
+          : {
+              // A copy of page text is a copy of whatever was selected, and a
+              // selection can include text a person typed.
+              capture_copied_text: false,
+              // Belt to the load-time switch's braces: even if this config were
+              // ever in force on a signed-in URL, nothing would be captured.
+              url_ignorelist: [/^https?:\/\/[^/]+\/(my|account|auth)(\/|$)/],
+              // Element attributes ride along on an autocaptured click. These
+              // two are the only ones that can hold what someone typed or the
+              // hint we showed them; the rest are our own markup.
+              element_attribute_ignorelist: ["value", "placeholder"],
+            },
+        enable_heatmaps: !isPrivate && !isEdu,
+        disable_surveys: isPrivate || isEdu,
+        disable_session_recording: isEdu,
+        // PostHog's own uncaught-error capture. Public pages only: an exception
+        // MESSAGE is free text nobody wrote a rule for, and on a signed-in
+        // screen it could quote a food, a dose or a note. Those screens keep
+        // the first-party js_error path in src/lib/analytics.ts instead, which
+        // sends a name-only count and never the text.
+        capture_exceptions: !isPrivate,
+        // Flags must never hold up a render. Three seconds, then the caller's
+        // safe default wins (src/lib/flags.ts).
+        feature_flag_request_timeout_ms: 3000,
+        session_recording: isPrivate
+          ? // Every input and every text node. The masking is config here
+            // rather than an attribute on our DOM, so it cannot be defeated by
+            // a component that forgets to carry a marker.
+            { maskAllInputs: true, maskTextSelector: "*" }
+          : // Public pages: what a visitor types is masked, what we wrote is
+            // visible — a replay of a blanked-out calculator answers nothing.
+            // .ph-mask is the opt-in hook for any public text that should join
+            // the masked side later.
+            { maskAllInputs: true, maskTextSelector: ".ph-mask" },
+        sanitize_properties: function (properties) {
+          if (!properties) return properties;
+          var urlKeys = ["$current_url", "$referrer", "$initial_current_url", "$initial_referrer"];
+          for (var i = 0; i < urlKeys.length; i++) {
+            if (properties[urlKeys[i]]) properties[urlKeys[i]] = stripUrl(properties[urlKeys[i]]);
+          }
+          if (properties.$pathname) properties.$pathname = stripUrl(properties.$pathname);
+          // A heatmap event keys its click map by the URL the clicks happened
+          // on, so the query string hides in the KEY rather than in a value.
+          // Two URLs that differ only by query string collapse into one entry,
+          // which is the right answer for a heatmap anyway.
+          var heat = properties.$heatmap_data;
+          if (heat && typeof heat === "object") {
+            var merged = {};
+            for (var key in heat) {
+              if (Object.prototype.hasOwnProperty.call(heat, key)) {
+                var clean = stripUrl(key);
+                merged[clean] = isArray(merged[clean])
+                  ? merged[clean].concat(heat[key])
+                  : heat[key];
+              }
+            }
+            properties.$heatmap_data = merged;
+          }
+          // An exception carries the URL of the script that threw, once per
+          // stack frame, plus a link back to the person's profile we never
+          // want minted in the first place.
+          var list = properties.$exception_list;
+          if (isArray(list)) {
+            for (var j = 0; j < list.length; j++) {
+              var frames = list[j] && list[j].stacktrace && list[j].stacktrace.frames;
+              if (!isArray(frames)) continue;
+              for (var k = 0; k < frames.length; k++) {
+                if (frames[k] && frames[k].filename) {
+                  frames[k].filename = stripUrl(frames[k].filename);
+                }
+              }
+            }
+          }
+          if (properties.$exception_source) {
+            properties.$exception_source = stripUrl(properties.$exception_source);
+          }
+          delete properties.$exception_personURL;
+          return properties;
+        },
+      });
+    })();
+  </script>
+
+  <!-- Pinterest Tag — visitor analytics for the claimed Pinterest business
+       account. Same guards as the ad stack: never on education-safe surfaces
+       (no ad-tech around students), never on health-private surfaces (/my,
+       /account, /auth — checked directly, because Pinterest stays out of the
+       signed-in area permanently and must not follow the ads lane when it
+       opens), never when the visitor sends Global Privacy Control,
+       never in iframes or /embed/*, production hostname only. Enhanced-match
+       (em) deliberately OMITTED — we do not share user emails with Pinterest.
+       No <noscript> pixel: it can't honor the edu-safe gate and would fire for
+       the no-JS crawlers we pledge not to track. SPA route changes fire
+       pintrk('page') via trackPageView in src/lib/analytics.ts. -->
+  <script>
+    (function () {
+      if (window.__eduSafe || window.__adsBlocked || window.__healthPrivate || navigator.globalPrivacyControl) return;
+      if (window.top !== window) return;
+      if (location.pathname.indexOf("/embed/") === 0) return;
+      if (!/(^|\.)myplate\.food$/.test(location.hostname)) return;
+      !function(e){if(!window.pintrk){window.pintrk = function () {
+      window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var
+        n=window.pintrk;n.queue=[],n.version="3.0";var
+        t=document.createElement("script");t.async=!0,t.src=e;var
+        r=document.getElementsByTagName("script")[0];
+        r.parentNode.insertBefore(t,r)}}("https://s.pinimg.com/ct/core.js");
+      window.pintrk('load', '2612456533260');
+      window.pintrk('page');
+    })();
+  </script>
+
+  <meta charset="UTF-8" />
+  <!-- viewport-fit=cover so env(safe-area-inset-*) resolves to real values in
+       the tracker's standalone PWA shell; on every other surface the insets are
+       0 and all existing safe-area uses are max()-guarded, so layouts are
+       unchanged. -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
+
+  <!-- Site verification (Impact / Instacart affiliate — uses value=, not content=) -->
+  <meta name="impact-site-verification" value="602918d3-0ef7-40f1-9e16-136c26885f9a" />
+
+  <!-- Pinterest domain claim (business account, added 2026-07-07) -->
+  <meta name="p:domain_verify" content="c8fb574862a4793e9bdf0c7959756c55" />
+
+  <!-- Primary Meta Tags -->
+  <title>MyPlate.food API — Free Nutrition Calculator &amp; Recipe JSON API</title>
+  <meta name="title" content="MyPlate.food API — Free Nutrition Calculator &amp; Recipe JSON API" />
+  <meta name="description"
+    content="A free, no-key JSON API for USDA nutrition calculators (BMI, calorie &amp; macro needs, body fat, the MyPlate food-group plan) and 1,072 MyPlate Kitchen recipes. CORS-enabled, edge-cached, every response cites its source. Built for developers and AI agents." />
+  <meta name="author" content="myplate.food" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="canonical" href="https://myplate.food/api" />
+  <link rel="alternate" hreflang="en" href="https://myplate.food/api" />
+  <link rel="alternate" hreflang="es" href="https://myplate.food/api" />
+  <link rel="alternate" hreflang="ko" href="https://myplate.food/api" />
+  <link rel="alternate" hreflang="fr" href="https://myplate.food/api" />
+  <link rel="alternate" hreflang="de" href="https://myplate.food/api" />
+  <link rel="alternate" hreflang="x-default" href="https://myplate.food/api" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico" sizes="32x32" />
+  <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://myplate.food/api" />
+  <meta property="og:title" content="MyPlate.food API — Free Nutrition Calculator &amp; Recipe JSON API" />
+  <meta property="og:description"
+    content="A free, no-key JSON API for USDA nutrition calculators (BMI, calorie &amp; macro needs, body fat, the MyPlate food-group plan) and 1,072 MyPlate Kitchen recipes. CORS-enabled, edge-cached, every response cites its source. Built for developers and AI agents." />
+  <meta property="og:image" content="https://myplate.food/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="MyPlate.food" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://myplate.food/api" />
+  <meta property="twitter:title" content="MyPlate.food API — Free Nutrition Calculator &amp; Recipe JSON API" />
+  <meta property="twitter:description"
+    content="A free, no-key JSON API for USDA nutrition calculators (BMI, calorie &amp; macro needs, body fat, the MyPlate food-group plan) and 1,072 MyPlate Kitchen recipes. CORS-enabled, edge-cached, every response cites its source. Built for developers and AI agents." />
+  <meta property="twitter:image" content="https://myplate.food/og-image.png" />
+
+  <!-- Theme -->
+  <meta name="theme-color" content="#10B981" />
+
+  <!-- Crawler-fallback content inside #root is for non-JS crawlers
+       (GPTBot, ClaudeBot, link unfurlers, etc.). Hide it visually so
+       humans don't see the unstyled-flash-of-fallback before React
+       mounts; the DOM text stays parseable for crawlers. React's
+       createRoot wipes the children of #root on first commit, so
+       this rule has no impact once the app has mounted. -->
+  <style>[data-fallback]{display:none}</style>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet" />
+  <script type="module" crossorigin src="/assets/index-Bh3e4Jez.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/vendor-react-DOW9amNY.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-clerk-DMd1QEUH.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-radix-CSb74HUv.js">
+  <link rel="stylesheet" crossorigin href="/assets/index-By5Gg9BK.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"MyPlate.food","url":"https://myplate.food","logo":"https://myplate.food/logo.png","description":"An independent nutrition platform preserving the USDA MyPlate format after USDA retired the MyPlate.gov website in January 2026 and replaced MyPlate with a different visual framework in the 2025–2030 edition. Offers free MyPlate Plan and DRI calculators, the preserved 1,072-recipe MyPlate Kitchen library, calorie-level meal plans, food-group guides, quizzes, and printables — plus calculators for other national dietary guidelines — built on the USDA Dietary Guidelines for Americans (2020–2025) and National Academies DRI methodology.","sameAs":["https://www.instagram.com/myplate.food/","https://www.tiktok.com/@myplate.food"],"contactPoint":{"@type":"ContactPoint","contactType":"customer support","url":"https://myplate.food","availableLanguage":["English","Spanish","Korean","French","German"]},"parentOrganization":{"@type":"Organization","name":"Reindex Ventures LLC","url":"https://reindexventures.com","subOrganization":[{"@type":"Organization","name":"MyPlate.food","url":"https://myplate.food"},{"@type":"Organization","name":"Presidential Fitness Test","url":"https://presidentialtest.fitness"},{"@type":"Organization","name":"Areacode","url":"https://areacode.fyi"}]},"citation":[{"@type":"CreativeWork","name":"Dietary Guidelines for Americans, 2020–2025","url":"https://www.dietaryguidelines.gov/sites/default/files/2021-03/Dietary_Guidelines_for_Americans-2020-2025.pdf"},{"@type":"CreativeWork","name":"Dietary Reference Intakes (DRI)","publisher":"National Academies of Sciences, Engineering, and Medicine","url":"https://nap.nationalacademies.org/topic/383/dietary-reference-intakes"},{"@type":"CreativeWork","name":"Dietary Guidelines for Americans, 2025–2030","url":"https://cdn.realfood.gov/DGA.pdf"},{"@type":"CreativeWork","name":"RealFood.gov","url":"https://realfood.gov"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebAPI","name":"MyPlate.food API — Free Nutrition Calculator & Recipe JSON API","description":"A free, no-key JSON API for USDA nutrition calculators (BMI, calorie & macro needs, body fat, the MyPlate food-group plan) and 1,072 MyPlate Kitchen recipes. CORS-enabled, edge-cached, every response cites its source. Built for developers and AI agents.","url":"https://myplate.food/api","documentation":"https://myplate.food/api","provider":{"@type":"Organization","name":"MyPlate.food","url":"https://myplate.food"},"isAccessibleForFree":true}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://myplate.food/"},{"@type":"ListItem","position":2,"name":"API","item":"https://myplate.food/api"}]}</script>
+  <link rel="modulepreload" href="/assets/home-Dm2kKGKb.js" />
+  <link rel="modulepreload" href="/assets/en-DwaIzTJe.js" />
+  <!--mpf-prerendered-->
+</head>
+
+<body>
+  <!-- Journey/Grow ad-unit blocklist (pairs with the dashboard toggles;
+       their script reads this div ONCE per document load — so this is a
+       per-device axis, never per-page: SPA swaps would carry the landing
+       page's decision across routes). Site-wide because index.html is the
+       shell for every route: no interstitials, no auto-insert sticky, no
+       GumGum skins, no ZergNet. Universal Player (outstream video, the
+       highest-CPM unit) runs on DESKTOP only (mp-nduk, owner 2026-08-22);
+       mobile stays blocked — the small viewport already carries the
+       adhesion unit, and the calculator flows are the conversion surface.
+       Adhesion, leaderboard, sidebar, in-content, recipe ads, Chicory stay
+       allowed. Outside #root so React never touches it. -->
+  <div id="ad-management-config-settings" data-blocklist-auto-insert-sticky="1" data-blocklist-zergnet="1" data-blocklist-interstitial-mobile="1" data-blocklist-interstitial-desktop="1" data-blocklist-universal-player-mobile="1" data-blocklist-gumgum-skins="1"></div>
+
+  <div id="root">
+    <div data-fallback>
+      <div class="entry-content">
+      <h1>MyPlate.food API — Free Nutrition Calculator &amp; Recipe JSON API</h1>
+      <p>A free, no-key JSON API for USDA nutrition calculators (BMI, calorie &amp; macro needs, body fat, the MyPlate food-group plan) and 1,072 MyPlate Kitchen recipes. CORS-enabled, edge-cached, every response cites its source. Built for developers and AI agents.</p>
+<div data-guideline="myplate" style="display:contents"><div class="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50"><div class="container-narrow pt-16 pb-12 sm:pt-20"><div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/70 backdrop-blur text-xs font-semibold text-muted-foreground mb-4">⚡ Developer API</div><h1 class="font-heading text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.05]">MyPlate.food nutrition API</h1><p class="mt-4 text-lg text-muted-foreground max-w-2xl">A free, no-key JSON API for USDA nutrition calculators and the MyPlate Kitchen recipe collection — BMI, calorie &amp; macro needs, body fat, the MyPlate food-group plan, and 1,072 recipes. CORS-enabled, edge-cached, and every response cites its source. Built for developers and AI agents.</p></div></div><div class="container-narrow py-10 sm:py-12 space-y-12"><section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><div class="rounded-2xl border border-stone-200 bg-white p-5"><div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-key-round h-5 w-5"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"></path><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle></svg></div><h3 class="mt-3 font-heading font-bold text-stone-900">No key</h3><p class="mt-1 text-sm text-muted-foreground">Free for low-volume use, CORS-enabled. Just call it.</p></div><div class="rounded-2xl border border-stone-200 bg-white p-5"><div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap h-5 w-5"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path></svg></div><h3 class="mt-3 font-heading font-bold text-stone-900">Fast</h3><p class="mt-1 text-sm text-muted-foreground">Deterministic calculators + static recipe data, edge-cached.</p></div><div class="rounded-2xl border border-stone-200 bg-white p-5"><div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-quote h-5 w-5"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"></path><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"></path></svg></div><h3 class="mt-3 font-heading font-bold text-stone-900">Cited</h3><p class="mt-1 text-sm text-muted-foreground">Every response carries source + canonical_url.</p></div><div class="rounded-2xl border border-stone-200 bg-white p-5"><div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot h-5 w-5"><path d="M12 8V4H8"></path><rect width="16" height="12" x="4" y="8" rx="2"></rect><path d="M2 14h2"></path><path d="M20 14h2"></path><path d="M15 13v2"></path><path d="M9 13v2"></path></svg></div><h3 class="mt-3 font-heading font-bold text-stone-900">Agent-ready</h3><p class="mt-1 text-sm text-muted-foreground">Same data as native tools via the MCP server.</p></div></section><section><h2 class="font-heading text-2xl font-extrabold text-stone-900 mb-2">Quick start</h2><p class="text-sm text-muted-foreground">No signup. Base URL <code class="rounded bg-stone-100 px-1.5 py-0.5 font-mono text-xs">https://myplate.food/api/v1</code>.</p><div class="relative my-3 overflow-hidden rounded-xl border border-stone-200 bg-stone-50"><div class="border-b border-stone-200 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-stone-500">bash</div><pre class="overflow-x-auto p-4 text-xs leading-relaxed"><code class="font-mono text-stone-800">curl &quot;https://myplate.food/api/v1/calculate/bmi?height_cm=180&amp;weight_kg=80&quot;</code></pre><button type="button" aria-label="Copy code" class="absolute right-2 top-2 inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-white px-2 py-1 text-xs font-semibold text-stone-600 transition-colors hover:text-stone-900"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy h-3.5 w-3.5"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>Copy</button></div><div class="relative my-3 overflow-hidden rounded-xl border border-stone-200 bg-stone-50"><div class="border-b border-stone-200 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-stone-500">json</div><pre class="overflow-x-auto p-4 text-xs leading-relaxed"><code class="font-mono text-stone-800">{
+  &quot;calculator&quot;: &quot;bmi&quot;,
+  &quot;inputs&quot;: { &quot;height_cm&quot;: 180, &quot;weight_kg&quot;: 80 },
+  &quot;bmi&quot;: 24.7,
+  &quot;classification&quot;: &quot;normal&quot;,
+  &quot;classification_label&quot;: &quot;Normal weight&quot;,
+  &quot;reference_system&quot;: &quot;adult-bmi&quot;,
+  &quot;source&quot;: &quot;Body Mass Index — WHO adult cutoffs, CDC BMI-for-age percentiles under age 20, computed by myplate.food&quot;,
+  &quot;canonical_url&quot;: &quot;https://myplate.food/bmi-calculator&quot;,
+  &quot;disclaimer&quot;: &quot;Educational estimate from published equations — not medical advice.&quot;
+}</code></pre><button type="button" aria-label="Copy code" class="absolute right-2 top-2 inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-white px-2 py-1 text-xs font-semibold text-stone-600 transition-colors hover:text-stone-900"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy h-3.5 w-3.5"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>Copy</button></div></section><section><h2 class="font-heading text-2xl font-extrabold text-stone-900 mb-3">Try it</h2><div class="rounded-2xl border border-stone-200 bg-white p-5"><div class="flex flex-wrap gap-2"><select aria-label="Endpoint" class="h-10 rounded-lg border border-stone-300 bg-white px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"><option value="bmi" selected="">bmi</option><option value="bmr">bmr</option><option value="macros">macros</option><option value="myplate-plan">myplate-plan</option><option value="calorie-needs">calorie-needs</option><option value="body-fat">body-fat</option><option value="dri">dri</option><option value="recipes">recipes (search)</option></select><input aria-label="Request path" spellcheck="false" class="h-10 min-w-0 flex-1 rounded-lg border border-stone-300 bg-white px-3 font-mono text-xs outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" value="/api/v1/calculate/bmi?height_cm=180&amp;weight_kg=80"/><button class="inline-flex h-10 items-center gap-2 rounded-lg bg-emerald-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-50">Send</button></div><p class="mt-2 break-all font-mono text-xs text-muted-foreground">GET /api/v1/calculate/bmi?height_cm=180&amp;weight_kg=80</p></div></section><section class="space-y-8"><h2 class="font-heading text-2xl font-extrabold text-stone-900">Endpoints</h2><div><h3 class="font-heading text-lg font-bold text-stone-900">Body metrics</h3><p class="mb-3 text-sm text-muted-foreground">Height, weight and tape measurements in — a value plus its healthy band out.</p><div class="overflow-hidden rounded-2xl border border-stone-200"><ul class="divide-y divide-stone-200"><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/bmi</code></div><p class="mt-1.5 text-sm text-muted-foreground">Body Mass Index + weight classification from height &amp; weight. Add age + sex for CDC BMI-for-age percentiles (under 20).</p><a href="/api/v1/calculate/bmi?height_cm=180&amp;weight_kg=80" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/bmi?height_cm=180&amp;weight_kg=80 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/body-fat</code></div><p class="mt-1.5 text-sm text-muted-foreground">Body-fat % via the U.S. Navy circumference method, with a Deurenberg BMI cross-check and ACE category.</p><a href="/api/v1/calculate/body-fat?sex=male&amp;age=30&amp;height_cm=180&amp;weight_kg=80&amp;neck_cm=38&amp;waist_cm=85" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/body-fat?sex=male&amp;age=30&amp;height_cm=180&amp;weight_kg=80&amp;neck_cm=38&amp;waist_cm=85 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/waist-to-height</code></div><p class="mt-1.5 text-sm text-muted-foreground">Waist-to-height ratio and its Ashwell risk band. Pair: /calculate/waist-to-hip (WHO cutoffs).</p><a href="/api/v1/calculate/waist-to-height?waist=80&amp;height=180" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/waist-to-height?waist=80&amp;height=180 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/lean-body-mass</code></div><p class="mt-1.5 text-sm text-muted-foreground">Lean body mass via Boer + Hume. Pair: /calculate/ffmi (fat-free mass index, Kouri normalization).</p><a href="/api/v1/calculate/ffmi?weight=80&amp;height=180&amp;body_fat=15&amp;sex=male" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/ffmi?weight=80&amp;height=180&amp;body_fat=15&amp;sex=male <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li></ul></div></div><div><h3 class="font-heading text-lg font-bold text-stone-900">Energy &amp; macros</h3><p class="mb-3 text-sm text-muted-foreground">The full metabolic picture, either bundled or one number at a time.</p><div class="overflow-hidden rounded-2xl border border-stone-200"><ul class="divide-y divide-stone-200"><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/calorie-needs</code></div><p class="mt-1.5 text-sm text-muted-foreground">Everything-energy in one call: BMR, TDEE at every activity level, deficit tiers, macro splits, protein and ideal-weight ranges.</p><a href="/api/v1/calculate/calorie-needs?age=30&amp;sex=male&amp;activity=active&amp;height_cm=180&amp;weight_kg=80" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/calorie-needs?age=30&amp;sex=male&amp;activity=active&amp;height_cm=180&amp;weight_kg=80 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/bmr</code></div><p class="mt-1.5 text-sm text-muted-foreground">Basal metabolic rate — Mifflin-St Jeor headline + revised Harris-Benedict.</p><a href="/api/v1/calculate/bmr?age=35&amp;sex=male&amp;height_ft=5&amp;height_in=10&amp;weight_lb=170" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/bmr?age=35&amp;sex=male&amp;height_ft=5&amp;height_in=10&amp;weight_lb=170 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/tdee</code></div><p class="mt-1.5 text-sm text-muted-foreground">Total daily energy expenditure — BMR × activity — at your level plus a table across all four.</p><a href="/api/v1/calculate/tdee?age=35&amp;sex=male&amp;activity=active&amp;height_ft=5&amp;height_in=10&amp;weight_lb=170" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/tdee?age=35&amp;sex=male&amp;activity=active&amp;height_ft=5&amp;height_in=10&amp;weight_lb=170 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/calorie-deficit</code></div><p class="mt-1.5 text-sm text-muted-foreground">Maintenance calories and three deficit tiers with realistic weekly rates and below-BMR flags.</p><a href="/api/v1/calculate/calorie-deficit?age=30&amp;sex=female&amp;activity=moderately-active&amp;height_cm=165&amp;weight_kg=70" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/calorie-deficit?age=30&amp;sex=female&amp;activity=moderately-active&amp;height_cm=165&amp;weight_kg=70 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/macros</code></div><p class="mt-1.5 text-sm text-muted-foreground">Split a calorie budget into protein/carbs/fat grams (IOM AMDR presets). Pass calories directly, or a profile.</p><a href="/api/v1/calculate/macros?calories=2000" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/macros?calories=2000 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/protein</code></div><p class="mt-1.5 text-sm text-muted-foreground">Daily protein target in grams — the RDA floor and an activity-scaled g/kg range.</p><a href="/api/v1/calculate/protein?age=35&amp;sex=male&amp;activity=moderately-active&amp;height_cm=178&amp;weight_kg=77" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/protein?age=35&amp;sex=male&amp;activity=moderately-active&amp;height_cm=178&amp;weight_kg=77 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/ideal-weight</code></div><p class="mt-1.5 text-sm text-muted-foreground">Ideal body weight via Devine, Robinson, Miller and Hamwi, plus the healthy-BMI weight band.</p><a href="/api/v1/calculate/ideal-weight?age=35&amp;sex=male&amp;height_ft=5&amp;height_in=10&amp;weight_lb=170" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/ideal-weight?age=35&amp;sex=male&amp;height_ft=5&amp;height_in=10&amp;weight_lb=170 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li></ul></div></div><div><h3 class="font-heading text-lg font-bold text-stone-900">MyPlate plan</h3><p class="mb-3 text-sm text-muted-foreground">A daily calorie estimate translated into USDA food-group amounts.</p><div class="overflow-hidden rounded-2xl border border-stone-200"><ul class="divide-y divide-stone-200"><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/myplate-plan</code></div><p class="mt-1.5 text-sm text-muted-foreground">USDA MyPlate food-group plan — calorie level, cups &amp; ounce-equivalents per group, and BMI — from a full profile. edition=iom2005 (default) | nasem2023.</p><a href="/api/v1/calculate/myplate-plan?age=30&amp;sex=female&amp;activity=moderately-active&amp;height_cm=165&amp;weight_kg=63" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/myplate-plan?age=30&amp;sex=female&amp;activity=moderately-active&amp;height_cm=165&amp;weight_kg=63 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li></ul></div></div><div><h3 class="font-heading text-lg font-bold text-stone-900">Guideline tools</h3><p class="mb-3 text-sm text-muted-foreground">Lifestyle calculators plus the full DRI table and the German D-A-CH energy method.</p><div class="overflow-hidden rounded-2xl border border-stone-200"><ul class="divide-y divide-stone-200"><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/dri</code></div><p class="mt-1.5 text-sm text-muted-foreground">The full Dietary Reference Intakes table for a life stage — macros, vitamins and minerals with upper limits.</p><a href="/api/v1/calculate/dri?age=25&amp;sex=male&amp;activity=moderately-active&amp;height_cm=178&amp;weight_kg=77" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/dri?age=25&amp;sex=male&amp;activity=moderately-active&amp;height_cm=178&amp;weight_kg=77 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/glp1-protein</code></div><p class="mt-1.5 text-sm text-muted-foreground">Muscle-preservation protein target for weight loss on a GLP-1 medication, with per-meal spread and fiber AI.</p><a href="/api/v1/calculate/glp1-protein?weight=80&amp;age=40&amp;sex=male" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/glp1-protein?weight=80&amp;age=40&amp;sex=male <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/dach-energy</code></div><p class="mt-1.5 text-sm text-muted-foreground">D-A-CH / DGE daily energy requirement — Müller-2004 resting energy × a PAL activity factor.</p><a href="/api/v1/calculate/dach-energy?sex=male&amp;age=40&amp;weight_kg=71&amp;pal=1.6" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/dach-energy?sex=male&amp;age=40&amp;weight_kg=71&amp;pal=1.6 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/calculate/water-intake</code></div><p class="mt-1.5 text-sm text-muted-foreground">Daily fluid target from weight + activity. Pair: /calculate/weight-loss-percentage, /calculate/one-rep-max.</p><a href="/api/v1/calculate/water-intake?weight=70" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/calculate/water-intake?weight=70 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li></ul></div></div><div><h3 class="font-heading text-lg font-bold text-stone-900">Recipes</h3><p class="mb-3 text-sm text-muted-foreground">Search and fetch the public-domain USDA MyPlate Kitchen collection.</p><div class="overflow-hidden rounded-2xl border border-stone-200"><ul class="divide-y divide-stone-200"><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/recipes</code></div><p class="mt-1.5 text-sm text-muted-foreground">Search 1,072 USDA MyPlate Kitchen recipes by query, food group, category, max calories and min rating.</p><a href="/api/v1/recipes?q=chicken&amp;food_group=protein-foods&amp;limit=5" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/recipes?q=chicken&amp;food_group=protein-foods&amp;limit=5 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li><li class="p-4"><div class="flex flex-wrap items-center gap-2"><span class="rounded bg-emerald-50 px-1.5 py-0.5 font-mono text-xs font-bold text-primary">GET</span><code class="break-all font-mono text-sm text-stone-900">/api/v1/recipes/{slug}</code></div><p class="mt-1.5 text-sm text-muted-foreground">A full recipe: ingredients, directions, the complete USDA nutrition table, and MyPlate food-group amounts.</p><a href="/api/v1/recipes/2-step-chicken" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-flex items-center gap-1 break-all text-xs text-primary hover:underline">/api/v1/recipes/2-step-chicken <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-3 w-3 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></li></ul></div></div></section><section><h2 class="font-heading text-2xl font-extrabold text-stone-900 mb-2">OpenAPI spec</h2><p class="text-sm leading-relaxed text-muted-foreground">The whole API is described by an OpenAPI 3.1 document — point Postman, a code generator, or an agent framework straight at it. Served with open CORS and edge-cached.</p><div class="relative my-3 overflow-hidden rounded-xl border border-stone-200 bg-stone-50"><div class="border-b border-stone-200 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-stone-500">bash</div><pre class="overflow-x-auto p-4 text-xs leading-relaxed"><code class="font-mono text-stone-800">curl &quot;https://myplate.food/api/v1/openapi.json&quot;</code></pre><button type="button" aria-label="Copy code" class="absolute right-2 top-2 inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-white px-2 py-1 text-xs font-semibold text-stone-600 transition-colors hover:text-stone-900"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy h-3.5 w-3.5"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>Copy</button></div><a href="https://myplate.food/api/v1/openapi.json" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 break-all text-sm text-primary hover:underline">https://myplate.food/api/v1/openapi.json <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-4 w-4 shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></section><section><h2 class="font-heading text-2xl font-extrabold text-stone-900 mb-2">Response format</h2><p class="text-sm leading-relaxed text-muted-foreground">Every successful response is JSON and carries citation fields: <code class="rounded bg-stone-100 px-1 py-0.5 font-mono text-xs">source</code> (how the number was derived) and <code class="rounded bg-stone-100 px-1 py-0.5 font-mono text-xs">canonical_url</code> (the matching myplate.food page); health calculators add a <code class="rounded bg-stone-100 px-1 py-0.5 font-mono text-xs">disclaimer</code>. Inputs accept metric (<code class="rounded bg-stone-100 px-1 py-0.5 font-mono text-xs">height_cm</code>, <code class="rounded bg-stone-100 px-1 py-0.5 font-mono text-xs">weight_kg</code>) or imperial (<code class="rounded bg-stone-100 px-1 py-0.5 font-mono text-xs">height_ft</code>+<code class="rounded bg-stone-100 px-1 py-0.5 font-mono text-xs">height_in</code>, <code class="rounded bg-stone-100 px-1 py-0.5 font-mono text-xs">weight_lb</code>). Responses are edge-cached; errors return <code class="rounded bg-stone-100 px-1 py-0.5 font-mono text-xs">{ &quot;error&quot;: &quot;…&quot; }</code> with a 4xx status.</p></section><section><h2 class="font-heading text-2xl font-extrabold text-stone-900 mb-2">Limits &amp; commercial use</h2><ul class="ml-4 list-disc space-y-1.5 text-sm leading-relaxed text-muted-foreground"><li><strong class="text-stone-800">Free, no key, for live per-request use</strong> — 20 requests/minute per IP, and full recipe fetches (API and MCP combined) cap at 100/day per IP. Over a limit returns HTTP 429 with a <code class="rounded bg-stone-100 px-1 py-0.5 font-mono text-xs">Retry-After</code> header.</li><li><strong class="text-stone-800">Building something high-volume or commercial?</strong> <a href="/for-professionals" class="text-primary hover:underline">Get in touch</a> or email <a href="mailto:hello@myplate.food" class="text-primary hover:underline">hello@myplate.food</a> — we offer dedicated access and licensing for products, classrooms, clinics and research.</li><li><strong class="text-stone-800">Educational estimates, not medical advice.</strong> The calculators implement published USDA/IOM/clinical equations. Independent; not affiliated with the USDA.</li></ul></section><section><h2 class="font-heading text-2xl font-extrabold text-stone-900 mb-2">MCP tools</h2><p class="mb-3 text-sm leading-relaxed text-muted-foreground">The same calculators and recipe search are exposed to AI agents as Model Context Protocol tools at <code class="rounded bg-stone-100 px-1.5 py-0.5 font-mono text-xs">https://mcp.myplate.food/mcp</code>. Every tool is read-only and calls the same endpoints, so the numbers match.</p><div class="overflow-hidden rounded-2xl border border-stone-200"><ul class="divide-y divide-stone-200"><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">calculate_bmi</code><span class="text-sm text-muted-foreground">BMI + classification (WHO adult / CDC youth percentiles).</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">calculate_body_fat</code><span class="text-sm text-muted-foreground">Body-fat % via the U.S. Navy circumference method.</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">calculate_body_metric</code><span class="text-sm text-muted-foreground">Quick body metrics: waist-to-height/hip, lean mass, FFMI, water, 1RM, weight-loss %.</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">calculate_myplate_plan</code><span class="text-sm text-muted-foreground">USDA MyPlate food-group plan at your calorie level.</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">calculate_calorie_needs</code><span class="text-sm text-muted-foreground">BMR, TDEE, deficit tiers, macros, protein and ideal weight in one call.</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">calculate_bmr</code><span class="text-sm text-muted-foreground">Basal metabolic rate (Mifflin-St Jeor + Harris-Benedict).</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">calculate_tdee</code><span class="text-sm text-muted-foreground">Total daily energy expenditure at your activity level, plus a table across all four.</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">calculate_calorie_deficit</code><span class="text-sm text-muted-foreground">Maintenance calories and three weight-loss deficit tiers with weekly rates.</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">calculate_macros</code><span class="text-sm text-muted-foreground">Macronutrient split from a calorie budget or a profile.</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">calculate_protein_target</code><span class="text-sm text-muted-foreground">Daily protein target in grams by weight + activity.</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">calculate_ideal_weight</code><span class="text-sm text-muted-foreground">Ideal weight (Devine/Robinson/Miller/Hamwi) + healthy-BMI band.</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">calculate_glp1_protein</code><span class="text-sm text-muted-foreground">GLP-1 muscle-preservation protein target + fiber AI.</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">calculate_dach_energy</code><span class="text-sm text-muted-foreground">German D-A-CH / DGE energy requirement (Müller-2004 × PAL).</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">calculate_dri</code><span class="text-sm text-muted-foreground">The full Dietary Reference Intakes nutrient table.</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">search_recipes</code><span class="text-sm text-muted-foreground">Search the MyPlate Kitchen recipe collection.</span></li><li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 p-3"><code class="font-mono text-sm font-semibold text-stone-900">get_recipe</code><span class="text-sm text-muted-foreground">Fetch one full recipe by slug.</span></li></ul></div></section><a href="/mcp" class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5 transition-colors hover:bg-emerald-50"><p class="text-sm text-stone-700"><strong class="text-stone-900">Building an AI agent?</strong> Use the same data as native tools via our MCP server.</p><span class="inline-flex items-center gap-1 text-sm font-semibold text-primary">MyPlate.food MCP server <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-4 w-4"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></a><section><h2 class="font-heading text-2xl font-extrabold text-stone-900 mb-4">API FAQ</h2><div class="space-y-3"><details class="group rounded-xl border border-stone-200 bg-white p-4"><summary class="cursor-pointer list-none font-semibold text-stone-900 marker:content-none">Is the MyPlate.food API free?</summary><p class="mt-2 text-sm leading-relaxed text-muted-foreground">Yes — free for live, per-request use with no API key and open CORS. It isn&#x27;t a bulk-download channel: replicating the recipe catalog into your own database or storage requires a license agreement. For higher limits or a dedicated tier, contact us.</p></details><details class="group rounded-xl border border-stone-200 bg-white p-4"><summary class="cursor-pointer list-none font-semibold text-stone-900 marker:content-none">Do I need an API key?</summary><p class="mt-2 text-sm leading-relaxed text-muted-foreground">No. Just call the endpoints. There&#x27;s a per-IP rate limit (20 requests/minute) to keep the free tier fair, and full recipe fetches — API and MCP combined — cap at 100/day per IP: plenty for live use, not enough to mirror the catalog.</p></details><details class="group rounded-xl border border-stone-200 bg-white p-4"><summary class="cursor-pointer list-none font-semibold text-stone-900 marker:content-none">Can I use it commercially?</summary><p class="mt-2 text-sm leading-relaxed text-muted-foreground">Yes, for live per-request calls inside your product. Bulk export or mirroring of the recipe catalog isn&#x27;t part of the free tier — that requires a license agreement. For products, classrooms, clinics, research, higher limits, or licensed data feeds, get in touch via /for-professionals.</p></details><details class="group rounded-xl border border-stone-200 bg-white p-4"><summary class="cursor-pointer list-none font-semibold text-stone-900 marker:content-none">Is this the official USDA API?</summary><p class="mt-2 text-sm leading-relaxed text-muted-foreground">No. MyPlate.food is independent and not affiliated with the USDA. The calculators implement published USDA/IOM equations and the recipe data preserves the public-domain USDA MyPlate Kitchen library; each response cites its source.</p></details><details class="group rounded-xl border border-stone-200 bg-white p-4"><summary class="cursor-pointer list-none font-semibold text-stone-900 marker:content-none">Is there an MCP server?</summary><p class="mt-2 text-sm leading-relaxed text-muted-foreground">Yes — the same calculators and recipe search are available to AI agents as Model Context Protocol tools. See the MCP server page.</p></details></div></section></div></div>
+      </div>
+      <nav aria-label="Site navigation">
+        <a href="/">Home</a>
+      <a href="/calculator">Calculator</a>
+      <a href="/dri-calculator">DRI Calculator</a>
+      <a href="/food-groups">Food Groups</a>
+      <a href="/methodology">Methodology</a>
+      <a href="/recipes">Recipes</a>
+      <a href="/meal-plans">Ready-Made Meal Plans</a>
+      <a href="/quizzes">Quizzes</a>
+      <a href="/printables">Printables</a>
+      <a href="/about">About</a>
+      </nav>
+      <nav aria-label="Site directory">
+        <a href="/dri-calculator">Dri Calculator</a>
+        <a href="/bmr-calculator">Bmr Calculator</a>
+        <a href="/tdee-calculator">Tdee Calculator</a>
+        <a href="/calorie-deficit-calculator">Deficit Calculator</a>
+        <a href="/macro-calculator">Macro Calculator</a>
+        <a href="/protein-calculator">Protein Calculator</a>
+        <a href="/ideal-weight-calculator">Ideal Weight Calculator</a>
+        <a href="/bmi-calculator">BMI Calculator</a>
+        <a href="/body-fat-calculator">Body Fat Calculator</a>
+        <a href="/ffmi-calculator">Ffmi Calculator</a>
+        <a href="/lean-body-mass-calculator">Lean Body Mass Calculator</a>
+        <a href="/waist-to-height-ratio-calculator">Waist To Height Ratio Calculator</a>
+        <a href="/waist-to-hip-ratio-calculator">Waist To Hip Ratio Calculator</a>
+        <a href="/water-intake-calculator">Water Intake Calculator</a>
+        <a href="/weight-loss-percentage-calculator">Weight Loss Percentage Calculator</a>
+        <a href="/one-rep-max-calculator">One Rep Max Calculator</a>
+        <a href="/glp-1-protein-calculator">GLP-1 Protein Calculator</a>
+        <a href="/calculators">Calculators</a>
+        <a href="/meal-planner">Meal Planner</a>
+        <a href="/calorie-tracker">Calorie Tracker</a>
+        <a href="/build-a-day">Build A Day</a>
+        <a href="/fitness-tools">Fitness Tools</a>
+        <a href="/for-professionals">For Professionals</a>
+        <a href="/partners">Partners</a>
+        <a href="/for-teachers">For Teachers</a>
+        <a href="/es/para-maestros">Para Maestros</a>
+        <a href="/supporters">Supporters</a>
+        <a href="/what-is-myplate">What Is MyPlate</a>
+        <a href="/myplate-for-older-adults">MyPlate for Older Adults</a>
+        <a href="/myplate-for-pregnancy">MyPlate for Pregnancy &amp; Breastfeeding</a>
+        <a href="/nutrition-statistics">Nutrition Statistics</a>
+        <a href="/pro-kit">Clinic &amp; Classroom Kit</a>
+        <a href="/guideline-watch">Guideline Watch</a>
+        <a href="/whats-new">What&#39;s New</a>
+        <a href="/glp-1">GLP-1 Diet Guide</a>
+        <a href="/glp-1/foods">GLP-1 Food List</a>
+        <a href="/glp-1/protein">Muscle Loss on GLP-1s</a>
+        <a href="/glp-1-companion">GLP-1 Companion</a>
+        <a href="/glp-1/meal-plan">GLP-1 Meal Plan</a>
+        <a href="/food-groups/fruits">Fruits Food Group</a>
+        <a href="/food-groups/vegetables">Vegetables Food Group</a>
+        <a href="/food-groups/grains">Grains Food Group</a>
+        <a href="/food-groups/protein-foods">Protein Foods Food Group</a>
+        <a href="/food-groups/dairy">Dairy Food Group</a>
+        <a href="/recipes">Recipes</a>
+        <a href="/meal-plans">Ready-Made Meal Plans</a>
+        <a href="/meal-prep">Meal Prep</a>
+        <a href="/healthy-breakfast-ideas">Healthy breakfast ideas</a>
+        <a href="/high-protein-meal-prep">High-protein meal prep</a>
+        <a href="/sunday-dinner-ideas">Sunday dinner ideas</a>
+        <a href="/family-dinner-ideas">Family dinner ideas</a>
+        <a href="/healthy-snacks-for-kids">Healthy snacks for kids</a>
+        <a href="/freezer-meals">Freezer meals</a>
+        <a href="/cheap-healthy-meals">Cheap healthy meals</a>
+        <a href="/vegan-recipes">Vegan recipes</a>
+        <a href="/foods">Grocery Picks</a>
+        <a href="/quizzes">Quizzes</a>
+        <a href="/es/quizzes">Cuestionarios (español)</a>
+        <a href="/printables">Printables</a>
+        <a href="/es/printables">Imprimibles (español)</a>
+        <a href="/ko/quizzes">퀴즈 (한국어)</a>
+        <a href="/ko/printables">인쇄물 (한국어)</a>
+        <a href="/food-diary-template">Food Diary Template</a>
+        <a href="/myplate-worksheets">MyPlate Worksheets</a>
+        <a href="/myfitnesspal-alternative">MyFitnessPal Alternative</a>
+        <a href="/meal-planner-template">Meal Planning Template</a>
+        <a href="/">myplate home</a>
+        <a href="/calculator">myplate calculator</a>
+        <a href="/food-groups">myplate food-groups</a>
+        <a href="/portions">myplate portions</a>
+        <a href="/methodology">myplate methodology</a>
+        <a href="/realfood-gov">myplate realfood-gov</a>
+        <a href="/plato/en">plato home</a>
+        <a href="/plato">plato home es</a>
+        <a href="/plato/en/calculator">plato calculator</a>
+        <a href="/plato/calculadora">plato calculator es</a>
+        <a href="/plato/en/food-groups">plato food-groups</a>
+        <a href="/plato/grupos-alimenticios">plato food-groups es</a>
+        <a href="/plato/en/portions">plato portions</a>
+        <a href="/plato/porciones">plato portions es</a>
+        <a href="/plato/en/methodology">plato methodology</a>
+        <a href="/plato/metodologia">plato methodology es</a>
+        <a href="/plato/en/jarra-del-buen-beber">plato jarra-del-buen-beber</a>
+        <a href="/plato/jarra-del-buen-beber">plato jarra-del-buen-beber es</a>
+        <a href="/plato/en/sellos">plato sellos</a>
+        <a href="/plato/sellos">plato sellos es</a>
+        <a href="/plato/en/recommendations-2023">plato recomendaciones-2023</a>
+        <a href="/plato/recomendaciones-2023">plato recomendaciones-2023 es</a>
+        <a href="/canada">canada home</a>
+        <a href="/canada/calculator">canada calculator</a>
+        <a href="/canada/food-groups">canada food-groups</a>
+        <a href="/canada/methodology">canada methodology</a>
+        <a href="/canada/plant-proteins">canada plant-proteins</a>
+        <a href="/canada/healthy-habits">canada healthy-habits</a>
+        <a href="/canada/water">canada water</a>
+        <a href="/canada/warning-symbols">canada fop-symbols</a>
+        <a href="/canada/indigenous-foodways">canada indigenous-foodways</a>
+        <a href="/korea">korea home</a>
+        <a href="/korea/calculator">korea calculator</a>
+        <a href="/korea/food-groups">korea food-groups</a>
+        <a href="/korea/methodology">korea methodology</a>
+        <a href="/korea/korean-meal-structure">korea korean-meal</a>
+        <a href="/korea/fermented-foods">korea fermented-foods</a>
+        <a href="/korea/sodium">korea sodium</a>
+        <a href="/korea/nine-guidelines">korea nine-guidelines</a>
+        <a href="/korea/food-labeling">korea food-labeling</a>
+        <a href="/planetary">eatlancet home</a>
+        <a href="/planetary/calculator">eatlancet calculator</a>
+        <a href="/planetary/reference-diet">eatlancet food-groups</a>
+        <a href="/planetary/methodology">eatlancet methodology</a>
+        <a href="/planetary/planetary-boundaries">eatlancet planetary-boundaries</a>
+        <a href="/planetary/great-food-transformation">eatlancet great-food-transformation</a>
+        <a href="/planetary/cultural-adaptation">eatlancet cultural-adaptation</a>
+        <a href="/planetary/debate">eatlancet phd-controversy</a>
+        <a href="/planetary/vs-national-guidelines">eatlancet phd-vs-national</a>
+        <a href="/diabetes">diabetes home</a>
+        <a href="/diabetes/food-groups">diabetes food-groups</a>
+        <a href="/diabetes/portions">diabetes portions</a>
+        <a href="/diabetes/methodology">diabetes methodology</a>
+        <a href="/diabetes/eating-patterns">diabetes eating-patterns</a>
+        <a href="/diabetes/beverages">diabetes beverages</a>
+        <a href="/australia">australia home</a>
+        <a href="/australia/calculator">australia calculator</a>
+        <a href="/australia/food-groups">australia food-groups</a>
+        <a href="/australia/methodology">australia methodology</a>
+        <a href="/australia/healthy-eating-pyramid">australia healthy-eating-pyramid</a>
+        <a href="/ernaehrungspyramide/en">dach home</a>
+        <a href="/ernaehrungspyramide">dach home de</a>
+        <a href="/ernaehrungspyramide/en/portion-calculator">dach calculator</a>
+        <a href="/ernaehrungspyramide/portionsrechner">dach calculator de</a>
+        <a href="/ernaehrungspyramide/en/food-groups">dach food-groups</a>
+        <a href="/ernaehrungspyramide/lebensmittelgruppen">dach food-groups de</a>
+        <a href="/ernaehrungspyramide/en/energy-requirements">dach methodology</a>
+        <a href="/ernaehrungspyramide/energiebedarf">dach methodology de</a>
+        <a href="/ernaehrungspyramide/en/dge-nutrition-circle">dach ernaehrungskreis</a>
+        <a href="/ernaehrungspyramide/ernaehrungskreis">dach ernaehrungskreis de</a>
+        <a href="/ernaehrungspyramide/en/dge-recommendations">dach dge-empfehlungen</a>
+        <a href="/ernaehrungspyramide/dge-empfehlungen">dach dge-empfehlungen de</a>
+        <a href="/ernaehrungspyramide/en/austrian-food-pyramid">dach oesterreich</a>
+        <a href="/ernaehrungspyramide/oesterreichische-ernaehrungspyramide">dach oesterreich de</a>
+        <a href="/ernaehrungspyramide/en/swiss-food-pyramid">dach schweiz</a>
+        <a href="/ernaehrungspyramide/schweizer-lebensmittelpyramide">dach schweiz de</a>
+        <a href="/about">About</a>
+        <a href="/ko/accessibility">접근성 안내 (한국어)</a>
+        <a href="/myplan">MyPlan Account</a>
+        <a href="/api">API</a>
+        <a href="/mcp">MCP Server</a>
+        <a href="/press">Press</a>
+        <a href="/editorial-policy">Editorial Policy</a>
+        <a href="/serving-up-myplate">Serving Up MyPlate</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/privacy/health-data">Consumer Health Data Privacy</a>
+        <a href="/terms">Terms</a>
+      </nav>
+    </div>
+  </div>
+  </div>
+
+  <!-- Statcounter — loaded via a guard (was a bare tag) so it NEVER runs on
+       health-private routes (__healthPrivate, set in <head> — checked directly,
+       because Statcounter stays out of the signed-in area permanently and must
+       not follow the ads lane when it opens) or under Global
+       Privacy Control (GPC). Edu-safe behavior is unchanged: it still loads on
+       edu-safe surfaces (only the health-private + GPC skips are added). The
+       counter.js reads the sc_* globals, so they're set on the same guarded
+       path. Its <noscript> pixel was REMOVED (not kept like a plain counter
+       would): a noscript img can't honor the health-private/GPC gates, and the
+       privacy policy's "Statcounter does not load or run on /my" claim must be
+       true absolutely — same rationale as the omitted Pinterest noscript pixel. -->
+  <script type="text/javascript">
+    (function () {
+      if (window.__adsBlocked || window.__healthPrivate || navigator.globalPrivacyControl) return;
+      window.sc_project = 13211394;
+      window.sc_invisible = 1;
+      window.sc_security = "34feadd2";
+      var s = document.createElement("script");
+      s.type = "text/javascript";
+      s.async = true;
+      s.src = "https://www.statcounter.com/counter/counter.js";
+      document.body.appendChild(s);
+    })();
+  </script>
+</body>
+
+</html>
