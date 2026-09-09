@@ -320,3 +320,50 @@ export function uiMinutesBucket(min) {
   if (m < 40) return 30;
   return 50;
 }
+
+// ---- Wave 2 additions (new helpers only; nothing above is changed) ----
+
+// Article for a module from data/articles.json, or null when none is loaded.
+export function uiArticleFor(moduleId) {
+  const a = uiState.data && uiState.data.articles;
+  return a && typeof a === 'object' && a[moduleId] && typeof a[moduleId] === 'object' ? a[moduleId] : null;
+}
+
+// Big tappable radio choices (one question, 2 to 4 answers, large type). Uses data-seg so existing bindings work.
+// options: [{ value, label, desc?, icon? }]
+export function uiBigChoices(name, options, current, opts = {}) {
+  return `<div class="big-choices ${opts.cols ? 'cols-' + opts.cols : ''}" role="radiogroup" aria-label="${uiEsc(opts.label || name)}">${options.map(o => {
+    const on = String(o.value) === String(current);
+    return `<label class="big-choice ${on ? 'on' : ''}"><input type="radio" name="${uiEsc(name)}" value="${uiEsc(o.value)}" ${on ? 'checked' : ''} data-seg="${uiEsc(name)}">${o.icon ? `<span class="big-choice-icon" aria-hidden="true">${o.icon}</span>` : ''}<span class="big-choice-text"><span class="big-choice-title">${uiEsc(o.label)}</span>${o.desc ? `<span class="big-choice-desc">${uiEsc(o.desc)}</span>` : ''}</span></label>`;
+  }).join('')}</div>`;
+}
+
+// Big tappable toggles (multi-select). Uses data-multi so existing bindings work.
+export function uiBigToggles(name, options, currentArr, opts = {}) {
+  const cur = new Set(currentArr || []);
+  return `<div class="big-choices ${opts.cols ? 'cols-' + opts.cols : ''}" role="group" aria-label="${uiEsc(opts.label || name)}">${options.map(o => {
+    const on = cur.has(o.value);
+    return `<label class="big-choice ${on ? 'on' : ''}"><input type="checkbox" name="${uiEsc(name)}" value="${uiEsc(o.value)}" ${on ? 'checked' : ''} data-multi="${uiEsc(name)}">${o.icon ? `<span class="big-choice-icon" aria-hidden="true">${o.icon}</span>` : ''}<span class="big-choice-text"><span class="big-choice-title">${uiEsc(o.label)}</span>${o.desc ? `<span class="big-choice-desc">${uiEsc(o.desc)}</span>` : ''}</span></label>`;
+  }).join('')}</div>`;
+}
+
+// Rules from a user-defined diet cite the source id "user-defined". Register a readable citation for it at render time
+// so the shared source list does not report it as missing. Runtime only; data/sources.json is not touched.
+export function uiEnsureUserDefinedSource() {
+  if (uiState.sourcesById && !uiState.sourcesById.has('user-defined')) {
+    uiState.sourcesById.set('user-defined', { id: 'user-defined', citation: 'Defined by you in this app. Not an evidence source and not evidence-rated.', type: 'other' });
+  }
+}
+
+// "Defined by you" badge for user-defined diets (shown in place of an evidence rating).
+export function uiUserDefinedBadge() {
+  return '<span class="badge gray outline">Defined by you</span>';
+}
+
+// Short display of a person's weight and height in pounds and feet/inches. Stored values stay metric.
+export function uiWeightHeightText(person, helpers) {
+  const parts = [];
+  if (person.weight_kg > 0 && helpers && helpers.kgToLb) parts.push(`${helpers.kgToLb(person.weight_kg)} lb`);
+  if (person.height_cm > 0 && helpers && helpers.cmToFtIn) { const h = helpers.cmToFtIn(person.height_cm); parts.push(`${h.ft} ft ${h.inch} in`); }
+  return parts.join(', ');
+}

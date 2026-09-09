@@ -25,6 +25,7 @@ for (const f of ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'a
   data[f] = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : (f === 'dictionaries' ? { tags: {}, entries: [] } : f === 'articles' ? {} : []);
 }
 const html = R('index.html');
+if (fs.existsSync(new URL('breathe.html', root))) data.breatheHtml = R('breathe.html');
 const iconSvg = fs.existsSync(new URL('icon.svg', root)) ? R('icon.svg') : '';
 const iconData = iconSvg ? 'data:image/svg+xml;utf8,' + encodeURIComponent(iconSvg) : '';
 const css = fs.existsSync(new URL('src/app.css', root)) ? R('src/app.css') : '';

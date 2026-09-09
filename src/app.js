@@ -14,6 +14,7 @@ import { renderSettingsScreen } from './ui/settings.js';
 import { renderTodayScreen } from './ui/today.js';
 import { renderPantryScreen } from './ui/pantry.js';
 import { renderTogetherScreen } from './ui/together.js';
+import { renderBreatheScreen } from './ui/breathe.js';
 
 const APP_DATA_FILES = ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'articles'];
 
@@ -76,6 +77,7 @@ const APP_SCREENS = [
   { id: 'pantry', label: 'Pantry', icon: 'M4 7h16v13H4zM4 7l2-4h12l2 4M9 12h6' },
   { id: 'together', label: 'Together', icon: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM2 21a7 7 0 0 1 14 0M14 21a6 6 0 0 1 8-5' },
   { id: 'log', label: 'Log', icon: 'M5 3h14v18H5zM8 8h8M8 12h8M8 16h5' },
+  { id: 'breathe', label: 'Breathe', icon: 'M12 21c-4-3-8-6.5-8-11a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 4.5-4 8-8 11z' },
   { id: 'learn', label: 'Learn', icon: 'M4 5a2 2 0 0 1 2-2h6v18H6a2 2 0 0 0-2 2zM12 3h6a2 2 0 0 1 2 2v16a2 2 0 0 0-2-2h-6' },
   { id: 'settings', label: 'Settings', icon: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm8 4l2-1-1-3-2 .3-1.5-1.5.3-2-3-1-1 2h-2l-1-2-3 1 .3 2L6.6 8.3 4.6 8l-1 3 2 1v2l-2 1 1 3 2-.3 1.5 1.5-.3 2 3 1 1-2h2l1 2 3-1-.3-2 1.5-1.5 2 .3 1-3-2-1z' }
 ];
@@ -137,6 +139,7 @@ export function appRender() {
       case 'week': renderWeekScreen(main, ctx); break;
       case 'pantry': renderPantryScreen(main, ctx); break;
       case 'together': renderTogetherScreen(main, ctx); break;
+      case 'breathe': renderBreatheScreen(main, ctx); break;
       case 'grocery': renderGroceryScreen(main, ctx); break;
       case 'log': renderLogScreen(main, ctx); break;
       case 'learn': renderLearnScreen(main, ctx); break;
