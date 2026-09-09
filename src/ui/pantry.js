@@ -2,31 +2,17 @@
 // checks each recipe against the active person's plan, and can push the missing items onto the grocery list.
 import { matchRecipes } from '../engine/pantry.js';
 import { checkRecipe } from '../engine/checker.js';
-import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiVerdictWord } from './common.js';
+import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiVerdictWord, uiVerdictChip, uiPageHeader, uiSection, uiIcon, uiEmptyState } from './common.js';
 import { weekRecipeModal } from './week.js';
 import { groceryAddExtra } from './grocery.js';
 
-const PANTRY_CSS = `
-.pantry-hit { border-top:1px solid var(--border); padding:.6rem 0; }
-.pantry-hit:first-child { border-top:0; }
-.pantry-hit .lists { display:grid; grid-template-columns:1fr; gap:.25rem .75rem; font-size:.9rem; margin-top:.3rem; }
-@media (min-width: 640px) { .pantry-hit .lists { grid-template-columns:1fr 1fr; } }
-.pantry-hit .lists .k { color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.03em; }
-`;
-
 let pantryResults = null;
-
-function pantryStyle() {
-  if (document.getElementById('pantry-style')) return;
-  const s = document.createElement('style'); s.id = 'pantry-style'; s.textContent = PANTRY_CSS; document.head.appendChild(s);
-}
 
 function pantryParse(text) {
   return String(text || '').split(/[,\n;]+/).map(s => s.trim()).filter(Boolean);
 }
 
 export function renderPantryScreen(root) {
-  pantryStyle();
   const person = uiActivePerson();
   const plan = uiPlanFor(person);
   const profile = uiState.profile;
@@ -34,15 +20,14 @@ export function renderPantryScreen(root) {
   const have = profile.pantry;
   const results = pantryResults && pantryResults.person === person.id ? pantryResults : null;
   root.innerHTML = `
-    <h1>Pantry</h1>
-    <p class="muted small">Type what is in the kitchen and the app ranks recipes by how few ingredients you would still need. Salt, oil, water, and common spices are assumed on hand. Each recipe is checked against ${uiEsc(person.name)}'s plan.</p>
+    ${uiPageHeader('Pantry', `Type what is in the kitchen and the app ranks recipes by how few ingredients you would still need. Each recipe is checked against ${uiEsc(person.name)}'s plan.`)}
     <div class="card">
       <div class="field"><label for="pantry-text">What do you have at home? One item per line or separated by commas</label>
         <textarea id="pantry-text" style="min-height:120px" placeholder="chicken, rice, broccoli&#10;eggs&#10;canned tomatoes">${uiEsc(have.join('\n'))}</textarea>
-        <div class="hint">Saved on this device as you type.</div></div>
-      <div class="btn-row" style="margin-top:0"><button class="btn primary" type="button" id="pantry-find">Find recipes</button><button class="btn" type="button" id="pantry-clear">Clear</button></div>
+        <div class="hint">Saved on this device as you type. Salt, oil, water, and common spices are assumed on hand.</div></div>
+      <div class="btn-row"><button class="btn primary" type="button" id="pantry-find">${uiIcon('search')}Find recipes</button><button class="btn" type="button" id="pantry-clear">Clear</button></div>
     </div>
-    <div id="pantry-results">${results ? pantryResultsHTML(results, person) : ''}</div>
+    <div id="pantry-results" class="stack-2">${results ? pantryResultsHTML(results, person) : ''}</div>
   `;
   const ta = root.querySelector('#pantry-text');
   ta.addEventListener('input', () => { profile.pantry = pantryParse(ta.value); uiPersist(); });
@@ -63,22 +48,20 @@ export function renderPantryScreen(root) {
 function pantryHitHTML(m) {
   const r = m.recipe, v = m.check.verdict;
   return `<div class="pantry-hit">
-    <div class="row between"><div><span class="dot ${v}" aria-hidden="true"></span><span class="visually-hidden">${uiVerdictWord(v)}: </span><strong>${uiEsc(r.name)}</strong> <span class="badge ${v === 'fail' ? 'red' : v === 'caution' ? 'amber' : 'green'} outline">${uiVerdictWord(v)}</span></div>
+    <div class="row between"><div><span class="dot ${v}" aria-hidden="true"></span><span class="visually-hidden">${uiVerdictWord(v)}: </span><strong>${uiEsc(r.name)}</strong> ${uiVerdictChip(v)}</div>
       <span class="small muted">${m.missingCount === 0 ? 'nothing missing' : `${m.missingCount} missing`} · ${r.active_min} min active, ${r.total_min} total</span></div>
     ${m.check.hits && m.check.hits.length ? `<div class="small">${v === 'fail' ? 'Hard exclusion' : 'Caution'}: ${m.check.hits.map(h => uiEsc(h.label)).join(', ')}</div>` : ''}
     <div class="lists"><div><span class="k">You have</span><br>${m.present.map(uiEsc).join(', ') || '<span class="muted">nothing matched</span>'}</div><div><span class="k">Missing</span><br>${m.missing.map(uiEsc).join(', ') || '<span class="muted">nothing</span>'}</div></div>
-    <div class="btn-row" style="margin-top:.5rem"><button class="btn small" type="button" data-open="${uiEsc(r.id)}">Open recipe</button>${m.missingCount && v !== 'fail' ? `<button class="btn small" type="button" data-missing="${uiEsc(r.id)}">Add missing to grocery list</button>` : ''}</div>
+    <div class="btn-row" style="margin-top:8px"><button class="btn small" type="button" data-open="${uiEsc(r.id)}">${uiIcon('book')}Open recipe</button>${m.missingCount && v !== 'fail' ? `<button class="btn small" type="button" data-missing="${uiEsc(r.id)}">${uiIcon('cart')}Add missing to grocery list</button>` : ''}</div>
   </div>`;
 }
 
 function pantryResultsHTML(results, person) {
   const ok = results.rows.filter(m => m.check.verdict !== 'fail');
   const bad = results.rows.filter(m => m.check.verdict === 'fail');
-  if (!results.rows.length) return `<p class="empty">No recipe uses at least half of what you listed. Try broader words (for example "chicken" rather than "chicken thighs").</p>`;
-  return `<section class="card" aria-labelledby="pantry-res-h"><h2 id="pantry-res-h">${ok.length} recipe${ok.length === 1 ? '' : 's'} you could make</h2>
-      <p class="small muted">Ranked by fewest missing ingredients. Searched for: ${results.have.map(uiEsc).join(', ')}.</p>
-      ${ok.map(pantryHitHTML).join('') || '<p class="muted small">Every match has a hard exclusion for this person.</p>'}
-    </section>
+  if (!results.rows.length) return uiEmptyState('No recipe uses at least half of what you listed. Try broader words, for example "chicken" rather than "chicken thighs".');
+  return `${uiSection(`${ok.length} recipe${ok.length === 1 ? '' : 's'} you could make`, `<p class="small muted">Ranked by fewest missing ingredients. Searched for: ${results.have.map(uiEsc).join(', ')}.</p>
+      <div class="list boxed">${ok.map(pantryHitHTML).join('') || '<p class="muted small" style="padding:12px 0">Every match has a hard exclusion for this person.</p>'}</div>`, { id: 'pantry-res-h' })}
     ${bad.length ? `<details class="card"><summary>Not allowed for ${uiEsc(person.name)} (${bad.length})</summary><p class="small muted">These match your pantry but hit a hard exclusion (allergen or a rule marked hard). They are never suggested.</p>${bad.map(pantryHitHTML).join('')}</details>` : ''}`;
 }
 

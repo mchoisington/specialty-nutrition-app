@@ -3,47 +3,12 @@
 import { energyTarget, ACTIVITIES, ACTIVITY_LEVELS, activityCalories, kgToLb, lbToKg } from '../engine/energy.js';
 import { nutrientsForGrams, recipeTotals, scaleTotals, addTotals, emptyTotals, compareToPlan, round, NUTRIENT_KEYS } from '../engine/nutrition.js';
 import { checkRecipe, checkFood } from '../engine/checker.js';
-import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiModal, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiNutrientLabel, uiVerdictWord, uiSegmented } from './common.js';
+import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiModal, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiNutrientLabel, uiVerdictWord, uiVerdictChip, uiSegmented, uiPageHeader, uiSection, uiChip, uiIcon, uiRing, uiMeter, uiStatTile, uiNoticeHTML, uiEmptyState, uiSwitch } from './common.js';
 import { weekGet } from './week.js';
 
 const TODAY_MEALS = [{ id: 'breakfast', label: 'Breakfast' }, { id: 'lunch', label: 'Lunch' }, { id: 'dinner', label: 'Dinner' }, { id: 'snacks', label: 'Snacks' }];
 const TODAY_TRACKED = ['protein_g', 'carb_g', 'fiber_g', 'sodium_mg', 'satfat_g'];
-const TODAY_CSS = `
-.today-datebar { display:flex; align-items:center; gap:.5rem; margin-bottom:.75rem; }
-.today-datebar input[type=date] { flex:1; min-width:0; }
-.today-bar { height:14px; border-radius:999px; background:var(--surface-2); overflow:hidden; border:1px solid var(--border); margin:.4rem 0; }
-.today-bar > span { display:block; height:100%; background:var(--accent); }
-.today-bar.over > span { background:var(--red); }
-.today-nut { display:grid; grid-template-columns: 1fr auto auto; gap:.2rem .75rem; font-size:.9rem; margin-top:.5rem; }
-.today-nut .h { color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.03em; }
-.today-nut .num { text-align:right; }
-.today-entry { display:flex; gap:.5rem; align-items:flex-start; padding:.5rem 0; border-top:1px solid var(--border); }
-.today-entry .main { flex:1; min-width:0; }
-.today-entry .acts { display:flex; gap:.25rem; flex-wrap:wrap; justify-content:flex-end; }
-.today-heart { background:none; border:0; font:inherit; font-size:1.25rem; line-height:1; cursor:pointer; color:var(--muted); padding:.2rem .35rem; min-height:32px; }
-.today-heart.on { color:var(--red); }
-.today-result { display:flex; gap:.5rem; align-items:center; border-top:1px solid var(--border); padding:.35rem 0; }
-.today-result > button.pick { flex:1; text-align:left; background:none; border:0; font:inherit; color:var(--text); padding:.4rem .25rem; min-height:44px; cursor:pointer; }
-.today-result > button.pick:hover { background:var(--surface-2); }
-.today-chip { display:inline-flex; align-items:center; min-height:36px; padding:.2rem .8rem; border:1px solid var(--border); border-radius:999px; background:var(--surface); color:var(--text); font:inherit; font-weight:600; cursor:pointer; }
-.today-chip.on { background:var(--blue-bg); border-color:var(--blue); color:var(--blue); }
-.today-chart { width:100%; height:auto; display:block; margin-top:.5rem; }
-.today-chart text { font-size:11px; fill:var(--muted); }
-.today-chart .axis { stroke:var(--border); }
-.today-chart .line { stroke:var(--accent); fill:none; stroke-width:2; }
-.today-chart .pt { fill:var(--accent); }
-.today-list { list-style:none; padding:0; margin:.5rem 0 0; }
-.today-list li { display:flex; justify-content:space-between; gap:.5rem; padding:.35rem 0; border-top:1px solid var(--border); font-size:.95rem; }
-.today-row { display:flex; gap:.5rem; align-items:flex-end; flex-wrap:wrap; }
-.today-row .field { margin-bottom:0; flex:1; min-width:120px; }
-`;
-
 let todayUi = { date: null, personId: null };
-
-function todayStyle() {
-  if (document.getElementById('today-style')) return;
-  const s = document.createElement('style'); s.id = 'today-style'; s.textContent = TODAY_CSS; document.head.appendChild(s);
-}
 
 function todayShiftDate(iso, n) {
   const [y, m, d] = iso.split('-').map(Number);
@@ -142,7 +107,6 @@ export function todayTargetInfo(person, plan) {
 }
 
 export function renderTodayScreen(root) {
-  todayStyle();
   const person = uiActivePerson();
   const plan = uiPlanFor(person);
   todayEnsure(person);
@@ -155,13 +119,12 @@ export function renderTodayScreen(root) {
   const exerciseKcal = exercise.reduce((s, e) => s + (Number(e.kcal) || 0), 0);
 
   root.innerHTML = `
-    <h1>Today</h1>
+    ${uiPageHeader('Today', `${uiFmtDate(date)}${date === today ? ' (today)' : ''} for ${uiEsc(person.name)}. Summed from USDA values by grams for what you logged.`)}
     <div class="today-datebar">
-      <button class="btn small" type="button" id="today-prev" aria-label="Previous day">&larr;</button>
+      <button class="btn small icon" type="button" id="today-prev" aria-label="Previous day">${uiIcon('arrow-left')}</button>
       <input type="date" id="today-date" value="${uiEsc(date)}" aria-label="Date">
-      <button class="btn small" type="button" id="today-next" aria-label="Next day">&rarr;</button>
+      <button class="btn small icon" type="button" id="today-next" aria-label="Next day">${uiIcon('arrow-right')}</button>
     </div>
-    <p class="small muted" style="margin-top:-.5rem">${uiFmtDate(date)}${date === today ? ' (today)' : ''} for ${uiEsc(person.name)}.</p>
     ${todayTargetCardHTML(person, plan, totals, exerciseKcal)}
     ${todayMealsHTML(person, plan, entries)}
     ${todayWeightHTML(person)}
@@ -173,69 +136,62 @@ export function renderTodayScreen(root) {
 function todayTargetCardHTML(person, plan, totals, exerciseKcal) {
   const info = todayTargetInfo(person, plan);
   const cmp = compareToPlan(totals, plan);
-  const rows = TODAY_TRACKED.map(n => {
+  const meters = TODAY_TRACKED.map(n => {
     const over = cmp.over.find(x => x.nutrient === n), under = cmp.under.find(x => x.nutrient === n), ok = cmp.ok.find(x => x.nutrient === n);
-    const val = uiFmtNum(totals[n], n === 'sodium_mg' ? 0 : 1);
-    let ref = '<span class="muted">no number in plan</span>', cls = '';
-    if (over) { ref = `over (at most ${uiFmtNum(over.limit, 1)})`; cls = 'over'; }
-    else if (under) { ref = `under (at least ${uiFmtNum(under.min, 1)})`; cls = 'under'; }
-    else if (ok) { ref = ok.limit != null ? `at most ${uiFmtNum(ok.limit, 1)}` : ok.min != null ? `at least ${uiFmtNum(ok.min, 1)}` : 'within plan'; cls = 'ok'; }
-    return `<span>${uiEsc(uiNutrientLabel(n))}</span><span class="num">${val}</span><span class="${cls}">${ref}</span>`;
-  }).join('');
+    const full = uiNutrientLabel(n);
+    const m = /^(.*?)\s*\((.*)\)\s*$/.exec(full);
+    const name = m ? m[1] : full, unit = m ? m[2] : '';
+    const digits = n === 'sodium_mg' ? 0 : 1;
+    if (over) return uiMeter({ label: uiEsc(name), value: totals[n], max: over.limit, kind: 'limit', unit, digits, labelExtra: plan.limits[n] && plan.limits[n].clinician ? uiChip('clinician-set', 'plum') : '' });
+    if (under) return uiMeter({ label: uiEsc(name), value: totals[n], max: under.min, kind: 'target', unit, digits });
+    if (ok && ok.limit != null) return uiMeter({ label: uiEsc(name), value: totals[n], max: ok.limit, kind: 'limit', unit, digits, labelExtra: plan.limits[n] && plan.limits[n].clinician ? uiChip('clinician-set', 'plum') : '' });
+    if (ok && ok.min != null) return uiMeter({ label: uiEsc(name), value: totals[n], max: ok.min, kind: 'target', unit, digits });
+    return `<div class="meter neutral"><div class="meter-label">${uiEsc(name)}</div><div class="meter-value"><strong>${uiFmtNum(totals[n], digits)}</strong> <span class="meter-of">${uiEsc(unit)}</span></div><div class="meter-word"><span>no number in plan</span></div></div>`;
+  });
   const satPct = cmp.over.find(x => x.nutrient === 'satfat_pct_kcal') || cmp.ok.find(x => x.nutrient === 'satfat_pct_kcal');
-  const nutTable = `<div class="today-nut" aria-label="Nutrients versus plan"><span class="h">Nutrient</span><span class="h num">Today</span><span class="h">Plan</span>${rows}${satPct ? `<span>${uiEsc(uiNutrientLabel('satfat_pct_kcal'))}</span><span class="num">${uiFmtNum(satPct.value, 1)}%</span><span class="${satPct.limit != null && satPct.value > satPct.limit ? 'over' : 'ok'}">at most ${uiFmtNum(satPct.limit, 0)}%</span>` : ''}</div>
-    <p class="small muted" style="margin-bottom:0">Summed from USDA values by grams for what you logged. Foods missing a nutrient value count as zero for that nutrient.</p>`;
-  let body = '';
+  if (satPct) meters.push(uiMeter({ label: 'Saturated fat', value: satPct.value, max: satPct.limit, kind: 'limit', unit: '% of calories', digits: 1 }));
+  const nutTable = `<div class="meters-grid" aria-label="Nutrients versus plan">${meters.join('')}</div>
+    <p class="small muted">Foods missing a nutrient value count as zero for that nutrient.</p>`;
+  let head = '';
   if (info.state === 'disabled') {
-    body = `<p>Calorie targets are turned off because of <strong>${uiEsc(info.by)}</strong>. The plan still checks foods and meals; there is no daily calorie number to chase.</p>
-      <p class="small muted">Today: ${uiFmtNum(totals.kcal)} kcal logged.</p>`;
+    head = `<div class="ring-row">${uiStatTile({ value: uiFmtNum(totals.kcal), label: 'kcal logged', note: 'no target' })}<div class="ring-text"><p>Calorie targets are turned off because of <strong>${uiEsc(info.by)}</strong>. The plan still checks foods and meals; there is no daily calorie number to chase.</p></div></div>`;
   } else if (info.state === 'off') {
-    body = `<p>No calorie target is set. The diary still adds up what you eat and compares protein, carbohydrate, fiber, sodium, and saturated fat against your plan. A calorie target is optional and is always an estimate.</p>
-      <p><strong>${uiFmtNum(totals.kcal)} kcal</strong> logged today.</p>
-      <button class="btn primary" type="button" id="today-set-target">Set a calorie target</button>`;
+    head = `<div class="ring-row">${uiStatTile({ value: uiFmtNum(totals.kcal), label: 'kcal logged', note: 'No target set' })}<div class="ring-text"><p>No calorie target is set. The diary still adds up what you eat and compares the nutrients below against your plan. A target is optional and is always an estimate.</p><button class="btn primary small" type="button" id="today-set-target">Set a calorie target</button></div></div>`;
   } else if (info.state === 'missing') {
-    body = `<p>The estimate needs <strong>${info.missing.join(', ')}</strong> on the person record. <a href="#/people/${uiEsc(person.id)}">Add it on the People screen</a>, or enter your own number.</p>
-      <p><strong>${uiFmtNum(totals.kcal)} kcal</strong> logged today.</p>
-      <div class="btn-row"><button class="btn" type="button" id="today-set-target">Change target</button></div>`;
+    head = `<div class="ring-row">${uiStatTile({ value: uiFmtNum(totals.kcal), label: 'kcal logged', note: 'No target yet', tone: 'caution' })}<div class="ring-text"><p>The estimate needs <strong>${info.missing.join(', ')}</strong> on the person record. <a href="#/people/${uiEsc(person.id)}/basics">Add it on the Basics step</a>, or enter your own number.</p><button class="btn small" type="button" id="today-set-target">Change target</button></div></div>`;
   } else {
     const count = !!(person.goals && person.goals.count_exercise);
     const target = info.kcal + (count ? exerciseKcal : 0);
     const diff = target - totals.kcal;
-    const pct = target > 0 ? Math.min(100, totals.kcal / target * 100) : 0;
-    const overCls = totals.kcal > target ? 'over' : '';
     const goalWord = info.manual ? 'your own number' : person.goals.calorie_target === 'loss' ? `weight loss, ${person.goals.deficit || 500} kcal a day below maintenance` : 'maintain weight';
-    body = `<div class="row between"><div><strong style="font-size:1.4rem">${uiFmtNum(totals.kcal)}</strong> of <strong>${uiFmtNum(target)}</strong> kcal <span class="badge gray outline">estimate</span></div>
-        <span class="${overCls || 'ok'}">${diff >= 0 ? `${uiFmtNum(diff)} kcal under` : `${uiFmtNum(-diff)} kcal over`}</span></div>
-      <div class="today-bar ${overCls}" role="img" aria-label="${uiFmtNum(pct)} percent of the estimated target"><span style="width:${pct}%"></span></div>
-      <p class="small muted" style="margin:.25rem 0">Goal: ${goalWord}.${count && exerciseKcal ? ` Includes ${uiFmtNum(exerciseKcal)} kcal of exercise added back today.` : ''} The number is an estimate from a published equation, not a measurement; appetite, sleep, and how you feel matter too.</p>
+    head = `<div class="ring-row">${uiRing({ value: totals.kcal, max: target, kind: 'kcal', unit: 'kcal', label: `of ${uiFmtNum(target)} target`, size: 148 })}
+      <div class="ring-text"><p><strong>${diff >= 0 ? `${uiFmtNum(diff)} kcal under` : `${uiFmtNum(-diff)} kcal over`}</strong> the estimated target of ${uiFmtNum(target)} kcal ${uiChip('estimate', 'neutral')}</p>
+      <p class="small muted">Goal: ${goalWord}.${count && exerciseKcal ? ` Includes ${uiFmtNum(exerciseKcal)} kcal of exercise added back today.` : ''} An estimate from a published equation, not a measurement; appetite, sleep, and how you feel matter too.</p>
       <details><summary>How this was estimated</summary><ul class="small">${(info.notes || []).map(n => `<li>${uiEsc(n)}</li>`).join('')}<li>Resting energy: Mifflin-St Jeor equation (Mifflin 1990), multiplied by an activity factor. Errors of 10 percent or more for an individual are normal.</li></ul></details>
-      <div class="btn-row"><button class="btn small" type="button" id="today-set-target">Change target</button></div>`;
+      <div><button class="btn small" type="button" id="today-set-target">${uiIcon('edit')}Change target</button></div></div></div>`;
   }
-  return `<section class="card" aria-labelledby="today-target-h"><h2 id="today-target-h">Calories and nutrients</h2>${body}${nutTable}</section>`;
+  return `<section class="card" aria-labelledby="today-target-h"><h2 id="today-target-h">Calories and nutrients</h2>${head}${nutTable}</section>`;
 }
 
 function todayMealsHTML(person, plan, entries) {
-  return `<section aria-labelledby="today-meals-h">
-    <div class="row between"><h2 id="today-meals-h">Meals</h2><div class="row"><button class="btn small" type="button" id="today-copy-yesterday">Copy yesterday</button><button class="btn small" type="button" id="today-from-plan">Add from this week's plan</button></div></div>
-    ${TODAY_MEALS.map(m => {
+  return uiSection('Meals', `<div class="stack-2">${TODAY_MEALS.map(m => {
       const list = entries.filter(e => e.meal === m.id);
       const kcal = list.reduce((s, e) => s + ((e.nutrients && e.nutrients.kcal) || 0), 0);
-      return `<div class="card tight">
-        <div class="row between"><h3 style="margin:0">${m.label} <span class="small muted" style="font-weight:400">${list.length ? uiFmtNum(kcal) + ' kcal' : ''}</span></h3><button class="btn small primary" type="button" data-add="${m.id}">Add</button></div>
-        ${list.map(e => {
+      return `<section class="meal-section" aria-labelledby="today-meal-${m.id}">
+        <div class="section-head"><h3 id="today-meal-${m.id}">${m.label}<span class="meal-kcal">${list.length ? uiFmtNum(kcal) + ' kcal' : ''}</span></h3><button class="btn small primary" type="button" data-add="${m.id}">${uiIcon('plus')}Add</button></div>
+        <div class="list">${list.map(e => {
           const fav = e.kind !== 'custom' && todayIsFavorite(person, e.kind, e.ref);
           const n = e.nutrients || {};
-          return `<div class="today-entry">
-            ${e.kind !== 'custom' ? `<button class="today-heart ${fav ? 'on' : ''}" type="button" data-fav="${e.kind}:${uiEsc(e.ref)}" aria-pressed="${fav}" aria-label="${fav ? 'Remove from favorites' : 'Add to favorites'}">${fav ? '&#9829;' : '&#9825;'}</button>` : '<span style="width:1.9rem"></span>'}
-            <div class="main"><div><strong>${uiEsc(todayEntryName(e))}</strong> <span class="small muted">${uiEsc(todayAmountText(e))}</span></div>
-              <div class="small muted">${uiFmtNum(n.kcal)} kcal · ${uiFmtNum(n.protein_g, 1)} g protein · ${uiFmtNum(n.carb_g, 1)} g carb · ${uiFmtNum(n.fiber_g, 1)} g fiber · ${uiFmtNum(n.sodium_mg)} mg sodium · ${uiFmtNum(n.satfat_g, 1)} g sat fat</div>
-              ${e.note ? `<div class="small">${uiEsc(e.note)}</div>` : ''}</div>
-            <div class="acts"><button class="btn small" type="button" data-edit="${uiEsc(e.id)}">Edit</button><button class="btn small danger" type="button" data-remove="${uiEsc(e.id)}">Remove</button></div>
+          return `<div class="entry-row">
+            ${e.kind !== 'custom' ? `<button class="heart-btn ${fav ? 'on' : ''}" type="button" data-fav="${e.kind}:${uiEsc(e.ref)}" aria-pressed="${fav}" aria-label="${fav ? 'Remove from favorites' : 'Add to favorites'}">${uiIcon('heart', { fill: fav })}</button>` : '<span style="width:40px;flex:none"></span>'}
+            <div class="entry-main"><div><span class="entry-name">${uiEsc(todayEntryName(e))}</span> <span class="entry-amount">${uiEsc(todayAmountText(e))}</span></div><div class="entry-kcal">${uiFmtNum(n.kcal)} kcal</div>
+              <div class="entry-nut">${uiFmtNum(n.protein_g, 1)} g protein · ${uiFmtNum(n.carb_g, 1)} g carb · ${uiFmtNum(n.fiber_g, 1)} g fiber · ${uiFmtNum(n.sodium_mg)} mg sodium · ${uiFmtNum(n.satfat_g, 1)} g sat fat</div>
+              ${e.note ? `<div class="entry-note">${uiEsc(e.note)}</div>` : ''}</div>
+            <div class="entry-acts"><button class="btn small icon" type="button" data-edit="${uiEsc(e.id)}" aria-label="Edit ${uiEsc(todayEntryName(e))}" title="Edit">${uiIcon('edit')}</button><button class="btn small icon danger" type="button" data-remove="${uiEsc(e.id)}" aria-label="Remove ${uiEsc(todayEntryName(e))}" title="Remove">${uiIcon('trash')}</button></div>
           </div>`;
-        }).join('') || '<p class="small muted" style="margin:.4rem 0 0">Nothing logged.</p>'}
-      </div>`;
-    }).join('')}
-  </section>`;
+        }).join('') || '<p class="small muted" style="padding:8px 0">Nothing logged.</p>'}</div>
+      </section>`;
+    }).join('')}</div>`, { id: 'today-meals-h', action: `<button class="btn small" type="button" id="today-copy-yesterday">Copy yesterday</button><button class="btn small" type="button" id="today-from-plan">${uiIcon('calendar')}Add from this week's plan</button>` });
 }
 
 function todayWeightHTML(person) {
@@ -244,15 +200,15 @@ function todayWeightHTML(person) {
   const cutoff = todayShiftDate(uiIsoDate(uiToday()), -90);
   const chart = all.filter(w => w.date >= cutoff);
   return `<section class="card" aria-labelledby="today-weight-h"><h2 id="today-weight-h">Weight</h2>
-    <div class="today-row"><div class="field"><label for="today-weight-lb">Weight (lb)</label><input id="today-weight-lb" type="number" inputmode="decimal" min="50" max="900" step="0.1" placeholder="${all.length ? kgToLb(all[all.length - 1].kg) : '150'}"></div><button class="btn primary" type="button" id="today-log-weight">Log weight</button></div>
+    <div class="today-row"><div class="field"><label for="today-weight-lb">Weight (lb)</label><input id="today-weight-lb" type="number" inputmode="decimal" min="50" max="900" step="0.1" placeholder="${all.length ? kgToLb(all[all.length - 1].kg) : '150'}"></div><button class="btn primary" type="button" id="today-log-weight">${uiIcon('scale')}Log weight</button></div>
     <p class="small muted">Stored in kilograms for the rules that need it; shown in pounds. Logging a weight updates the calorie estimate.</p>
     ${chart.length ? todayChartSVG(chart) : '<p class="small muted">No weights in the last 90 days to chart.</p>'}
-    ${last30.length ? `<details><summary>Last ${last30.length} entr${last30.length === 1 ? 'y' : 'ies'}</summary><ul class="today-list">${last30.map(w => `<li><span>${uiFmtDate(w.date)}</span><span>${kgToLb(w.kg)} lb <span class="muted small">(${w.kg} kg)</span> <button class="btn link small" type="button" data-del-weight="${uiEsc(w.date)}" style="min-height:auto">Delete</button></span></li>`).join('')}</ul></details>` : ''}
+    ${last30.length ? `<details><summary>Last ${last30.length} entr${last30.length === 1 ? 'y' : 'ies'}</summary><ul class="today-list">${last30.map(w => `<li><span>${uiFmtDate(w.date)}</span><span class="num">${kgToLb(w.kg)} lb <span class="muted small">(${w.kg} kg)</span> <button class="btn link small" type="button" data-del-weight="${uiEsc(w.date)}" style="min-height:32px">Delete</button></span></li>`).join('')}</ul></details>` : ''}
   </section>`;
 }
 
 function todayChartSVG(points) {
-  const W = 360, H = 160, L = 44, R = 12, T = 12, B = 26;
+  const W = 360, H = 170, L = 48, R = 12, T = 14, B = 30;
   const lbs = points.map(p => kgToLb(p.kg));
   let lo = Math.min(...lbs), hi = Math.max(...lbs);
   if (hi - lo < 4) { lo -= 2; hi += 2; }
@@ -263,14 +219,14 @@ function todayChartSVG(points) {
   const y = lb => T + (hi - lb) / (hi - lo) * (H - T - B);
   const mid = Math.round((lo + hi) / 2);
   const path = points.map((p, i) => `${i ? 'L' : 'M'}${x(p).toFixed(1)},${y(kgToLb(p.kg)).toFixed(1)}`).join(' ');
-  return `<svg class="today-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weight over the last 90 days, ${lbs[0]} to ${lbs[lbs.length - 1]} pounds">
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weight over the last 90 days, ${lbs[0]} to ${lbs[lbs.length - 1]} pounds">
     <line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${H - B}"/><line class="axis" x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}"/>
-    <line class="axis" x1="${L}" y1="${y(mid).toFixed(1)}" x2="${W - R}" y2="${y(mid).toFixed(1)}" stroke-dasharray="3 3"/>
+    <line class="grid" x1="${L}" y1="${y(mid).toFixed(1)}" x2="${W - R}" y2="${y(mid).toFixed(1)}"/><line class="grid" x1="${L}" y1="${T}" x2="${W - R}" y2="${T}"/>
     <text x="${L - 6}" y="${T + 4}" text-anchor="end">${hi}</text><text x="${L - 6}" y="${y(mid).toFixed(1)}" dy="4" text-anchor="end">${mid}</text><text x="${L - 6}" y="${H - B}" text-anchor="end">${lo}</text>
+    <text class="axis-title" x="${L - 6}" y="${H - B + 14}" text-anchor="end">lb</text>
     <text x="${L}" y="${H - 8}">${uiEsc(uiFmtDate(points[0].date))}</text><text x="${W - R}" y="${H - 8}" text-anchor="end">${uiEsc(uiFmtDate(points[points.length - 1].date))}</text>
-    <text x="6" y="${T + 4}" font-size="10">lb</text>
     <path class="line" d="${path}"/>
-    ${points.map(p => `<circle class="pt" cx="${x(p).toFixed(1)}" cy="${y(kgToLb(p.kg)).toFixed(1)}" r="3"><title>${uiEsc(uiFmtDate(p.date))}: ${kgToLb(p.kg)} lb</title></circle>`).join('')}
+    ${points.map(p => `<circle class="pt" cx="${x(p).toFixed(1)}" cy="${y(kgToLb(p.kg)).toFixed(1)}" r="3.5"><title>${uiEsc(uiFmtDate(p.date))}: ${kgToLb(p.kg)} lb</title></circle>`).join('')}
   </svg>`;
 }
 
@@ -278,14 +234,14 @@ function todayExerciseHTML(person, exercise, exerciseKcal) {
   const wkg = todayLatestWeightKg(person);
   const count = !!(person.goals && person.goals.count_exercise);
   return `<section class="card" aria-labelledby="today-ex-h"><h2 id="today-ex-h">Exercise</h2>
-    ${exercise.length ? `<ul class="today-list">${exercise.map(e => `<li><span>${uiEsc(e.name || (ACTIVITIES.find(a => a.id === e.activity) || {}).label || e.activity)}${e.minutes ? `, ${e.minutes} min` : ''}</span><span>${e.kcal != null ? uiFmtNum(e.kcal) + ' kcal' : '<span class="muted">no estimate</span>'} <button class="btn link small" type="button" data-del-ex="${uiEsc(e.id)}" style="min-height:auto">Delete</button></span></li>`).join('')}</ul><p class="small muted">About ${uiFmtNum(exerciseKcal)} kcal today (estimate: MET x weight x hours, 2011 Compendium).</p>` : '<p class="small muted">Nothing logged.</p>'}
+    ${exercise.length ? `<div class="list">${exercise.map(e => `<div class="list-row"><div class="list-main"><div class="list-title">${uiEsc(e.name || (ACTIVITIES.find(a => a.id === e.activity) || {}).label || e.activity)}</div><div class="list-sub">${e.minutes ? `${e.minutes} min · ` : ''}${e.kcal != null ? `<span class="num">${uiFmtNum(e.kcal)} kcal</span>` : 'no estimate'}</div></div><div class="list-actions"><button class="btn small icon" type="button" data-del-ex="${uiEsc(e.id)}" aria-label="Delete this activity" title="Delete">${uiIcon('trash')}</button></div></div>`).join('')}</div><p class="small muted">About ${uiFmtNum(exerciseKcal)} kcal today (estimate: MET x weight x hours, 2011 Compendium).</p>` : '<p class="small muted">Nothing logged.</p>'}
     <div class="today-row"><div class="field"><label for="today-ex-act">Activity</label><select id="today-ex-act">${ACTIVITIES.map(a => `<option value="${a.id}">${uiEsc(a.label)}</option>`).join('')}</select></div>
       <div class="field" style="max-width:120px"><label for="today-ex-min">Minutes</label><input id="today-ex-min" type="number" inputmode="numeric" min="1" max="600" value="30"></div>
-      <button class="btn primary" type="button" id="today-add-ex">Add activity</button></div>
+      <button class="btn primary" type="button" id="today-add-ex">${uiIcon('plus')}Add activity</button></div>
     <div class="hint" id="today-ex-est">${wkg ? '' : 'Log a weight to get a calorie estimate for activities.'}</div>
-    <details style="margin-top:.5rem"><summary>Enter an activity by hand</summary>
+    <details><summary>Enter an activity by hand</summary>
       <div class="today-row"><div class="field"><label for="today-ex-name">Name</label><input id="today-ex-name" type="text" placeholder="Pickleball"></div><div class="field" style="max-width:120px"><label for="today-ex-kcal">Calories</label><input id="today-ex-kcal" type="number" inputmode="numeric" min="0" max="5000"></div><button class="btn" type="button" id="today-add-ex-manual">Add</button></div></details>
-    <label class="choice" style="margin-top:.75rem"><input type="checkbox" id="today-count-ex" ${count ? 'checked' : ''}><span class="choice-body"><span class="choice-title">Count exercise toward today's calories</span><div class="hint">Off by default. Activity estimates run high for many people; eating them back can cancel a deficit.</div></span></label>
+    ${uiSwitch('today-count-ex', "Count exercise toward today's calories", 'Off by default. Activity estimates run high for many people; eating them back can cancel a deficit.', count)}
   </section>`;
 }
 
@@ -370,6 +326,7 @@ function todayBind(root, person, plan, date) {
   }));
   root.querySelector('#today-count-ex').addEventListener('change', e => {
     person.goals.count_exercise = e.target.checked;
+    e.target.setAttribute('aria-checked', String(e.target.checked));
     uiPersist(); uiState.rerender();
   });
 }
@@ -383,7 +340,7 @@ function todayTargetModal(person, plan) {
     <div class="field" id="today-goal-loss" ${draft.goal === 'loss' ? '' : 'hidden'}><label for="today-deficit">Daily deficit: <span id="today-deficit-val">${draft.deficit}</span> kcal</label><input id="today-deficit" type="range" min="500" max="750" step="50" value="${draft.deficit}"><div class="hint">Guidelines use 500 to 750 kcal a day below maintenance. The estimate never goes below 1,200 kcal.</div></div>
     <div class="field" id="today-goal-manual" ${draft.goal === 'manual' ? '' : 'hidden'}><label for="today-manual">Calories per day</label><input id="today-manual" type="number" inputmode="numeric" min="800" max="6000" value="${uiEsc(draft.manual)}"><div class="hint">Use the number your clinician or dietitian gave you.</div></div>
     <div class="field" id="today-goal-activity" ${draft.goal === 'manual' ? 'hidden' : ''}><label for="today-activity">Usual activity</label><select id="today-activity">${ACTIVITY_LEVELS.map(l => `<option value="${l.id}" ${l.id === draft.activity ? 'selected' : ''}>${uiEsc(l.label)}</option>`).join('')}</select></div>
-    <div id="today-target-preview" class="notice info"></div>
+    <div id="today-target-preview" class="notice info plain"></div>
     <div class="btn-row"><button class="btn primary" type="button" id="today-target-save">Save</button>${g.calorie_target !== 'off' ? '<button class="btn" type="button" id="today-target-off">Turn off the target</button>' : ''}</div>
   `, { title: 'Calorie target' });
   if (!m) return;
@@ -393,15 +350,15 @@ function todayTargetModal(person, plan) {
     el.querySelector('#today-goal-loss').hidden = draft.goal !== 'loss';
     el.querySelector('#today-goal-manual').hidden = draft.goal !== 'manual';
     el.querySelector('#today-goal-activity').hidden = draft.goal === 'manual';
-    if (draft.goal === 'manual') { box.innerHTML = `<div class="notice-head">Info</div><div>${draft.manual ? uiFmtNum(draft.manual) + ' kcal a day, entered by you.' : 'Enter a number.'}</div>`; return; }
+    if (draft.goal === 'manual') { box.innerHTML = `<div class="notice-head">Info</div><div class="notice-body">${draft.manual ? uiFmtNum(draft.manual) + ' kcal a day, entered by you.' : 'Enter a number.'}</div>`; return; }
     const missing = [];
     if (!person.sex) missing.push('sex');
     if (!(Number(person.age) > 0)) missing.push('age');
     if (!(Number(person.weight_kg) > 0)) missing.push('weight');
     if (!(Number(person.height_cm) > 0)) missing.push('height');
-    if (missing.length) { box.innerHTML = `<div class="notice-head">Info</div><div>Missing: <strong>${missing.join(', ')}</strong>. <a href="#/people/${uiEsc(person.id)}">Add it on the People screen</a>, then come back. You can still save the goal now.</div>`; return; }
+    if (missing.length) { box.innerHTML = `<div class="notice-head">Info</div><div class="notice-body">Missing: <strong>${missing.join(', ')}</strong>. <a href="#/people/${uiEsc(person.id)}/basics">Add it on the Basics step</a>, then come back. You can still save the goal now.</div>`; return; }
     const t = energyTarget({ ...person, activity: draft.activity }, { goal: draft.goal, deficit: draft.deficit });
-    box.innerHTML = `<div class="notice-head">Estimate</div><div><strong>${uiFmtNum(t.kcal)} kcal a day</strong></div><details><summary>Notes</summary><ul class="small">${t.notes.map(n => `<li>${uiEsc(n)}</li>`).join('')}</ul></details>`;
+    box.innerHTML = `<div class="notice-head">Estimate</div><div class="notice-body"><strong>${uiFmtNum(t.kcal)} kcal a day</strong></div><details><summary>Notes</summary><ul class="small">${t.notes.map(n => `<li>${uiEsc(n)}</li>`).join('')}</ul></details>`;
   };
   el.querySelectorAll('[data-seg="today-goal"]').forEach(r => r.addEventListener('change', () => { draft.goal = r.value; el.querySelectorAll('[data-seg="today-goal"]').forEach(x => x.parentElement.classList.toggle('on', x.checked)); preview(); }));
   el.querySelector('#today-deficit').addEventListener('input', e => { draft.deficit = Number(e.target.value); el.querySelector('#today-deficit-val').textContent = draft.deficit; preview(); });
@@ -438,7 +395,7 @@ function todaySearchItems(person, plan, query, favOnly) {
 function todayAddModal(person, plan, date, meal) {
   const state = { q: '', fav: false };
   const m = uiModal(`
-    <div class="row"><input type="search" id="today-q" placeholder="Search recipes and foods" aria-label="Search recipes and foods" style="flex:1;min-width:0"><button class="today-chip" type="button" id="today-fav-chip" aria-pressed="false">&#9829; Favorites</button></div>
+    <div class="row"><input type="search" id="today-q" placeholder="Search recipes and foods" aria-label="Search recipes and foods" style="flex:1;min-width:0"><button class="today-chip" type="button" id="today-fav-chip" aria-pressed="false">${uiIcon('heart')}Favorites</button></div>
     <div id="today-results" style="margin-top:.5rem"></div>
     <details style="margin-top:.75rem"><summary>Custom entry (from a label)</summary>
       <div class="today-row"><div class="field"><label for="today-c-name">Name</label><input id="today-c-name" type="text"></div><div class="field" style="max-width:110px"><label for="today-c-kcal">kcal</label><input id="today-c-kcal" type="number" inputmode="numeric" min="0"></div></div>
@@ -451,9 +408,9 @@ function todayAddModal(person, plan, date, meal) {
   const draw = () => {
     const { out, total } = todaySearchItems(person, plan, state.q, state.fav);
     results.innerHTML = out.length ? `<p class="small muted" style="margin:0 0 .25rem">${total} match${total === 1 ? '' : 'es'}${total > out.length ? ', showing the first ' + out.length : ''}. Favorites first.</p>` + out.map(it => `<div class="today-result">
-      <button class="today-heart ${it.fav ? 'on' : ''}" type="button" data-fav="${it.kind}:${uiEsc(it.id)}" aria-pressed="${it.fav}" aria-label="${it.fav ? 'Remove from favorites' : 'Add to favorites'}">${it.fav ? '&#9829;' : '&#9825;'}</button>
+      <button class="heart-btn ${it.fav ? 'on' : ''}" type="button" data-fav="${it.kind}:${uiEsc(it.id)}" aria-pressed="${it.fav}" aria-label="${it.fav ? 'Remove from favorites' : 'Add to favorites'}">${uiIcon('heart', { fill: it.fav })}</button>
       <button class="pick" type="button" data-pick="${it.kind}:${uiEsc(it.id)}"><span class="dot ${it.verdict}" aria-hidden="true"></span><span class="visually-hidden">${uiVerdictWord(it.verdict)}: </span><strong>${uiEsc(it.name)}</strong><br><span class="small muted">${uiEsc(it.sub)}</span></button>
-    </div>`).join('') : `<p class="empty">${state.fav ? 'No favorites match. Tap the heart on any recipe or food to add one.' : 'No recipe or food matches.'}</p>`;
+    </div>`).join('') : uiEmptyState(state.fav ? 'No favorites match. Tap the heart on any recipe or food to add one.' : 'No recipe or food matches.', '', 'list');
     results.querySelectorAll('[data-fav]').forEach(b => b.addEventListener('click', () => { const [k, id] = b.dataset.fav.split(':'); todayToggleFavorite(person, k, id); draw(); }));
     results.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => { const [k, id] = b.dataset.pick.split(':'); m.close(); todayAmountModal(person, plan, { date, meal, kind: k, ref: id }); }));
   };
@@ -485,15 +442,15 @@ function todayAmountModal(person, plan, { date, meal, kind, ref, entry = null })
   if (kind === 'food' && draft.unit === 'g') draft.amount = draft.grams;
   const check = kind === 'recipe' ? checkRecipe(obj, plan, uiState.matcher, uiState.foodsById, person) : checkFood(obj, plan, uiState.matcher, person);
   const m = uiModal(`
-    <div class="row"><span class="badge ${check.verdict === 'fail' ? 'red' : check.verdict === 'caution' ? 'amber' : 'green'}">${uiVerdictWord(check.verdict)}</span> ${check.hits.length ? `<span class="small">Matches: ${check.hits.map(h => uiEsc(h.label) + (h.hard ? ' (hard)' : '')).join(', ')}</span>` : '<span class="small muted">No avoid tags matched.</span>'}</div>
-    ${check.verdict === 'fail' ? '<div class="notice block"><div class="notice-head">Stop</div><div>This has a hard exclusion for this person. You can still record that it was eaten, but it is not allowed by the plan.</div></div>' : ''}
+    <div class="row">${uiVerdictChip(check.verdict)} ${check.hits.length ? `<span class="small">Matches: ${check.hits.map(h => uiEsc(h.label) + (h.hard ? ' (hard)' : '')).join(', ')}</span>` : '<span class="small muted">No avoid tags matched.</span>'}</div>
+    ${check.verdict === 'fail' ? uiNoticeHTML({ level: 'block', text: 'This has a hard exclusion for this person. You can still record that it was eaten, but it is not allowed by the plan.' }) : ''}
     <div class="field"><label for="today-a-meal">Meal</label><select id="today-a-meal">${TODAY_MEALS.map(x => `<option value="${x.id}" ${x.id === draft.meal ? 'selected' : ''}>${x.label}</option>`).join('')}</select></div>
     ${kind === 'recipe' ? `<div class="field"><label for="today-a-amount">Servings (recipe makes ${obj.servings})</label><input id="today-a-amount" type="number" inputmode="decimal" min="0.5" step="0.5" value="${uiEsc(draft.amount)}"></div>`
     : `<div class="today-row"><div class="field"><label for="today-a-unit">Portion</label><select id="today-a-unit">${portions.map(p => `<option value="${uiEsc(p.label)}" data-grams="${p.grams}" ${draft.unit === p.label ? 'selected' : ''}>${uiEsc(p.label)} (${p.grams} g)</option>`).join('')}<option value="g" ${draft.unit === 'g' ? 'selected' : ''}>grams</option></select></div>
       <div class="field" style="max-width:130px"><label for="today-a-amount" id="today-a-amount-l">${draft.unit === 'g' ? 'Grams' : 'How many'}</label><input id="today-a-amount" type="number" inputmode="decimal" min="0" step="${draft.unit === 'g' ? '1' : '0.25'}" value="${uiEsc(draft.amount)}"></div></div>
       ${portions.length ? `<div class="btn-row" style="margin-top:0"><button class="btn small" type="button" id="today-a-one">1 serving (${uiEsc(portions[0].label)})</button></div>` : ''}`}
     <div class="field"><label for="today-a-note">Note (optional)</label><input id="today-a-note" type="text" value="${uiEsc(draft.note)}"></div>
-    <div class="notice info" id="today-a-preview"></div>
+    <div class="notice info plain" id="today-a-preview"></div>
     <div class="btn-row"><button class="btn primary" type="button" id="today-a-save">${entry ? 'Save changes' : 'Add'}</button></div>
   `, { title: name });
   if (!m) return;
@@ -511,7 +468,7 @@ function todayAmountModal(person, plan, { date, meal, kind, ref, entry = null })
       draft.grams = sel.value === 'g' ? amt : amt * Number(opt.dataset.grams || 0);
     }
     const n = todayNutrientsFor({ kind, ref, amount: draft.amount, grams: draft.grams });
-    el.querySelector('#today-a-preview').innerHTML = `<div class="notice-head">This entry</div><div>${uiFmtNum(n.kcal)} kcal · ${uiFmtNum(n.protein_g, 1)} g protein · ${uiFmtNum(n.carb_g, 1)} g carb · ${uiFmtNum(n.fiber_g, 1)} g fiber · ${uiFmtNum(n.sodium_mg)} mg sodium · ${uiFmtNum(n.satfat_g, 1)} g saturated fat${kind === 'food' ? ` · ${uiFmtNum(draft.grams)} g` : ''}</div>`;
+    el.querySelector('#today-a-preview').innerHTML = `<div class="notice-head">This entry</div><div class="notice-body">${uiFmtNum(n.kcal)} kcal · ${uiFmtNum(n.protein_g, 1)} g protein · ${uiFmtNum(n.carb_g, 1)} g carb · ${uiFmtNum(n.fiber_g, 1)} g fiber · ${uiFmtNum(n.sodium_mg)} mg sodium · ${uiFmtNum(n.satfat_g, 1)} g saturated fat${kind === 'food' ? ` · ${uiFmtNum(draft.grams)} g` : ''}</div>`;
     return n;
   };
   el.querySelector('#today-a-amount').addEventListener('input', compute);

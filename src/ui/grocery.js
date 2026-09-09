@@ -1,32 +1,11 @@
 // Grocery: list from the current week, grouped by food group, with eaters per day, shopper edits (quantity, grams, note,
 // remove), a change log that records every difference and why, copy and share, and a calendar (.ics) export of the week's meals.
 import { buildGroceryList, applyAdjustments, diffGrocery, groceryText } from '../engine/grocery.js';
-import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiWeekKey, uiFmtDate, uiFmtNum, uiToast, uiCopyText, uiPersist, uiIsoDate, uiToday, uiDownload } from './common.js';
+import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiWeekKey, uiFmtDate, uiFmtNum, uiToast, uiCopyText, uiPersist, uiIsoDate, uiToday, uiDownload, uiPageHeader, uiSection, uiChip, uiIcon, uiNoticeHTML, uiEmptyState } from './common.js';
 import { weekGet } from './week.js';
 
 const GROCERY_DAY_NAMES = { sun: 'Sunday', mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday' };
 const GROCERY_SLOT_LABEL = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' };
-const GROCERY_CSS = `
-.grocery-days { display:grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap:.4rem; margin-top:.5rem; }
-.grocery-days label { display:flex; flex-direction:column; gap:.2rem; font-size:.85rem; font-weight:600; }
-.grocery-days input { width:100%; min-height:40px; padding:.3rem .4rem; }
-.grocery-line { border-top:1px solid var(--border); }
-.grocery-line .grocery-item { border-top:0; }
-.grocery-line .grocery-row { display:flex; align-items:flex-start; gap:.4rem; }
-.grocery-line .grocery-row .grocery-item { flex:1; min-width:0; }
-.grocery-line.removed .g-name { text-decoration: line-through; color: var(--muted); }
-.grocery-edit { background:var(--surface-2); border-radius:10px; padding:.6rem .75rem; margin:.25rem 0 .5rem; }
-.grocery-edit .field { margin-bottom:.5rem; }
-.grocery-changes { list-style:none; padding:0; margin:.5rem 0 0; }
-.grocery-changes li { color: var(--red); padding:.35rem 0; border-top:1px solid var(--border); font-size:.95rem; }
-.grocery-changes li .why { color: var(--muted); }
-`;
-
-function groceryStyle() {
-  if (document.getElementById('grocery-style')) return;
-  const s = document.createElement('style'); s.id = 'grocery-style'; s.textContent = GROCERY_CSS; document.head.appendChild(s);
-}
-
 function groceryStorageKey(person) { return 'sn-grocery:' + uiWeekKey(person); }
 function groceryLoadChecked(person) {
   try { return new Set(JSON.parse(localStorage.getItem(groceryStorageKey(person)) || '[]')); } catch { return new Set(); }
@@ -160,11 +139,10 @@ export function groceryIcsForWeek(week, person, opts = {}) {
 function groceryChangeWord(t) { return t === 'added' ? 'Added' : t === 'removed' ? 'Removed' : 'Changed'; }
 
 export function renderGroceryScreen(root) {
-  groceryStyle();
   const person = uiActivePerson();
   const plan = uiPlanFor(person);
   if (!uiState.data.recipes.length) {
-    root.innerHTML = '<h1>Grocery</h1><p class="empty">No recipes are loaded, so there is no week to shop for.</p>';
+    root.innerHTML = `${uiPageHeader('Grocery')}${uiEmptyState('No recipes are loaded, so there is no week to shop for.', '', 'list')}`;
     return;
   }
   const { week, list } = groceryComputeList(person);
@@ -174,35 +152,31 @@ export function renderGroceryScreen(root) {
   const active = list.items.filter(i => !i.removed);
   const sodiumItems = active.filter(grocerySodiumFlag);
   const household = Math.max(1, Number((person.cooking || {}).household) || 1);
+  const sodiumMatters = !!(plan.limits.sodium_mg || plan.modules.some(m => /hypertension|heart-failure|ckd|kidney/.test(m.id)));
   root.innerHTML = `
-    <h1>Grocery</h1>
-    <p class="muted small">For the week starting ${uiFmtDate(week.days[0].date)}: ${active.length} items across ${groups.length} groups. Quantities are summed from recipe grams for the servings you will make. Ticks are remembered on this device for this week.</p>
-    <div class="btn-row" style="margin-top:0"><button class="btn primary" type="button" id="grocery-copy">Copy list</button><button class="btn" type="button" id="grocery-share">Share</button><button class="btn" type="button" id="grocery-ics">Add to calendar (.ics)</button></div>
-    <p class="small muted">The .ics file puts each day's meals on your calendar as an all-day event; Google Calendar, Apple Calendar, and Skylight can import an .ics file. There is no direct Google Keep or Skylight list integration (neither has a public list API), so Share or Copy is the way to get the list into those apps.</p>
-    <section class="card" aria-labelledby="grocery-eaters-h"><h2 id="grocery-eaters-h">Cooking for</h2>
-      <p class="small muted" style="margin:0">Household: ${household}. Change the number of eaters for any day (guests, someone away) and the week and list update; the change is logged below.</p>
-      <div class="grocery-days">${week.days.map(d => `<label>${uiEsc(uiFmtDate(d.date))}<input type="number" inputmode="numeric" min="1" max="20" value="${d.eaters}" data-eaters="${uiEsc(d.date)}" data-day="${uiEsc(d.day)}" aria-label="Eaters on ${uiEsc(uiFmtDate(d.date))}"></label>`).join('')}</div>
-    </section>
-    ${sodiumItems.length && (plan.limits.sodium_mg || plan.modules.some(m => /hypertension|heart-failure|ckd|kidney/.test(m.id))) ? `<div class="notice warn"><div class="notice-head">Caution</div><div><strong>Sodium:</strong> ${sodiumItems.map(i => uiEsc(i.name)).join(', ')} can carry a lot of salt. Canned goods, broths, and rotisserie chicken are the usual traps. Choose no-salt-added or low-sodium versions and rinse canned beans and vegetables. The plan counts the USDA value for the food as listed.</div></div>` : sodiumItems.length ? `<p class="small muted">Sodium note: ${sodiumItems.map(i => uiEsc(i.name)).join(', ')} tend to be salty. Low-sodium versions exist for most.</p>` : ''}
-    ${groups.length ? groups.map(([g, items]) => `<section class="card" aria-labelledby="g-${uiEsc(g).replace(/\W+/g, '-')}">
-      <h3 id="g-${uiEsc(g).replace(/\W+/g, '-')}">${uiEsc(g)}</h3>
+    ${uiPageHeader('Grocery', `Week starting ${uiFmtDate(week.days[0].date)}: ${active.length} items across ${groups.length} store sections. Quantities are summed from recipe grams for the servings you will make. Ticks are remembered on this device for this week.`)}
+    ${uiSection('Cooking for', `<p class="small muted">Household: ${household}. Change the number of eaters for any day (guests, someone away) and the week and list update; the change is logged below.</p>
+      <div class="grocery-days">${week.days.map(d => `<label>${uiEsc(uiFmtDate(d.date))}<input type="number" inputmode="numeric" min="1" max="20" value="${d.eaters}" data-eaters="${uiEsc(d.date)}" data-day="${uiEsc(d.day)}" aria-label="Eaters on ${uiEsc(uiFmtDate(d.date))}"></label>`).join('')}</div>`, { id: 'grocery-eaters-h' })}
+    ${sodiumItems.length && sodiumMatters ? uiNoticeHTML({ level: 'warn', text: `Sodium: ${sodiumItems.map(i => i.name).join(', ')} can carry a lot of salt. Canned goods, broths, and rotisserie chicken are the usual traps. Choose no-salt-added or low-sodium versions and rinse canned beans and vegetables. The plan counts the USDA value for the food as listed.` }) : sodiumItems.length ? `<p class="small muted">Sodium note: ${sodiumItems.map(i => uiEsc(i.name)).join(', ')} tend to be salty. Low-sodium versions exist for most.</p>` : ''}
+    ${groups.length ? `<div class="stack-2">${groups.map(([g, items]) => `<section class="grocery-group" aria-labelledby="g-${uiEsc(g).replace(/\W+/g, '-')}">
+      <div class="grocery-group-head"><h3 id="g-${uiEsc(g).replace(/\W+/g, '-')}">${uiEsc(g)}</h3><span class="count">${items.filter(i => !i.removed).length} item${items.filter(i => !i.removed).length === 1 ? '' : 's'}</span></div>
       ${items.map(it => `<div class="grocery-line ${it.removed ? 'removed' : ''}">
         <div class="grocery-row">
-          <label class="grocery-item ${checked.has(it.food) ? 'checked' : ''}"><input type="checkbox" data-food="${uiEsc(it.food)}" ${checked.has(it.food) ? 'checked' : ''} ${it.removed ? 'disabled' : ''}><span><span class="g-name"><strong>${uiEsc(it.name)}</strong> · ${uiEsc(it.quantity)}</span>${it.adjusted && !it.removed ? ' <span class="badge blue outline">edited</span>' : ''}${it.removed ? ' <span class="badge gray outline">removed</span>' : ''}<br><span class="small muted">For: ${(it.uses || []).map(uiEsc).join(', ') || 'you'}${(it.displays || []).length ? ' · ' + it.displays.map(uiEsc).join('; ') : ''}</span>${it.note ? `<br><span class="small">${uiEsc(it.note)}</span>` : ''}</span></label>
-          ${it.removed ? `<button class="btn small" type="button" data-restore="${uiEsc(it.food)}">Restore</button>` : `<button class="btn small" type="button" data-edit="${uiEsc(it.food)}" aria-expanded="false">Edit</button>`}
+          <label class="grocery-item ${checked.has(it.food) ? 'checked' : ''}"><input type="checkbox" data-food="${uiEsc(it.food)}" ${checked.has(it.food) ? 'checked' : ''} ${it.removed ? 'disabled' : ''}><span class="g-body"><span class="g-name">${uiEsc(it.name)}</span> <span class="g-qty num">· ${uiEsc(it.quantity)}</span>${it.removed ? ' ' + uiChip('removed', 'neutral') : ''}<br><span class="g-uses">For: ${(it.uses || []).map(uiEsc).join(', ') || 'you'}${(it.displays || []).length ? ' · ' + it.displays.map(uiEsc).join('; ') : ''}</span>${it.adjusted && !it.removed ? `<span class="g-note">${uiIcon('edit', { label: 'Edited' })}<span>${it.note ? uiEsc(it.note) : 'Edited by you'}</span></span>` : it.note ? `<br><span class="small">${uiEsc(it.note)}</span>` : ''}</span></label>
+          ${it.removed ? `<button class="btn small" type="button" data-restore="${uiEsc(it.food)}">Restore</button>` : `<button class="btn small icon" type="button" data-edit="${uiEsc(it.food)}" aria-expanded="false" aria-label="Edit ${uiEsc(it.name)}" title="Edit">${uiIcon('edit')}</button>`}
         </div>
         <div class="grocery-edit" hidden data-form="${uiEsc(it.food)}">
           <div class="field"><label for="ge-q-${uiEsc(it.food)}">Quantity (free text)</label><input id="ge-q-${uiEsc(it.food)}" type="text" value="${uiEsc(it.quantity)}" placeholder="1 can, 14 oz"></div>
           <div class="field"><label for="ge-g-${uiEsc(it.food)}">Grams</label><input id="ge-g-${uiEsc(it.food)}" type="number" inputmode="numeric" min="0" value="${uiEsc(it.grams)}"></div>
           <div class="field"><label for="ge-n-${uiEsc(it.food)}">Note or reason</label><input id="ge-n-${uiEsc(it.food)}" type="text" value="${uiEsc(it.note || '')}" placeholder="only 14 oz cans available"></div>
-          <div class="btn-row" style="margin-top:0"><button class="btn small primary" type="button" data-save="${uiEsc(it.food)}">Save</button><button class="btn small danger" type="button" data-remove="${uiEsc(it.food)}">Remove</button><button class="btn small" type="button" data-cancel="${uiEsc(it.food)}">Cancel</button></div>
+          <div class="btn-row" style="margin-top:8px"><button class="btn small primary" type="button" data-save="${uiEsc(it.food)}">Save</button><button class="btn small danger" type="button" data-remove="${uiEsc(it.food)}">Remove</button><button class="btn small" type="button" data-cancel="${uiEsc(it.food)}">Cancel</button></div>
         </div>
       </div>`).join('')}
-    </section>`).join('') : '<p class="empty">The week has no cooked meals, so the list is empty.</p>'}
-    <section class="card" aria-labelledby="grocery-changes-h"><h2 id="grocery-changes-h">Changes</h2>
-      ${changes.length ? `<ul class="grocery-changes">${changes.slice().reverse().map(c => `<li><strong>${groceryChangeWord(c.type)}</strong> ${uiEsc(c.name)}: ${c.type === 'added' ? `now ${uiEsc(c.to)}` : c.type === 'removed' ? `was ${uiEsc(c.from)}` : `was ${uiEsc(c.from || 'not on the list')}, now ${uiEsc(c.to)}`}. <span class="why">${uiEsc(c.reason)}</span></li>`).join('')}</ul>
-        <div class="btn-row"><button class="btn small" type="button" id="grocery-clear-changes">Clear the change log</button></div>` : '<p class="small muted">No changes yet this week. Regenerating, swapping a meal, changing eaters, or editing a line will be listed here with the reason.</p>'}
-    </section>
+    </section>`).join('')}</div>` : uiEmptyState('The week has no cooked meals, so the list is empty.', '<a class="btn small" href="#/week">Open the week</a>', 'list')}
+    ${uiSection('Changes', changes.length ? `<ul class="grocery-changes">${changes.slice().reverse().map(c => `<li><span class="change-word">${groceryChangeWord(c.type)}</span>${uiEsc(c.name)}: ${c.type === 'added' ? `now ${uiEsc(c.to)}` : c.type === 'removed' ? `was ${uiEsc(c.from)}` : `was ${uiEsc(c.from || 'not on the list')}, now ${uiEsc(c.to)}`}. <span class="why">${uiEsc(c.reason)}</span></li>`).join('')}</ul>
+        <div><button class="btn small" type="button" id="grocery-clear-changes">Clear the change log</button></div>` : '<p class="small muted">No changes yet this week. Regenerating, swapping a meal, changing eaters, or editing a line will be listed here with the reason.</p>', { id: 'grocery-changes-h' })}
+    <div class="action-bar sticky"><button class="btn primary" type="button" id="grocery-copy">${uiIcon('copy')}Copy</button><button class="btn" type="button" id="grocery-share">${uiIcon('share')}Share</button><button class="btn" type="button" id="grocery-ics">${uiIcon('calendar')}Calendar</button></div>
+    <p class="small muted">The .ics file puts each day's meals on your calendar as an all-day event; Google Calendar, Apple Calendar, and Skylight can import an .ics file. There is no direct Google Keep or Skylight list integration, so Share or Copy is the way to get the list into those apps.</p>
   `;
   root.querySelectorAll('[data-food]').forEach(inp => inp.addEventListener('change', () => {
     if (inp.checked) checked.add(inp.dataset.food); else checked.delete(inp.dataset.food);

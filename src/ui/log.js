@@ -1,6 +1,6 @@
 // Log: symptom diary. Meals eaten against symptoms, day by day. No analytics claims.
 import { checkText } from '../engine/checker.js';
-import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiIsoDate, uiToday, uiFmtDate, uiToast, uiVerdictWord } from './common.js';
+import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiIsoDate, uiToday, uiFmtDate, uiToast, uiPageHeader, uiSection, uiVerdictChip, uiNoticeHTML, uiEmptyState, uiIcon } from './common.js';
 import { weekGet } from './week.js';
 
 const LOG_SYMPTOMS = [
@@ -44,10 +44,10 @@ export function renderLogScreen(root) {
   const textCheck = d.text.trim() ? checkText(d.text, plan, uiState.matcher, person) : null;
 
   root.innerHTML = `
-    <h1>Log</h1>
-    ${inElimination.length ? `<div class="notice info"><div class="notice-head">Info</div><div>${inElimination.map(p => `${uiEsc(p.moduleName)} is in the ${uiEsc(p.label)} phase.`).join(' ')} This log is how you identify your triggers: note what you ate and how you felt over the next day or so, then compare across the reintroduction of each food group. The app records; it does not interpret.</div></div>` : ''}
+    ${uiPageHeader('Log', 'What you ate and how you felt, day by day. The app records; it does not interpret.')}
+    ${inElimination.length ? uiNoticeHTML({ level: 'info', text: `${inElimination.map(p => `${p.moduleName} is in the ${p.label} phase.`).join(' ')} This log is how you identify your triggers: note what you ate and how you felt over the next day or so, then compare across the reintroduction of each food group.` }) : ''}
     <div class="card">
-      <h2 style="margin-top:0">New entry</h2>
+      <h2>New entry</h2>
       <div class="grid-2">
         <div class="field"><label for="log-date">Date</label><input id="log-date" type="date" value="${uiEsc(d.date)}" max="${today}"></div>
         <div class="field"><label for="log-meal">Meal</label><select id="log-meal">${['breakfast', 'lunch', 'dinner', 'snack'].map(s => `<option value="${s}" ${d.meal === s ? 'selected' : ''}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`).join('')}</select></div>
@@ -56,22 +56,22 @@ export function renderLogScreen(root) {
         <select id="log-recipe"><option value="">Not from the plan</option>${dayMeals.map(m => `<option value="${uiEsc(m.recipe)}" ${d.recipe === m.recipe ? 'selected' : ''}>${uiEsc(m.slot)}: ${uiEsc(m.name)}</option>`).join('')}</select>
         ${!dayMeals.length ? '<div class="hint">No planned meals for this date. Describe the meal below instead.</div>' : ''}</div>
       <div class="field"><label for="log-text">Or describe what you ate</label><textarea id="log-text" style="min-height:80px" placeholder="oatmeal with banana and almond butter">${uiEsc(d.text)}</textarea>
-        ${textCheck ? `<div class="small" style="margin-top:.25rem"><span class="badge ${textCheck.verdict === 'fail' ? 'red' : textCheck.verdict === 'caution' ? 'amber' : 'green'}">${uiVerdictWord(textCheck.verdict)}</span> ${textCheck.hits.length ? 'Matched: ' + textCheck.hits.map(h => uiEsc(h.label)).join(', ') + '.' : ''} ${textCheck.unrecognized.length ? 'Not recognized: ' + textCheck.unrecognized.map(uiEsc).join('; ') + '.' : ''}</div>` : ''}</div>
+        ${textCheck ? `<div class="small row" style="margin-top:6px">${uiVerdictChip(textCheck.verdict)} <span>${textCheck.hits.length ? 'Matched: ' + textCheck.hits.map(h => uiEsc(h.label)).join(', ') + '.' : ''} ${textCheck.unrecognized.length ? 'Not recognized: ' + textCheck.unrecognized.map(uiEsc).join('; ') + '.' : ''}</span></div>` : ''}</div>
       <h3>Symptoms</h3>
       <p class="small muted">Slide each one from 0 (none) to 3 (severe). Leave anything that did not happen at 0.</p>
       <div class="symptom-grid">
       ${LOG_SYMPTOMS.map(s => `<div class="field symptom"><label for="log-sym-${s.id}"><span class="symptom-name">${s.label}</span> <span class="symptom-val" id="log-symval-${s.id}">${LOG_LEVELS[d.symptoms[s.id] || 0]}</span></label><div class="hint">${s.help}</div><input id="log-sym-${s.id}" type="range" min="0" max="3" step="1" value="${d.symptoms[s.id] || 0}" data-sym="${s.id}" aria-valuetext="${LOG_LEVELS[d.symptoms[s.id] || 0]}" aria-describedby="log-symhelp-${s.id}"><span class="visually-hidden" id="log-symhelp-${s.id}">${s.help}. 0 none, 1 mild, 2 moderate, 3 severe.</span></div>`).join('')}
       </div>
       <div class="field"><label for="log-notes">Notes</label><textarea id="log-notes" style="min-height:70px">${uiEsc(d.notes)}</textarea></div>
-      <div class="btn-row"><button class="btn primary" type="button" id="log-save">Save entry</button></div>
+      <div class="btn-row"><button class="btn primary" type="button" id="log-save">${uiIcon('check')}Save entry</button></div>
     </div>
 
-    <h2>Last 14 days</h2>
-    ${Object.keys(byDate).length ? Object.entries(byDate).map(([date, list]) => `<section class="card tight"><h3>${uiFmtDate(date)}</h3>
-      ${list.map(e => `<div class="rule"><div class="row between"><div><strong>${uiEsc(e.meal || '')}</strong> ${e.name ? uiEsc(e.name) : e.recipe && uiState.recipesById.get(e.recipe) ? uiEsc(uiState.recipesById.get(e.recipe).name) : ''} ${e.text ? `<span class="muted">${uiEsc(e.text)}</span>` : ''}</div><button class="btn small danger" type="button" data-del="${uiEsc(e.logged_at || '')}|${uiEsc(e.date)}|${uiEsc(e.meal || '')}">Delete</button></div>
-        <div class="small">${Object.entries(e.symptoms || {}).filter(([, v]) => v > 0).map(([k, v]) => `${uiEsc((LOG_SYMPTOMS.find(s => s.id === k) || { label: LOG_LEGACY_LABELS[k] || k }).label)}: ${LOG_LEVELS[v] || v}`).join(', ') || '<span class="muted">no symptoms recorded</span>'}</div>
-        ${e.notes ? `<div class="small muted">${uiEsc(e.notes)}</div>` : ''}</div>`).join('')}
-    </section>`).join('') : '<p class="empty">No entries in the last 14 days.</p>'}
+    ${uiSection('Last 14 days', Object.keys(byDate).length ? `<div class="stack-2">${Object.entries(byDate).map(([date, list]) => `<section class="log-day"><h3>${uiFmtDate(date)}</h3>
+      <div class="list">${list.map(e => `<div class="list-row"><div class="list-main"><div class="list-title">${uiEsc(e.meal || '')} <span style="font-weight:400">${e.name ? uiEsc(e.name) : e.recipe && uiState.recipesById.get(e.recipe) ? uiEsc(uiState.recipesById.get(e.recipe).name) : ''}</span> ${e.text ? `<span class="muted" style="font-weight:400">${uiEsc(e.text)}</span>` : ''}</div>
+        <div class="list-sub">${Object.entries(e.symptoms || {}).filter(([, v]) => v > 0).map(([k, v]) => `${uiEsc((LOG_SYMPTOMS.find(s => s.id === k) || { label: LOG_LEGACY_LABELS[k] || k }).label)}: ${LOG_LEVELS[v] || v}`).join(', ') || 'no symptoms recorded'}</div>
+        ${e.notes ? `<div class="small">${uiEsc(e.notes)}</div>` : ''}</div>
+        <div class="list-actions"><button class="btn small danger" type="button" data-del="${uiEsc(e.logged_at || '')}|${uiEsc(e.date)}|${uiEsc(e.meal || '')}">Delete</button></div></div>`).join('')}</div>
+    </section>`).join('')}</div>` : uiEmptyState('No entries in the last 14 days.', '', 'list'), { id: 'log-recent-h' })}
     <p class="small muted">The log is a record for you and your clinician. The app does not analyze it or claim to find causes.</p>
   `;
 

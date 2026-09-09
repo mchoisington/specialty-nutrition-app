@@ -2,7 +2,7 @@
 // Weight and height are entered in pounds and feet/inches and stored in kilograms and centimetres.
 import { newPerson } from '../store.js';
 import { lbToKg, kgToLb, ftInToCm, cmToFtIn, ACTIVITY_LEVELS } from '../engine/energy.js';
-import { uiState, uiEsc, uiPersist, uiActivePerson, uiSetActive, uiPlanFor, uiRatingBadge, uiSegmented, uiMultiPills, uiYesNo, uiNavigate, uiToast, uiModal, uiFindPersonById, UI_ALLERGENS, uiTagLabel, uiModuleName, uiNutrientLabel, uiEnsurePerson, uiParamUnit, uiBigChoices, uiBigToggles, uiEnsureUserDefinedSource, uiUserDefinedBadge, uiWeightHeightText } from './common.js';
+import { uiState, uiEsc, uiPersist, uiActivePerson, uiSetActive, uiPlanFor, uiRatingBadge, uiSegmented, uiMultiPills, uiYesNo, uiNavigate, uiToast, uiModal, uiFindPersonById, UI_ALLERGENS, uiTagLabel, uiModuleName, uiNutrientLabel, uiEnsurePerson, uiParamUnit, uiBigChoices, uiBigToggles, uiEnsureUserDefinedSource, uiUserDefinedBadge, uiWeightHeightText, uiPageHeader, uiSection, uiChip, uiIcon, uiAvatar, uiEmptyState, uiNoticeHTML } from './common.js';
 import { learnArticleHTML } from './learn.js';
 
 const PEOPLE_STEPS = [
@@ -139,7 +139,7 @@ export function renderPeopleScreen(root, ctx) {
   if (!parts.length) return peopleRenderList(root);
   if (parts[0] === 'new') return peopleRenderNew(root);
   const person = uiEnsurePerson(uiFindPersonById(parts[0]));
-  if (!person) { root.innerHTML = '<h1>People</h1><p class="empty">That person was not found.</p><a class="btn" href="#/people">Back to People</a>'; return; }
+  if (!person) { root.innerHTML = `${uiPageHeader('People')}${uiEmptyState('That person was not found.', '<a class="btn" href="#/people">All people</a>')}`; return; }
   const steps = peopleStepsFor(person);
   const stepId = steps.some(s => s.id === parts[1]) ? parts[1] : steps[0].id;
   const sub = stepId === 'cooking' ? (PEOPLE_COOKING_SUBS.some(c => c.id === parts[2]) ? parts[2] : 'time') : null;
@@ -150,27 +150,26 @@ function peopleRenderList(root) {
   const people = uiState.profile.people;
   const active = uiActivePerson();
   root.innerHTML = `
-    <div class="row between"><h1>People</h1><a class="btn primary" href="#/people/new">Add a person</a></div>
-    <p class="muted">Each person has their own conditions, allergens, numbers, and week. Only the active person's plan is shown on the other screens.</p>
-    ${people.length ? people.map(p => {
+    ${uiPageHeader('People', "Each person has their own conditions, allergens, numbers, and week. Only the active person's plan is shown on the other screens.", `<a class="btn primary" href="#/people/new">${uiIcon('plus')}Add a person</a>`)}
+    ${people.length ? `<div class="stack-2">${people.map(p => {
       const isActive = active && active.id === p.id;
       const mods = (p.modules || []).length + (p.custom_modules || []).length;
       const allergens = (p.allergens || []).map(peopleAllergenLabel);
       const summary = [`${mods} module${mods === 1 ? '' : 's'}`, allergens.length ? `allergens: ${allergens.join(', ')}` : 'no allergens', p.adult === false ? 'caregiver mode' : ''].filter(Boolean).join(', ');
       return `
       <div class="card person-card">
-        <div class="person-row"><span class="avatar" aria-hidden="true">${uiEsc(p.name.slice(0, 1).toUpperCase())}</span>
-          <div class="person-main"><div class="name">${uiEsc(p.name)} ${isActive ? '<span class="badge blue">active</span>' : ''}${p.setup_complete ? '' : ' <span class="badge amber">setup not finished</span>'}</div>
+        <div class="person-row">${uiAvatar(p.name, { size: 'lg', tone: p.guest ? 'plum' : '' })}
+          <div class="person-main"><div class="name">${uiEsc(p.name)} ${isActive ? uiChip('active', 'plum') : ''}${p.guest ? ' ' + uiChip('Guest', 'plum') : ''}${p.setup_complete ? '' : ' ' + uiChip('setup not finished', 'caution')}</div>
           <div class="small muted">${uiEsc(summary)}</div></div>
         </div>
         <div class="btn-row">
-          ${isActive ? '<span class="btn small" aria-disabled="true" style="opacity:.6">Active now</span>' : `<button class="btn small" type="button" data-activate="${uiEsc(p.id)}">Set active</button>`}
+          ${isActive ? '' : `<button class="btn small" type="button" data-activate="${uiEsc(p.id)}">${uiIcon('check')}Set active</button>`}
           ${p.setup_complete ? '' : `<a class="btn small primary" href="#/people/${uiEsc(p.id)}/basics">Finish setup</a>`}
-          <button class="btn small danger" type="button" data-delete="${uiEsc(p.id)}">Delete</button>
+          <button class="btn small danger" type="button" data-delete="${uiEsc(p.id)}">${uiIcon('trash')}Delete</button>
         </div>
-        ${p.setup_complete ? `<div class="edit-row" role="group" aria-label="Edit ${uiEsc(p.name)}"><span class="small muted edit-label">Edit:</span>${peopleStepsFor(p).map(s => `<a class="btn small" href="#/people/${uiEsc(p.id)}/${s.id}${s.id === 'cooking' ? '/time' : ''}">${s.label}</a>`).join('')}</div>` : ''}
+        ${p.setup_complete ? `<div class="edit-row" role="group" aria-label="Edit ${uiEsc(p.name)}"><span class="small muted edit-label">${uiIcon('edit')}Edit</span>${peopleStepsFor(p).map(s => `<a class="chip neutral" href="#/people/${uiEsc(p.id)}/${s.id}${s.id === 'cooking' ? '/time' : ''}">${s.label}</a>`).join('')}</div>` : ''}
       </div>`;
-    }).join('') : '<p class="empty">No people yet. Add the first person to build a plan.</p>'}
+    }).join('')}</div>` : uiEmptyState('No people yet. Add the first person to build a plan.', `<a class="btn primary" href="#/people/new">Add a person</a>`)}
   `;
   root.querySelectorAll('[data-activate]').forEach(b => b.addEventListener('click', () => { uiSetActive(b.dataset.activate); uiToast('Active person changed.'); uiState.rerender(); }));
   root.querySelectorAll('[data-delete]').forEach(b => b.addEventListener('click', () => {
@@ -189,8 +188,7 @@ function peopleRenderList(root) {
 function peopleRenderNew(root) {
   const first = !uiState.profile.people.length;
   root.innerHTML = `
-    <h1>${first ? 'Welcome' : 'Add a person'}</h1>
-    ${first ? '<p>This app keeps everything on this device. Start by adding the first person. You can add family members later, each with their own plan.</p>' : ''}
+    ${uiPageHeader(first ? 'The first person' : 'Add a person', first ? 'Everything stays on this device. Start with one person; family members can be added later, each with their own plan.' : 'A new person gets their own conditions, allergens, numbers, and week.')}
     <div class="card">
       <form id="people-new-form">
         <div class="field"><label for="people-new-name">Name</label><input id="people-new-name" type="text" autocomplete="off" required maxlength="40"></div>
@@ -221,21 +219,24 @@ function peopleRenderStepper(root, person, stepId, sub) {
   const prev = pages[pageIdx - 1] || null;
   const next = pages[pageIdx + 1] || null;
   const done = !!person.setup_complete;
+  const cur = steps[idx];
   root.innerHTML = `
-    <div class="row between"><h1>${uiEsc(person.name)}</h1><a class="btn small" href="#/people">Back to People</a></div>
-    ${done ? '' : '<p class="small muted">Setting up. Use Next to walk through each step; the plan is ready once you save on the Review step.</p>'}
-    <div class="stepper" role="list" aria-label="Steps">
+    ${uiPageHeader(uiEsc(person.name), done ? `Editing: ${uiEsc(cur.label)}.` : 'Setting up. Use Next to walk through each step; the plan is ready once you save on the Review step.', `<a class="btn small" href="#/people">${uiIcon('people')}All people</a>`)}
+    <div class="stepper" aria-label="Steps">
+      <div class="stepper-status">Step ${idx + 1} of ${steps.length}: ${uiEsc(cur.label)}</div>
+      <div class="stepper-bar" aria-hidden="true">${steps.map((s, i) => `<span class="${i < idx ? 'done' : i === idx ? 'current' : ''}"></span>`).join('')}</div>
+      <div class="stepper-names" role="list">
       ${steps.map((s, i) => {
         const clickable = done || i <= idx;
         return `<button type="button" role="listitem" data-step="${s.id}" ${s.id === stepId ? 'aria-current="step"' : ''} class="${i < idx ? 'done' : ''}" ${clickable ? '' : 'disabled aria-disabled="true"'}>${i + 1}. ${s.label}</button>`;
       }).join('')}
+      </div>
     </div>
     <div id="people-step"></div>
     <div class="btn-row people-actions">
-      ${prev ? `<button class="btn" type="button" data-step="${prev.hash}">Back</button>` : ''}
-      ${next ? `<button class="btn primary" type="button" data-step="${next.hash}">Next: ${uiEsc(next.label)}</button>` : ''}
+      ${prev ? `<button class="btn" type="button" data-step="${prev.hash}">${uiIcon('arrow-left')}Back</button>` : ''}
+      ${next ? `<button class="btn primary" type="button" data-step="${next.hash}">Next: ${uiEsc(next.label)}${uiIcon('arrow-right')}</button>` : ''}
       <button class="btn" type="button" id="people-save">Save</button>
-      <a class="btn" href="#/people">Back to People</a>
     </div>`;
   root.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => {
     const target = b.dataset.step === 'cooking' ? 'cooking/time' : b.dataset.step;
@@ -288,7 +289,7 @@ function peopleStepBasics(container, person) {
     <div class="card">
       <div class="field"><label for="pb-name">Name</label><input id="pb-name" type="text" value="${uiEsc(person.name)}" maxlength="40"></div>
       <div class="field"><span class="label">Is this person an adult (18 or older)?</span>${uiYesNo('adult', person.adult !== false)}
-        ${person.adult === false ? `<div class="notice block" style="margin-top:.5rem"><div class="notice-head">Stop</div><div>This app is for adults. A caregiver may use it to manage a child's confirmed celiac disease or diagnosed food allergies only. The other steps are turned off for this profile.</div></div>` : ''}
+        ${person.adult === false ? uiNoticeHTML({ level: 'block', text: "This app is for adults. A caregiver may use it to manage a child's confirmed celiac disease or diagnosed food allergies only. The other steps are turned off for this profile." }) : ''}
       </div>
       <div class="field"><span class="label">Sex</span>${uiSegmented('sex', [{ value: 'female', label: 'Female' }, { value: 'male', label: 'Male' }, { value: 'other', label: 'Other or prefer not to say' }], person.sex || '')}
         <div class="hint">Used only where a rule differs by sex.</div></div>
@@ -352,7 +353,7 @@ function peopleStepConditions(container, person) {
   for (const c of cats) if (!groups.some(g => g.key === c)) groups.push({ key: c, title: c.charAt(0).toUpperCase() + c.slice(1) });
   container.innerHTML = `
     <p>Select everything that applies. The plan merges the rules and shows every conflict rather than picking a side. Tap a name to read about it before choosing.</p>
-    ${modules.length ? '' : '<p class="empty">No condition modules are loaded (data/conditions.json is missing or empty).</p>'}
+    ${modules.length ? '' : uiEmptyState('No condition modules are loaded (data/conditions.json is missing or empty).', '', 'list')}
     ${groups.map(g => {
       const list = modules.filter(m => m.category === g.key);
       if (!list.length) return '';
@@ -469,7 +470,7 @@ function peopleStepAllergens(container, person) {
   const allergyModule = uiState.conditionsById.get('food-allergies');
   const configurable = ((allergyModule && allergyModule.rules) || []).filter(r => r.configurable);
   container.innerHTML = `
-    <div class="notice block"><div class="notice-head">Stop</div><div>Allergens are hard exclusions. Nothing in this app overrides them: not a preference, not a mode, not an acknowledgment. When an ingredient is not recognized, the app says so and does not assume it is safe.</div></div>
+    ${uiNoticeHTML({ level: 'block', text: 'Allergens are hard exclusions. Nothing in this app overrides them: not a preference, not a mode, not an acknowledgment. When an ingredient is not recognized, the app says so and does not assume it is safe.' })}
     <p>Confirmed food allergies (the nine FDA major allergens):</p>
     <div class="choice-list">
       ${UI_ALLERGENS.map(a => `<label class="choice"><input type="checkbox" data-allergen="${a.tag}" ${sel.has(a.tag) ? 'checked' : ''}><span class="choice-body"><span class="choice-title">${a.label}</span></span></label>`).join('')}
@@ -636,8 +637,8 @@ function peopleCustomDietHTML(person) {
 
 function peopleProposalHTML(p) {
   const list = arr => Array.isArray(arr) && arr.length ? arr.map(x => uiEsc(String(x))).join(', ') : '<span class="muted">none</span>';
-  return `<div class="notice info proposal" role="status"><div class="notice-head">Claude's suggestion</div>
-    <div><strong>This is Claude's summary from general knowledge, not a medical source. Check it, change anything wrong, then save.</strong></div>
+  return `<div class="notice info proposal plain" role="status"><div class="notice-head">Claude's suggestion</div>
+    <div class="notice-body"><strong>This is Claude's summary from general knowledge, not a medical source. Check it, change anything wrong, then save.</strong>
     <dl class="kv" style="margin-top:.5rem">
       <dt>Summary</dt><dd>${uiEsc(p.summary || '')}</dd>
       <dt>Avoid</dt><dd>${list((p.avoid_tags || []).map(uiTagLabel))}</dd>
@@ -647,7 +648,7 @@ function peopleProposalHTML(p) {
       <dt>Cautions</dt><dd>${list(p.cautions)}</dd>
     </dl>
     <div class="btn-row"><button class="btn primary small" type="button" id="cd-accept">Put this into the form</button><button class="btn small" type="button" id="cd-dismiss">Ignore</button></div>
-    <p class="small muted" style="margin:.5rem 0 0">Nothing is saved until you press "Save this diet".</p></div>`;
+    <p class="small muted">Nothing is saved until you press "Save this diet".</p></div></div>`;
 }
 
 function peopleReadCustomForm(container, d) {
@@ -789,7 +790,7 @@ function peopleStepMedications(container, person) {
       <span class="label">${uiEsc(q.text)}</span>
       <div class="small muted" style="margin-bottom:.5rem">Asked by ${uiEsc(q.moduleName)}.</div>
       ${uiYesNo('med-' + q.id, person.medications[q.id] === true ? true : person.medications[q.id] === false ? false : null)}
-    </div>`).join('') : '<p class="empty">No medication questions apply to the modules you selected.</p>'}`;
+    </div>`).join('') : uiEmptyState('No medication questions apply to the modules you selected.')}`;
   for (const q of qs) peopleBindSeg(container, person, 'medications', 'med-' + q.id, v => { person.medications[q.id] = v === 'yes'; }, { rerender: false });
 }
 
@@ -820,19 +821,19 @@ function peopleStepClinician(container, person) {
   const applied = new Map(plan.tier2.applied.map(a => [a.param, a.value]));
   container.innerHTML = `
     <p>These numbers are Tier 2: the app knows the published range but does not choose a value for you. Until a number is entered, the module runs on its Tier 1 rules only and the plan says so.</p>
-    ${list.some(t => /per_kg/.test(t.param)) && !person.weight_kg ? '<div class="notice warn"><div class="notice-head">Caution</div><div>Some of these are per kilogram of body weight. Enter a weight on the Basics step so they can become daily numbers.</div></div>' : ''}
+    ${list.some(t => /per_kg/.test(t.param)) && !person.weight_kg ? uiNoticeHTML({ level: 'warn', text: 'Some of these are per kilogram of body weight. Enter a weight on the Basics step so they can become daily numbers.' }) : ''}
     ${list.length ? list.map(t => `<div class="card">
-      <label for="pt-${uiEsc(t.param)}">${uiEsc(t.label || t.param)}${/per_kg/.test(t.param) ? ' <span class="badge gray outline">per kilogram</span>' : ''}</label>
+      <label for="pt-${uiEsc(t.param)}">${uiEsc(t.label || t.param)}${/per_kg/.test(t.param) ? ' ' + uiChip('per kilogram', 'neutral') : ''}</label>
       <div class="small muted">${uiEsc(t.moduleName || '')}${t.when ? ` (applies when: ${uiEsc(t.when)})` : ''}</div>
       ${t.consensus ? `<div class="small"><strong>Published range:</strong> ${uiEsc(t.consensus)}</div>` : ''}
       ${t.why ? `<div class="small muted">${uiEsc(t.why)}</div>` : ''}
       <div class="row" style="margin-top:.5rem">
         <input id="pt-${uiEsc(t.param)}" type="number" inputmode="decimal" step="any" style="max-width:220px" data-tier2="${uiEsc(t.param)}" value="${typeof person.tier2[t.param] === 'number' ? person.tier2[t.param] : ''}" aria-describedby="pt-help-${uiEsc(t.param)}">
         <span class="muted small">${uiEsc(uiParamUnit(t.param))}</span>
-        ${applied.has(t.param) ? '<span class="badge blue">clinician-set, applied</span>' : typeof person.tier2[t.param] === 'number' ? '<span class="badge gray">saved, not currently used</span>' : t.declaredOnly ? '<span class="badge gray">not needed right now</span>' : '<span class="badge amber">not applied</span>'}
+        ${applied.has(t.param) ? uiChip('clinician-set, applied', 'plum') : typeof person.tier2[t.param] === 'number' ? uiChip('saved, not currently used', 'neutral') : t.declaredOnly ? uiChip('not needed right now', 'neutral') : uiChip('not applied', 'caution')}
       </div>
       <p id="pt-help-${uiEsc(t.param)}" class="small" style="margin:.5rem 0 0"><strong>Enter the number your clinician gave you. The app does not set this.</strong></p>
-    </div>`).join('') : '<p class="empty">No clinician-set numbers are needed for the modules you selected.</p>'}`;
+    </div>`).join('') : uiEmptyState('No clinician-set numbers are needed for the modules you selected.')}`;
   container.querySelectorAll('[data-tier2]').forEach(inp => inp.addEventListener('change', () => {
     const v = inp.value.trim();
     if (v === '') delete person.tier2[inp.dataset.tier2]; else person.tier2[inp.dataset.tier2] = Number(v);
@@ -887,9 +888,9 @@ function peopleStepCooking(container, person, sub) {
       ${uiBigChoices('leftovers', PEOPLE_LEFTOVER_OPTIONS, c.leftovers || 'ok', { label: 'Leftovers' })}
       <h2 class="big-q" style="margin-top:1.5rem" id="pc-household-label">How many people are you usually cooking for?</h2>
       <div class="stepper-ctl" role="group" aria-labelledby="pc-household-label">
-        <button class="btn stepper-btn" type="button" id="pc-minus" aria-label="Fewer people">&minus;</button>
+        <button class="btn stepper-btn" type="button" id="pc-minus" aria-label="Fewer people">${uiIcon('minus')}</button>
         <output class="stepper-value" id="pc-household" aria-live="polite">${household}</output>
-        <button class="btn stepper-btn" type="button" id="pc-plus" aria-label="More people">+</button>
+        <button class="btn stepper-btn" type="button" id="pc-plus" aria-label="More people">${uiIcon('plus')}</button>
       </div>
       <h2 class="big-q" style="margin-top:1.5rem">Where do you shop?</h2>
       ${uiBigChoices('grocery', PEOPLE_SHOP_OPTIONS, c.grocery || 'supermarket', { label: 'Where you shop' })}
@@ -949,8 +950,8 @@ function peopleStepReview(container, person) {
   ];
   container.innerHTML = `
     <div class="card"><dl class="kv">${kv.map(([k, v]) => `<dt>${uiEsc(k)}</dt><dd>${v}</dd>`).join('')}</dl></div>
-    ${plan.notices.filter(n => n.level !== 'info').length ? `<h2>The plan will show these notices</h2>${plan.notices.filter(n => n.level !== 'info').map(n => `<div class="notice ${n.level}"><div class="notice-head">${n.level === 'block' ? 'Stop' : 'Caution'}</div><div>${uiEsc(n.text)}</div></div>`).join('')}` : ''}
-    <div class="finish"><button class="btn primary big" type="button" id="pr-save">Save and see my plan</button><p class="small muted" style="margin:.5rem 0 0">You can come back and change any step from the People screen.</p></div>`;
+    ${plan.notices.filter(n => n.level !== 'info').length ? `<h2>The plan will show these notices</h2><div class="stack">${plan.notices.filter(n => n.level !== 'info').map(n => uiNoticeHTML(n)).join('')}</div>` : ''}
+    <div class="finish"><button class="btn primary big" type="button" id="pr-save">${uiIcon('check')}Save and see my plan</button><p class="small muted">You can come back and change any step from the People screen.</p></div>`;
   container.querySelector('#pr-save').addEventListener('click', () => {
     person.setup_complete = true;
     uiSetActive(person.id);

@@ -154,7 +154,7 @@ export function appRender() {
     return;
   }
   if (profile.people.length && uiState.route.screen === 'welcome') { uiState.navReplaceNext = true; location.replace('#/home'); return; }
-  if (uiState.modalClose) uiState.modalClose();
+  if (uiState.modalClose) uiState.modalClose({ silent: true });
   appRenderNav();
   main.innerHTML = '';
   main.classList.toggle('print-sheet', false);

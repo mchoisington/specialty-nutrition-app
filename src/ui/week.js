@@ -2,24 +2,13 @@
 import { buildWeekPlan, scoreRecipe } from '../engine/planner.js';
 import { checkRecipe } from '../engine/checker.js';
 import { compareToPlan, recipeTotals, emptyTotals, addTotals, round } from '../engine/nutrition.js';
-import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiWeekKey, uiToday, uiIsoDate, uiFmtDate, uiFmtNum, uiNutrientLabel, uiModal, uiToast, uiVerdictWord, uiTagLabel } from './common.js';
+import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiWeekKey, uiToday, uiIsoDate, uiFmtDate, uiFmtNum, uiNutrientLabel, uiModal, uiToast, uiVerdictWord, uiVerdictChip, uiTagLabel, uiPageHeader, uiSection, uiChip, uiIcon, uiNoticeHTML, uiEmptyState, uiSwitch, uiMeterTone } from './common.js';
 import { grocerySyncChanges, grocerySetEaters } from './grocery.js';
-import { todayAddDiaryEntry, todayIsFavorite, todayToggleFavorite } from './today.js';
+import { todayAddDiaryEntry, todayIsFavorite, todayToggleFavorite, todayTargetInfo } from './today.js';
 
 const WEEK_SLOT_LABEL = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' };
 const WEEK_DAY_NAMES = { sun: 'Sunday', mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday' };
-const WEEK_CSS = `
-.week-heart { background:none; border:0; font:inherit; font-size:1.15rem; line-height:1; cursor:pointer; color:var(--muted); padding:.1rem .3rem; min-height:32px; vertical-align:middle; }
-.week-heart.on { color:var(--red); }
-.week-eaters { display:inline-flex; align-items:center; gap:.3rem; font-size:.85rem; color:var(--muted); margin-left:auto; }
-.week-eaters input { width:64px; min-height:36px; padding:.2rem .4rem; }
-@media (max-width: 520px) { .meal { grid-template-columns: 1fr; } .meal .meal-actions { justify-content: flex-start; } }
-`;
-
-function weekStyle() {
-  if (document.getElementById('week-style')) return;
-  const s = document.createElement('style'); s.id = 'week-style'; s.textContent = WEEK_CSS; document.head.appendChild(s);
-}
+const WEEK_DAY_SHORT = { sun: 'Sun', mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat' };
 
 export function weekGet(person, plan) {
   const key = uiWeekKey(person);
@@ -57,19 +46,18 @@ export function renderWeekScreen(root) {
   const person = uiActivePerson();
   const plan = uiPlanFor(person);
   if (!uiState.data.recipes.length) {
-    root.innerHTML = '<h1>Week</h1><p class="empty">No recipes are loaded (data/recipes.json is missing or empty), so a week cannot be built.</p>';
+    root.innerHTML = `${uiPageHeader('Week')}${uiEmptyState('No recipes are loaded (data/recipes.json is missing or empty), so a week cannot be built.')}`;
     return;
   }
-  weekStyle();
   const week = weekGet(person, plan);
   const budget = !!(person.cooking && person.cooking.budget);
   const household = Math.max(1, Number((person.cooking || {}).household) || 1);
   root.innerHTML = `
-    <div class="row between"><h1>Week for ${uiEsc(person.name)}</h1><button class="btn" type="button" id="week-regen">Regenerate</button></div>
-    <p class="muted small">Starting ${uiFmtDate(week.days[0].date)}. ${week.eligibleCount} of ${uiState.data.recipes.length} recipes are eligible. Meals are scheduled on the days you can cook; leftovers and assembly meals fill the rest. Every meal was checked against the plan.</p>
-    <div class="row" style="margin-bottom:.75rem"><span class="badge ${budget ? 'green' : 'gray'} outline">Save money: ${budget ? 'on' : 'off'}</span><label class="small" style="display:inline-flex;align-items:center;gap:.4rem;min-height:36px"><input type="checkbox" id="week-budget" ${budget ? 'checked' : ''}> Prefer recipes that reuse this week's ingredients</label><span class="small muted">Household of ${household}.</span></div>
-    ${week.unmet.length ? `<div class="notice warn"><div class="notice-head">Caution</div><div>${week.unmet.length} slot${week.unmet.length === 1 ? '' : 's'} could not be filled: ${week.unmet.map(u => `${uiFmtDate(u.date)} ${u.slot}`).join(', ')}. No recipe fit the plan for that slot.</div></div>` : ''}
-    ${week.days.map((d, di) => weekDayHTML(d, di, plan, person)).join('')}
+    ${uiPageHeader(`Week for ${uiEsc(person.name)}`, `Starting ${uiFmtDate(week.days[0].date)}. ${week.eligibleCount} of ${uiState.data.recipes.length} recipes are eligible. Meals land on the days you can cook; leftovers and assembly meals fill the rest. Every meal was checked against the plan.`, `<button class="btn small" type="button" id="week-regen">${uiIcon('swap')}Regenerate</button>`)}
+    <div class="card tight">${uiSwitch('week-budget', 'Save money', `Prefer recipes that reuse this week's ingredients. Household of ${household}.`, budget)}</div>
+    ${week.unmet.length ? uiNoticeHTML({ level: 'warn', text: `${week.unmet.length} slot${week.unmet.length === 1 ? '' : 's'} could not be filled: ${week.unmet.map(u => `${uiFmtDate(u.date)} ${u.slot}`).join(', ')}. No recipe fit the plan for that slot.` }) : ''}
+    <div class="week-grid">${week.days.map((d, di) => weekDayHTML(d, di, plan, person)).join('')}</div>
+    ${uiSection('Week at a glance', weekGlanceHTML(week, plan, person), { id: 'week-glance-h' })}
     <details class="card"><summary>Excluded recipes (${week.excluded.length})</summary>
       ${week.excluded.length ? `<ul>${week.excluded.map(x => `<li><strong>${uiEsc(x.name)}</strong>: hard exclusion${x.why.length ? ' on ' + x.why.map(uiEsc).join(', ') : ''}</li>`).join('')}</ul>` : '<p class="muted small">None.</p>'}
       <p class="small muted">Hard exclusions are allergens and any rule marked hard. They are never scheduled.</p></details>
@@ -114,35 +102,68 @@ export function renderWeekScreen(root) {
   }));
 }
 
+// "Sodium (mg)" -> "Sodium mg"; whole numbers for milligram nutrients.
+function weekShortLabel(n) { return uiNutrientLabel(n).replace(/\s*\((.*)\)\s*$/, ' $1').replace('% of calories', '%'); }
+function weekDigits(n) { return /_mg$|^kcal$/.test(n) ? 0 : 1; }
+
+// Source glyph for a meal: cook (flame), leftovers (clock), assembly (bowl).
+function weekSourceGlyph(source) {
+  if (source === 'leftover') return uiIcon('clock', { cls: 'src', label: 'Leftovers' });
+  if (source === 'assembly') return uiIcon('bowl', { cls: 'src', label: 'Assembly, no cooking' });
+  return uiIcon('flame', { cls: 'src', label: 'Cook' });
+}
+
 function weekDayHTML(d, di, plan, person) {
   const cmp = compareToPlan(d.totals, plan);
   const isToday = d.date === uiIsoDate(uiToday());
-  return `<section class="card day" aria-labelledby="day-${di}">
-    <div class="day-head"><h3 id="day-${di}">${uiFmtDate(d.date)}</h3>
-      ${d.canCook ? '<span class="badge green">can cook</span>' : '<span class="badge gray">no cooking</span>'}
-      <span class="small muted">${d.minutes} min per meal</span>
-      <label class="week-eaters">Cooking for <input type="number" inputmode="numeric" min="1" max="20" value="${d.eaters}" data-eaters="${uiEsc(d.date)}" data-day="${uiEsc(d.day)}" aria-label="Eaters on ${uiEsc(uiFmtDate(d.date))}"> ${isToday ? 'today' : WEEK_DAY_NAMES[d.day] || ''}</label></div>
-    ${d.meals.map(m => `<div class="meal">
-      <div>
-        <div class="slot">${WEEK_SLOT_LABEL[m.slot] || m.slot}</div>
-        ${m.recipe ? `<div class="meal-name"><span class="dot ${m.check.verdict}" aria-hidden="true"></span><span class="visually-hidden">${uiVerdictWord(m.check.verdict)}: </span><button type="button" class="btn link" style="min-height:auto;padding:0;font-weight:600;text-align:left" data-recipe="${uiEsc(m.recipe)}">${uiEsc(m.name)}</button>${person ? `<button class="week-heart ${todayIsFavorite(person, 'recipe', m.recipe) ? 'on' : ''}" type="button" data-fav="${uiEsc(m.recipe)}" aria-pressed="${todayIsFavorite(person, 'recipe', m.recipe)}" aria-label="${todayIsFavorite(person, 'recipe', m.recipe) ? 'Remove from favorites' : 'Add to favorites'}">${todayIsFavorite(person, 'recipe', m.recipe) ? '&#9829;' : '&#9825;'}</button>` : ''}</div>
-        <div class="small muted">${m.source === 'leftover' ? 'Leftovers' : m.source === 'assembly' ? 'Assembly, no cooking' : 'Cook'}${m.servingsMade && m.servingsMade > m.servings ? `, make ${m.servingsMade} servings` : ''}, ${m.servings} serving${m.servings === 1 ? '' : 's'} · <span class="badge ${m.check.verdict === 'fail' ? 'red' : m.check.verdict === 'caution' ? 'amber' : 'green'} outline">${uiVerdictWord(m.check.verdict)}</span>${m.swapped ? ' · swapped' : ''}</div>
-        ${m.check.hits && m.check.hits.length ? `<div class="small">Caution: ${m.check.hits.map(h => uiEsc(h.label)).join(', ')}</div>` : ''}
-        ${m.check.exceeds && m.check.exceeds.length ? `<div class="small">One serving exceeds the daily ${m.check.exceeds.map(uiNutrientLabel).map(uiEsc).join(', ')}.</div>` : ''}
-        ${m.reasons && m.reasons.length || m.source === 'leftover' ? `<details><summary>Why this</summary><ul class="small">${m.source === 'leftover' ? '<li>Leftovers from a meal made earlier this week.</li>' : ''}${(m.reasons || []).map(r => `<li>${uiEsc(r)}</li>`).join('')}${m.reasons && !m.reasons.length && m.source !== 'leftover' ? '<li>Fits the plan, your time, skill, and equipment with no penalties.</li>' : ''}${m.score != null ? `<li class="muted">Score ${m.score}</li>` : ''}</ul></details>` : ''}` : '<div class="muted">No recipe fit this slot.</div>'}
-      </div>
-      <div class="meal-actions">
-        <button class="btn small" type="button" data-swap="${di}" data-slot="${uiEsc(m.slot)}">Swap</button>
-        ${m.recipe ? `<button class="btn small" type="button" data-log="${di}:${uiEsc(m.slot)}">Log this meal</button><button class="btn small" type="button" data-today="${di}:${uiEsc(m.slot)}">Add to Today</button>` : ''}
-      </div>
-    </div>`).join('')}
-    <div class="totals" aria-label="Day totals versus plan">
-      ${cmp.over.map(x => `<span class="nutrient-chip over">${uiEsc(uiNutrientLabel(x.nutrient))}: ${uiFmtNum(x.value, 1)} (over ${uiFmtNum(x.limit, 1)})</span>`).join('')}
-      ${cmp.under.map(x => `<span class="nutrient-chip under">${uiEsc(uiNutrientLabel(x.nutrient))}: ${uiFmtNum(x.value, 1)} (under ${uiFmtNum(x.min, 1)})</span>`).join('')}
-      ${cmp.ok.map(x => `<span class="nutrient-chip ok">${uiEsc(uiNutrientLabel(x.nutrient))}: ${uiFmtNum(x.value, 1)}</span>`).join('')}
-      ${!cmp.over.length && !cmp.under.length && !cmp.ok.length ? `<span class="small muted">${uiFmtNum(d.totals.kcal)} kcal, ${uiFmtNum(d.totals.sodium_mg)} mg sodium. No numeric limits in the plan.</span>` : ''}
+  const [, mo, da] = d.date.split('-');
+  return `<section class="week-day ${isToday ? 'today' : ''}" aria-labelledby="day-${di}">
+    <div class="week-day-head">
+      <div class="week-day-name"><span id="day-${di}">${WEEK_DAY_NAMES[d.day] || uiFmtDate(d.date)}</span><span class="week-day-date">${Number(mo)}/${Number(da)}${isToday ? ' · today' : ''}</span></div>
+      <div class="week-day-meta">${d.canCook ? uiChip('can cook', 'pass') : uiChip('no cooking', 'neutral')}<span>${d.minutes} min</span>
+        <label class="week-eaters">${uiIcon('people')}<input type="number" inputmode="numeric" min="1" max="20" value="${d.eaters}" data-eaters="${uiEsc(d.date)}" data-day="${uiEsc(d.day)}" aria-label="Eaters on ${uiEsc(uiFmtDate(d.date))}"></label></div>
+    </div>
+    ${d.meals.map(m => {
+      const fav = m.recipe && person ? todayIsFavorite(person, 'recipe', m.recipe) : false;
+      return `<div class="week-meal">
+      <div class="slot">${WEEK_SLOT_LABEL[m.slot] || m.slot}</div>
+      ${m.recipe ? `<button type="button" class="meal-chip" data-recipe="${uiEsc(m.recipe)}" aria-label="${uiEsc(m.name)}, ${uiVerdictWord(m.check.verdict)}. Open recipe."><span class="dot ${m.check.verdict}" aria-hidden="true"></span><span class="meal-chip-text"><span class="meal-chip-name">${uiEsc(m.name)}</span><span class="meal-chip-sub">${weekSourceGlyph(m.source)}<span>${uiVerdictWord(m.check.verdict)}${m.servingsMade && m.servingsMade > m.servings ? ` · make ${m.servingsMade}` : ''}${m.swapped ? ' · swapped' : ''}</span></span></span></button>
+        ${m.check.hits && m.check.hits.length ? `<div class="meal-note">Caution: ${m.check.hits.map(h => uiEsc(h.label)).join(', ')}</div>` : ''}
+        ${m.check.exceeds && m.check.exceeds.length ? `<div class="meal-note">One serving exceeds the daily ${m.check.exceeds.map(uiNutrientLabel).map(uiEsc).join(', ')}.</div>` : ''}
+        <div class="meal-acts">
+          <button class="btn small icon" type="button" data-swap="${di}" data-slot="${uiEsc(m.slot)}" aria-label="Swap ${WEEK_SLOT_LABEL[m.slot] || m.slot} on ${uiEsc(uiFmtDate(d.date))}" title="Swap">${uiIcon('swap')}</button>
+          <button class="btn small icon" type="button" data-log="${di}:${uiEsc(m.slot)}" aria-label="Log ${uiEsc(m.name)} in the symptom log" title="Log this meal">${uiIcon('note')}</button>
+          <button class="btn small icon" type="button" data-today="${di}:${uiEsc(m.slot)}" aria-label="Add ${uiEsc(m.name)} to Today" title="Add to Today">${uiIcon('plus')}</button>
+          ${person ? `<button class="heart-btn ${fav ? 'on' : ''}" type="button" data-fav="${uiEsc(m.recipe)}" aria-pressed="${fav}" aria-label="${fav ? 'Remove from favorites' : 'Add to favorites'}">${uiIcon('heart', { fill: fav })}</button>` : ''}
+        </div>
+        ${m.reasons && m.reasons.length || m.source === 'leftover' ? `<details><summary>Why this</summary><ul class="small">${m.source === 'leftover' ? '<li>Leftovers from a meal made earlier this week.</li>' : ''}${(m.reasons || []).map(r => `<li>${uiEsc(r)}</li>`).join('')}${m.reasons && !m.reasons.length && m.source !== 'leftover' ? '<li>Fits the plan, your time, skill, and equipment with no penalties.</li>' : ''}${m.score != null ? `<li class="muted">Score ${m.score}</li>` : ''}</ul></details>` : ''}`
+      : `<div class="muted small">No recipe fit this slot.</div><div class="meal-acts"><button class="btn small icon" type="button" data-swap="${di}" data-slot="${uiEsc(m.slot)}" aria-label="Pick a meal for ${WEEK_SLOT_LABEL[m.slot] || m.slot}" title="Pick a meal">${uiIcon('swap')}</button></div>`}
+    </div>`; }).join('')}
+    <div class="week-totals" aria-label="Day totals versus plan">
+      ${cmp.over.map(x => `<span class="nutrient-chip over">${uiEsc(weekShortLabel(x.nutrient))} ${uiFmtNum(x.value, weekDigits(x.nutrient))}, over ${uiFmtNum(x.limit, weekDigits(x.nutrient))}</span>`).join('')}
+      ${cmp.under.map(x => `<span class="nutrient-chip under">${uiEsc(weekShortLabel(x.nutrient))} ${uiFmtNum(x.value, weekDigits(x.nutrient))}, under ${uiFmtNum(x.min, weekDigits(x.nutrient))}</span>`).join('')}
+      ${cmp.ok.map(x => `<span class="nutrient-chip ok">${uiEsc(weekShortLabel(x.nutrient))} ${uiFmtNum(x.value, weekDigits(x.nutrient))}, ok</span>`).join('')}
+      ${!cmp.over.length && !cmp.under.length && !cmp.ok.length ? `<span class="muted">${uiFmtNum(d.totals.kcal)} kcal, ${uiFmtNum(d.totals.sodium_mg)} mg sodium. No numeric limits in the plan.</span>` : ''}
     </div>
   </section>`;
+}
+
+// One small bar per day: planned kcal against the calorie target when one exists, otherwise sodium against its limit.
+function weekGlanceHTML(week, plan, person) {
+  const info = todayTargetInfo(person, plan);
+  const useKcal = info.state === 'ok' && info.kcal > 0;
+  const limit = useKcal ? info.kcal : plan.limits.sodium_mg ? plan.limits.sodium_mg.value : null;
+  const key = useKcal ? 'kcal' : 'sodium_mg';
+  const label = useKcal ? 'kcal' : 'mg sodium';
+  const max = Math.max(limit || 0, ...week.days.map(d => d.totals[key] || 0)) || 1;
+  return `<div class="week-glance" role="img" aria-label="Planned ${label} per day${limit ? ` against ${uiFmtNum(limit)}` : ''}">
+    ${week.days.map(d => {
+      const v = d.totals[key] || 0;
+      const t = limit ? uiMeterTone(v, limit, useKcal ? 'kcal' : 'limit') : { tone: 'neutral', word: '' };
+      return `<div class="glance-day"><div class="glance-col ${t.tone}" title="${uiEsc(uiFmtDate(d.date))}: ${uiFmtNum(v)} ${label}${limit ? `, ${t.word}` : ''}">${limit ? `<span class="glance-limit" style="bottom:${(limit / max * 100).toFixed(1)}%"></span>` : ''}<span style="height:${(v / max * 100).toFixed(1)}%"></span></div><div class="glance-label">${WEEK_DAY_SHORT[d.day] || ''}</div><div class="glance-value">${uiFmtNum(v)}</div></div>`;
+    }).join('')}
+  </div>
+  <p class="small muted">Planned ${label} per day from the recipes above${limit ? `; the dashed line is ${useKcal ? 'the estimated calorie target' : 'the sodium limit'} of ${uiFmtNum(limit)}` : '; no calorie target or sodium limit is active'}. Days over the line are marked "over" in the day's totals.</p>`;
 }
 
 function weekSwapModal(di, slot, person, plan, week) {
@@ -166,12 +187,12 @@ function weekSwapModal(di, slot, person, plan, week) {
   }).filter(x => x.score > -Infinity).sort((a, b) => b.score - a.score).slice(0, 5);
   const m = uiModal(`
     <p class="small muted">Top alternatives for ${WEEK_SLOT_LABEL[slot] || slot} on ${uiFmtDate(day.date)}, scored the same way the planner scores them. Recipes with a hard exclusion are not listed.</p>
-    ${scored.length ? scored.map(x => `<div class="card tight">
-      <div class="row between"><div><span class="dot ${x.check.verdict}" aria-hidden="true"></span><strong>${uiEsc(x.r.name)}</strong> <span class="badge ${x.check.verdict === 'caution' ? 'amber' : 'green'} outline">${uiVerdictWord(x.check.verdict)}</span></div><span class="small muted">score ${Math.round(x.score)}</span></div>
-      <div class="small muted">${x.r.active_min} min active, ${x.r.total_min} total, ${uiEsc(x.r.skill)}${x.r.assembly_only ? ', assembly only' : ''}</div>
+    ${scored.length ? `<div class="list">${scored.map(x => `<div class="list-row"><div class="list-main">
+      <div class="list-title"><span class="dot ${x.check.verdict}" aria-hidden="true"></span>${uiEsc(x.r.name)} ${uiVerdictChip(x.check.verdict)}</div>
+      <div class="list-sub">${x.r.active_min} min active, ${x.r.total_min} total, ${uiEsc(x.r.skill)}${x.r.assembly_only ? ', assembly only' : ''} · score ${Math.round(x.score)}</div>
       ${x.reasons.length ? `<ul class="small">${x.reasons.map(r => `<li>${uiEsc(r)}</li>`).join('')}</ul>` : ''}
-      <div class="btn-row"><button class="btn small primary" type="button" data-pick="${uiEsc(x.r.id)}">Use this</button><button class="btn small" type="button" data-detail="${uiEsc(x.r.id)}">Details</button></div>
-    </div>`).join('') : '<p class="empty">No alternative fits this slot.</p>'}`, { title: 'Swap meal' });
+      <div class="btn-row" style="margin-top:8px"><button class="btn small primary" type="button" data-pick="${uiEsc(x.r.id)}">Use this</button><button class="btn small" type="button" data-detail="${uiEsc(x.r.id)}">Details</button></div>
+    </div></div>`).join('')}</div>` : uiEmptyState('No alternative fits this slot.')}`, { title: 'Swap meal' });
   if (!m) return;
   m.el.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => {
     person.mealOverrides = person.mealOverrides || {};
@@ -193,7 +214,7 @@ export function weekRecipeModal(recipeId, person, plan) {
   const targetRows = Object.entries(plan.targets || {}).map(([n, t]) => ({ nutrient: n, perServing: round(per[n], 1), min: t.min, pct: t.min ? round(per[n] / t.min * 100) : null }));
   const swaps = ((r.notes && r.notes.swaps) || []).filter(s => plan.avoid && plan.avoid[s.if_tag]);
   uiModal(`
-    <div class="verdict ${check.verdict}" style="padding:.6rem 1rem"><span class="verdict-word" style="font-size:1.2rem">${uiVerdictWord(check.verdict)}</span> <span class="small">${check.hits.length ? 'Matches: ' + check.hits.map(h => uiEsc(h.label) + (h.hard ? ' (hard)' : '')).join(', ') : 'No avoid tags matched.'}${check.exceeds.length ? ' One serving exceeds the daily ' + check.exceeds.map(e => uiEsc(uiNutrientLabel(e.nutrient))).join(', ') + '.' : ''}</span></div>
+    <div class="verdict compact ${check.verdict}"><span class="verdict-word">${uiVerdictWord(check.verdict)}</span> <span class="small">${check.hits.length ? 'Matches: ' + check.hits.map(h => uiEsc(h.label) + (h.hard ? ' (hard)' : '')).join(', ') : 'No avoid tags matched.'}${check.exceeds.length ? ' One serving exceeds the daily ' + check.exceeds.map(e => uiEsc(uiNutrientLabel(e.nutrient))).join(', ') + '.' : ''}</span></div>
     <dl class="kv">
       <dt>Time</dt><dd>${r.active_min} min active, ${r.total_min} min total</dd>
       <dt>Skill</dt><dd>${uiEsc(r.skill)}</dd>
@@ -201,18 +222,20 @@ export function weekRecipeModal(recipeId, person, plan) {
       <dt>Servings</dt><dd>${r.servings}${r.leftovers ? `, leftovers ${uiEsc(r.leftovers)}` : ''}</dd>
       ${r.meal ? `<dt>Meal</dt><dd>${r.meal.map(uiEsc).join(', ')}</dd>` : ''}
     </dl>
-    ${swaps.length ? `<h3 style="margin-top:1rem">Swaps for your plan</h3>${swaps.map(s => `<div class="notice warn"><div class="notice-head">Caution</div><div><strong>${uiEsc(uiTagLabel(s.if_tag))}</strong> is on your avoid list. ${uiEsc(s.then)}</div></div>`).join('')}` : ''}
-    <h3 style="margin-top:1rem">Ingredients</h3>
-    <ul>${(r.ingredients || []).map(i => { const f = uiState.foodsById.get(i.food); return `<li>${uiEsc(i.display || (f ? f.short || f.name : i.food))} <span class="muted small">(${uiFmtNum(i.grams)} g${f ? '' : ', food not in database'})</span></li>`; }).join('')}</ul>
-    ${check.unrecognized.length ? `<p class="small"><strong>Not recognized:</strong> ${check.unrecognized.map(uiEsc).join('; ')}. The app does not assume these are safe.</p>` : ''}
-    <h3>Steps</h3>
-    <ol>${(r.steps || []).map(s => `<li>${uiEsc(s)}</li>`).join('')}</ol>
-    ${r.notes && r.notes.sodium_tip ? `<p class="small"><strong>Sodium:</strong> ${uiEsc(r.notes.sodium_tip)}</p>` : ''}
+    ${swaps.length ? `<div class="stack">${swaps.map(s => uiNoticeHTML({ level: 'warn', text: `${uiTagLabel(s.if_tag)} is on your avoid list. ${s.then}` })).join('')}</div>` : ''}
+    <div class="recipe-cols">
+      <div><h3>Ingredients</h3>
+        <ul>${(r.ingredients || []).map(i => { const f = uiState.foodsById.get(i.food); return `<li>${uiEsc(i.display || (f ? f.short || f.name : i.food))} <span class="muted small num">(${uiFmtNum(i.grams)} g${f ? '' : ', food not in database'})</span></li>`; }).join('')}</ul>
+        ${check.unrecognized.length ? `<p class="small"><strong>Not recognized:</strong> ${check.unrecognized.map(uiEsc).join('; ')}. The app does not assume these are safe.</p>` : ''}</div>
+      <div><h3>Steps</h3>
+        <ol>${(r.steps || []).map(s => `<li>${uiEsc(s)}</li>`).join('')}</ol>
+        ${r.notes && r.notes.sodium_tip ? `<p class="small"><strong>Sodium:</strong> ${uiEsc(r.notes.sodium_tip)}</p>` : ''}</div>
+    </div>
     <h3>Per serving versus your plan</h3>
     <div class="table-wrap"><table>
       <thead><tr><th>Nutrient</th><th class="num">Per serving</th><th class="num">Daily number</th><th class="num">% of daily</th></tr></thead>
       <tbody>
-        ${check.vsLimits.map(v => `<tr><td>${uiEsc(uiNutrientLabel(v.nutrient))}</td><td class="num">${v.missingData ? '<span class="muted">partial</span> ' : ''}${uiFmtNum(v.perServing, 1)}</td><td class="num">at most ${uiFmtNum(v.dailyLimit, 1)}</td><td class="num ${v.exceedsInOneServing ? 'over' : ''}">${v.pctOfDaily}%</td></tr>`).join('')}
+        ${check.vsLimits.map(v => `<tr><td>${uiEsc(uiNutrientLabel(v.nutrient))}</td><td class="num">${v.missingData ? '<span class="muted">partial</span> ' : ''}${uiFmtNum(v.perServing, 1)}</td><td class="num">at most ${uiFmtNum(v.dailyLimit, 1)}</td><td class="num ${v.exceedsInOneServing ? 'over' : ''}">${v.pctOfDaily}%${v.exceedsInOneServing ? ' over' : ''}</td></tr>`).join('')}
         ${targetRows.map(v => `<tr><td>${uiEsc(uiNutrientLabel(v.nutrient))}</td><td class="num">${uiFmtNum(v.perServing, 1)}</td><td class="num">at least ${uiFmtNum(v.min, 1)}</td><td class="num">${v.pct != null ? v.pct + '%' : ''}</td></tr>`).join('')}
         ${!check.vsLimits.length && !targetRows.length ? '<tr><td colspan="4" class="muted">No numeric limits or targets in the plan.</td></tr>' : ''}
       </tbody></table></div>

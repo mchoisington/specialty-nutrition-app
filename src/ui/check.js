@@ -1,21 +1,21 @@
 // Check: paste an ingredient list or search a food, get a verdict with the rules behind it.
 import { checkText, checkFood } from '../engine/checker.js';
 import { nutrientsForGrams, derived, round } from '../engine/nutrition.js';
-import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiRulesList, uiVerdictWord, uiNutrientLabel, uiFmtNum } from './common.js';
+import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiRulesList, uiVerdictWord, uiNutrientLabel, uiFmtNum, uiPageHeader, uiSection, uiChip, uiModal, uiIcon, uiEmptyState } from './common.js';
 
 let checkLastText = '';
+let checkLastRules = [];
 
 export function renderCheckScreen(root) {
   const person = uiActivePerson();
   const plan = uiPlanFor(person);
   const foods = uiState.data.foods;
   root.innerHTML = `
-    <h1>Check</h1>
-    <p class="muted">Checked against ${uiEsc(person.name)}'s plan. The dictionary matches exact terms; it does not guess. Anything it does not recognize is reported, not assumed safe.</p>
+    ${uiPageHeader('Check a food', `Checked against ${uiEsc(person.name)}'s plan. The dictionary matches exact terms; it does not guess. Anything it does not recognize is reported, not assumed safe.`)}
     <div class="card">
       <label for="check-text">Paste an ingredient list or type a food</label>
       <textarea id="check-text" placeholder="Ingredients: water, roasted peanuts, salt, natural flavors">${uiEsc(checkLastText)}</textarea>
-      <div class="btn-row"><button class="btn primary" type="button" id="check-run">Check</button><button class="btn" type="button" id="check-clear">Clear</button></div>
+      <div class="btn-row"><button class="btn primary" type="button" id="check-run">${uiIcon('check')}Check</button><button class="btn" type="button" id="check-clear">Clear</button></div>
     </div>
     <div class="card">
       <label for="check-search">Search foods (${foods.length} in the database)</label>
@@ -23,15 +23,16 @@ export function renderCheckScreen(root) {
       <ul class="search-results" id="check-results" hidden></ul>
       ${foods.length ? '' : '<p class="small muted">The food database (data/foods.json) is not loaded.</p>'}
     </div>
-    <div id="check-result" aria-live="polite" aria-atomic="true"></div>
+    <div id="check-result" aria-live="polite" aria-atomic="true" class="stack-2"></div>
   `;
   const ta = root.querySelector('#check-text');
   const out = root.querySelector('#check-result');
+  const show = html => { out.innerHTML = html; checkBindResult(out); };
   root.querySelector('#check-run').addEventListener('click', () => {
     checkLastText = ta.value;
-    if (!ta.value.trim()) { out.innerHTML = '<p class="muted">Type or paste something first.</p>'; return; }
+    if (!ta.value.trim()) { show(uiEmptyState('Type or paste something first.', '', 'list')); return; }
     const r = checkText(ta.value, plan, uiState.matcher, person);
-    out.innerHTML = checkResultHTML(r, person, plan, { title: 'Ingredient text' });
+    show(checkResultHTML(r, person, plan, { title: 'Ingredient text' }));
   });
   ta.addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') root.querySelector('#check-run').click(); });
   root.querySelector('#check-clear').addEventListener('click', () => { ta.value = ''; checkLastText = ''; out.innerHTML = ''; ta.focus(); });
@@ -49,11 +50,20 @@ export function renderCheckScreen(root) {
       const food = uiState.foodsById.get(b.dataset.food);
       if (!food) return;
       const r = checkFood(food, plan, uiState.matcher, person);
-      out.innerHTML = checkResultHTML(r, person, plan, { title: food.short || food.name, food });
+      show(checkResultHTML(r, person, plan, { title: food.short || food.name, food }));
       results.hidden = true;
       out.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }));
   });
+}
+
+// Wires the "why" links (rules behind a match) to a sheet.
+export function checkBindResult(root) {
+  root.querySelectorAll('[data-why]').forEach(b => b.addEventListener('click', () => {
+    const h = checkLastRules[Number(b.dataset.why)];
+    if (!h) return;
+    uiModal(`<p class="small muted">${h.hard ? 'A hard stop: never overridden by a preference, a mode, or an acknowledgment.' : 'A soft rule: shown as a caution; your call.'}</p>${uiRulesList(h.rules)}`, { title: `Why: ${h.label}` });
+  }));
 }
 
 export function checkResultHTML(r, person, plan, opts = {}) {
@@ -61,22 +71,24 @@ export function checkResultHTML(r, person, plan, opts = {}) {
   const verdict = r.verdict;
   const unrec = r.unrecognized || [];
   const headline = verdict === 'fail' ? 'Contains a hard exclusion.' : verdict === 'caution' ? (unrec.length && hasAllergens && !r.hits.length ? 'Some ingredients were not recognized.' : 'Something here needs a look.') : 'Nothing in the plan flags this.';
+  checkLastRules = r.hits.slice();
   return `
     <div class="verdict ${verdict}" role="${verdict === 'fail' ? 'alert' : 'status'}">
       <div class="verdict-word">${uiVerdictWord(verdict)}</div>
-      <div><strong>${uiEsc(opts.title || '')}</strong>${opts.food && opts.food.group ? ` <span class="muted small">${uiEsc(opts.food.group)}</span>` : ''}</div>
-      <div>${headline}</div>
-      ${unrec.length && hasAllergens ? '<div style="margin-top:.5rem"><strong>Some ingredients were not recognized.</strong> With an allergen on file, that alone is a caution.</div>' : ''}
+      <div class="verdict-reason">${headline}</div>
+      <div class="small"><strong>${uiEsc(opts.title || '')}</strong>${opts.food && opts.food.group ? ` <span class="muted">${uiEsc(opts.food.group)}</span>` : ''}</div>
+      ${unrec.length && hasAllergens ? '<div class="small"><strong>Some ingredients were not recognized.</strong> With an allergen on file, that alone is a caution.</div>' : ''}
     </div>
-    ${r.hits.length ? `<h2>Matches</h2>${r.hits.map(h => `<div class="card tight">
-        <div class="row"><strong>${uiEsc(h.label)}</strong> ${h.hard ? '<span class="badge red">hard stop</span>' : '<span class="badge amber">soft</span>'} ${h.terms && h.terms.length ? `<span class="small muted">matched: ${h.terms.map(uiEsc).join(', ')}</span>` : ''}</div>
-        <details><summary>Rules behind this (${h.rules.length})</summary>${uiRulesList(h.rules)}</details>
-      </div>`).join('')}` : ''}
-    ${(r.termHits || []).length ? `<h2>Your avoid words</h2><div class="card tight">${r.termHits.map(t => `<div class="row"><strong>${uiEsc(t.term)}</strong> <span class="badge amber">soft</span> <span class="small muted">personal preference</span></div>`).join('')}</div>` : ''}
-    ${(r.unknownRisk || []).length ? `<h2>Terms that can hide something</h2><div class="card tight">${r.unknownRisk.map(u => `<div class="rule"><strong>${uiEsc(u.term)}</strong>${u.segment ? ` <span class="small muted">in "${uiEsc(u.segment)}"</span>` : ''}<div class="small">${uiEsc(u.note || 'This term does not say what it contains.')}</div></div>`).join('')}</div>` : ''}
-    ${(r.notes || []).length ? `<h2>Portion notes</h2><div class="card tight">${r.notes.map(n => `<div class="rule"><strong>${uiEsc(n.term)}</strong><div class="small">${uiEsc(n.note)}</div></div>`).join('')}</div>` : ''}
-    ${unrec.length ? `<h2>Not recognized</h2><div class="card tight"><p><strong>Not recognized:</strong> ${unrec.map(uiEsc).join('; ')}.</p><p class="small muted" style="margin:0">The app does not assume these are safe. Check the label yourself or add the term to the dictionary.</p></div>` : ''}
-    ${(r.preferHits || []).length ? `<h2>Fits a preference</h2><div class="card tight"><div class="row">${r.preferHits.map(p => `<span class="badge green">${uiEsc(p.label)}</span>`).join(' ')}</div></div>` : ''}
+    ${r.hits.length ? uiSection('Matches', `<div class="list boxed">${r.hits.map((h, i) => `<div class="match-row">
+        ${uiChip(h.hard ? 'hard stop' : 'soft', h.hard ? 'stop' : 'caution')}
+        <div><strong>${uiEsc(h.label)}</strong>${h.terms && h.terms.length ? `<div class="match-term">matched: ${h.terms.map(uiEsc).join(', ')}</div>` : ''}</div>
+        <button class="btn link small" type="button" data-why="${i}">Why (${h.rules.length})</button>
+      </div>`).join('')}</div>`, { id: 'check-matches-h' }) : ''}
+    ${(r.termHits || []).length ? uiSection('Your avoid words', `<div class="list boxed">${r.termHits.map(t => `<div class="match-row">${uiChip('soft', 'caution')}<div><strong>${uiEsc(t.term)}</strong><div class="match-term">personal preference</div></div><span></span></div>`).join('')}</div>`, { id: 'check-terms-h' }) : ''}
+    ${(r.unknownRisk || []).length ? uiSection('Terms that can hide something', `<div class="list boxed">${r.unknownRisk.map(u => `<div class="rule"><strong>${uiEsc(u.term)}</strong>${u.segment ? ` <span class="small muted">in "${uiEsc(u.segment)}"</span>` : ''}<div class="small">${uiEsc(u.note || 'This term does not say what it contains.')}</div></div>`).join('')}</div>`, { id: 'check-hide-h' }) : ''}
+    ${(r.notes || []).length ? uiSection('Portion notes', `<div class="list boxed">${r.notes.map(n => `<div class="rule"><strong>${uiEsc(n.term)}</strong><div class="small">${uiEsc(n.note)}</div></div>`).join('')}</div>`, { id: 'check-notes-h' }) : ''}
+    ${unrec.length ? uiSection('Not recognized', `<ul class="small">${unrec.map(u => `<li>${uiEsc(u)}</li>`).join('')}</ul><p class="small muted">The app does not assume these are safe. Check the label yourself or add the term to the dictionary.</p>`, { id: 'check-unrec-h' }) : ''}
+    ${(r.preferHits || []).length ? uiSection('Fits a preference', `<div class="chip-cloud">${r.preferHits.map(p => uiChip(p.label, 'pass')).join('')}</div>`, { id: 'check-prefer-h' }) : ''}
     ${opts.food ? checkFoodNutrientsHTML(opts.food, plan) : ''}
     ${opts.food && opts.food.tags && opts.food.tags.length ? `<p class="small muted">Tags: ${opts.food.tags.map(t => `<code>${uiEsc(t)}</code>`).join(' ')}</p>` : ''}
     ${opts.food && opts.food.fdcId ? `<p class="small muted">USDA FoodData Central ID ${uiEsc(opts.food.fdcId)}${opts.food.dataset ? ` (${uiEsc(opts.food.dataset)})` : ''}. Numbers are per the USDA file, never estimated.</p>` : ''}
@@ -101,10 +113,11 @@ function checkFoodNutrientsHTML(food, plan) {
     const missing = per100._missing && per100._missing[k];
     const pct = vPortion != null && daily && !isPct ? round(vPortion / daily * 100) : null;
     const cls = pct == null ? '' : lim ? (pct > 100 ? 'over' : '') : (pct >= 100 ? 'ok' : '');
-    return `<tr><td>${uiEsc(uiNutrientLabel(k))}</td><td class="num">${missing ? '<span class="muted">no data</span>' : uiFmtNum(v100, 1)}</td><td class="num">${perPortion ? (missing ? '<span class="muted">no data</span>' : uiFmtNum(vPortion, 1)) : ''}</td><td class="num">${daily != null ? uiFmtNum(daily, 1) : ''}${lim && lim.clinician || tg && tg.clinician ? ' <span class="badge blue">clinician-set</span>' : ''}</td><td class="num ${cls}">${pct != null ? pct + '%' : ''}</td></tr>`;
+    const word = pct == null ? '' : lim ? (pct > 100 ? ' over' : '') : (pct >= 100 ? ' met' : '');
+    return `<tr><td>${uiEsc(uiNutrientLabel(k))}</td><td class="num">${missing ? '<span class="muted">no data</span>' : uiFmtNum(v100, 1)}</td><td class="num">${perPortion ? (missing ? '<span class="muted">no data</span>' : uiFmtNum(vPortion, 1)) : ''}</td><td class="num">${daily != null ? uiFmtNum(daily, 1) : ''}${lim && lim.clinician || tg && tg.clinician ? ' ' + uiChip('clinician-set', 'plum') : ''}</td><td class="num ${cls}">${pct != null ? pct + '%' + word : ''}</td></tr>`;
   }).join('');
-  return `<h2>Nutrients that matter for this plan</h2><div class="table-wrap"><table>
+  return uiSection('Nutrients that matter for this plan', `<div class="table-wrap"><table>
     <thead><tr><th>Nutrient</th><th class="num">Per 100 g</th><th class="num">${portion ? 'Per ' + uiEsc(portion.label) + ' (' + portion.grams + ' g)' : 'Per portion'}</th><th class="num">Daily number</th><th class="num">% of daily (portion)</th></tr></thead>
     <tbody>${rows}</tbody></table></div>
-    <p class="small muted">"no data" means the USDA record has no value for that nutrient; the app does not fill it in.</p>`;
+    <p class="small muted">"no data" means the USDA record has no value for that nutrient; the app does not fill it in.</p>`, { id: 'check-nut-h' });
 }
