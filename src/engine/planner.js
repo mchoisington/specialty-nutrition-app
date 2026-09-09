@@ -2,6 +2,7 @@
 // Scoring blends: hard/soft avoid, prefer tags, time fit, skill and equipment fit, leftovers tolerance, variety, and daily nutrient limits.
 import { checkRecipe } from './checker.js';
 import { emptyTotals, addTotals, scaleTotals, recipeTotals, derived } from './nutrition.js';
+import { cuisineSkipped, cuisineLoved } from './cuisine.js';
 
 const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const SKILL = { beginner: 0, comfortable: 1, confident: 2 };
@@ -22,13 +23,15 @@ export function minutesAvailable(cooking, dayIdx) {
   return Number(m) || 20;
 }
 
-export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked }) {
+export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked, person }) {
   if (check.verdict === 'fail') return { score: -Infinity, reasons: ['hard exclusion'] };
   if (disliked && disliked.includes(recipe.id)) return { score: -Infinity, reasons: ['marked never again'] };
+  if (person && cuisineSkipped(recipe, person)) return { score: -Infinity, reasons: ['cuisine skipped'] };
   const reasons = [];
   let score = 100;
   // taste: the only signal that matters for a family. Favorites get a solid bonus.
   if (favorites && favorites.includes(recipe.id)) { score += 35; reasons.push('a favorite'); }
+  if (person && cuisineLoved(recipe, person)) { score += 12; reasons.push('a cuisine you love'); }
   // soft avoid
   for (const h of check.hits) { score -= 25; reasons.push(`contains ${h.label} (avoid)`); }
   for (const t of check.termHits || []) { score -= 15; reasons.push(`contains "${t.term}" (your preference)`); }
@@ -83,7 +86,7 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
   // Only recipes with known nutrition can be held to daily limits. Recipes without it (community imports whose
   // ingredients are not yet linked to foods) are scheduled only when the person has favorited them, and are flagged.
   const hasNutrition = r => !!(r.nutrition_per_serving && r.nutrition_source) || (r.ingredients || []).some(i => i.food);
-  const pool = recipes.filter(r => hasNutrition(r) || favorites.includes(r.id) || cooking.include_unknown_nutrition);
+  const pool = recipes.filter(r => (hasNutrition(r) || favorites.includes(r.id) || cooking.include_unknown_nutrition) && !cuisineSkipped(r, person));
   const checks = new Map(pool.map(r => [r.id, checkRecipe(r, plan, matcher, foodsById, person)]));
   const eligible = pool.filter(r => checks.get(r.id).verdict !== 'fail' && !disliked.includes(r.id));
   const excluded = pool.filter(r => checks.get(r.id).verdict === 'fail').map(r => ({ id: r.id, name: r.name, why: checks.get(r.id).hits.filter(h => h.hard).map(h => h.label) }));
@@ -119,7 +122,7 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
       const candidates = eligible.filter(r => recipeMeal(r, slot));
       const scored = candidates.map(r => {
         const check = checks.get(r.id);
-        const s = scoreRecipe({ recipe: r, check, cooking, dayIdx, canCook, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked });
+        const s = scoreRecipe({ recipe: r, check, cooking, dayIdx, canCook, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked, person });
         return { r, check, score: s.score + rnd() * 4, reasons: s.reasons };
       }).filter(x => x.score > -Infinity).sort((a, b) => b.score - a.score);
       if (!scored.length) { unmet.push({ date: date.toISOString().slice(0, 10), slot, why: 'no recipe fits' }); meals.push({ slot, recipe: null, source: 'none' }); continue; }

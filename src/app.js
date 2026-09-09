@@ -1,6 +1,7 @@
 // Router and top-level state. Loads data from window.__APP_DATA__ (single-file bundle) or fetch('data/*.json') over http.
 import { load } from './store.js';
 import { buildMatcher } from './engine/dictionary.js';
+import { annotateCuisines } from './engine/cuisine.js';
 import { uiState, uiEsc, uiActivePerson, uiToast, uiEnsurePerson, uiIcon, uiBrandMark, uiAvatar, uiNavRecord, uiCanGoBack, uiGoBack, uiBackButtonHTML } from './ui/common.js';
 import { renderHomeScreen, renderWelcomeScreen } from './ui/home.js';
 import { renderPeopleScreen } from './ui/people.js';
@@ -231,6 +232,7 @@ function appAssembleRecipes() {
     else out.push(r);
   }
   for (const cr of profile.custom_recipes || []) if (cr && cr.id) out.push({ source: 'Peace Meal', ...cr, custom: true });
+  annotateCuisines(out);
   uiState.data.recipes = out;
   uiState.recipesById = new Map(out.map(r => [r.id, r]));
   return out;

@@ -4,6 +4,7 @@ import { newPerson } from '../store.js';
 import { lbToKg, kgToLb, ftInToCm, cmToFtIn, ACTIVITY_LEVELS } from '../engine/energy.js';
 import { uiState, uiEsc, uiPersist, uiActivePerson, uiSetActive, uiPlanFor, uiRatingBadge, uiSegmented, uiMultiPills, uiYesNo, uiNavigate, uiToast, uiModal, uiFindPersonById, UI_ALLERGENS, uiTagLabel, uiModuleName, uiNutrientLabel, uiEnsurePerson, uiParamUnit, uiBigChoices, uiBigToggles, uiEnsureUserDefinedSource, uiUserDefinedBadge, uiWeightHeightText, uiPageHeader, uiSection, uiChip, uiIcon, uiAvatar, uiEmptyState, uiNoticeHTML } from './common.js';
 import { learnArticleHTML } from './learn.js';
+import { CUISINES } from '../engine/cuisine.js';
 import { listDirectory, openPerson } from '../engine/sync.js';
 import { sharingState, sharingLocalHTML, sharingPendingHTML, sharingSafe, sharingPublishIfShared, sharingPersonModal } from './sharing.js';
 
@@ -525,6 +526,12 @@ function peopleStepPreferences(container, person) {
     ${uiMultiPills('avoid_tags', options, prefs.avoid_tags, { label: 'Soft avoid tags' })}
     <div class="field" style="margin-top:1rem"><label for="pp-terms">Words to avoid in ingredient text</label>
       <input id="pp-terms" type="text" value="${uiEsc(prefs.avoid_terms.join(', '))}" placeholder="cilantro, blue cheese" autocomplete="off">
+    </div>
+    <h2>Cuisines</h2>
+    <p class="small muted">Tick the cuisines you want left out; those recipes disappear from the week, search, and Pantry. Ticking a cuisine you love nudges the week plan toward it. Labels come from the recipe source where it has them; otherwise the app guesses from the title and ingredients.</p>
+    <div class="field"><span class="label">Cuisines to skip</span><div class="chip-grid">${CUISINES.filter(c => c.id !== 'other').map(c => `<label class="choice compact"><input type="checkbox" data-cskip="${c.id}" ${(prefs.cuisines_skip || []).includes(c.id) ? 'checked' : ''}><span class="choice-body"><span class="choice-title">${uiEsc(c.label)}</span></span></label>`).join('')}</div></div>
+    <div class="field"><span class="label">Cuisines you love</span><div class="chip-grid">${CUISINES.filter(c => c.id !== 'other').map(c => `<label class="choice compact"><input type="checkbox" data-clove="${c.id}" ${(prefs.cuisines_love || []).includes(c.id) ? 'checked' : ''}><span class="choice-body"><span class="choice-title">${uiEsc(c.label)}</span></span></label>`).join('')}</div></div>
+    <div class="field" hidden>
       <div class="hint">Comma separated. Matched as plain text in ingredient lists and recipe names. Soft.</div></div>
     <h2 id="custom-diet">A diet not on the list</h2>
     ${peopleCustomDietHTML(person)}`;
@@ -540,6 +547,17 @@ function peopleStepPreferences(container, person) {
     if (on && !prefs.avoid_tags.includes(v)) prefs.avoid_tags.push(v);
     if (!on) prefs.avoid_tags = prefs.avoid_tags.filter(x => x !== v);
   }, { rerender: false });
+    prefs.cuisines_skip = prefs.cuisines_skip || []; prefs.cuisines_love = prefs.cuisines_love || [];
+  container.querySelectorAll('[data-cskip]').forEach(inp => inp.addEventListener('change', () => {
+    const id = inp.getAttribute('data-cskip');
+    prefs.cuisines_skip = prefs.cuisines_skip.filter(x => x !== id); if (inp.checked) { prefs.cuisines_skip.push(id); prefs.cuisines_love = prefs.cuisines_love.filter(x => x !== id); const other = container.querySelector(`[data-clove="${id}"]`); if (other) other.checked = false; }
+    uiPersist();
+  }));
+  container.querySelectorAll('[data-clove]').forEach(inp => inp.addEventListener('change', () => {
+    const id = inp.getAttribute('data-clove');
+    prefs.cuisines_love = prefs.cuisines_love.filter(x => x !== id); if (inp.checked) { prefs.cuisines_love.push(id); prefs.cuisines_skip = prefs.cuisines_skip.filter(x => x !== id); const other = container.querySelector(`[data-cskip="${id}"]`); if (other) other.checked = false; }
+    uiPersist();
+  }));
   container.querySelector('#pp-terms').addEventListener('change', e => {
     const manual = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
     prefs.avoid_terms = Array.from(new Set(manual));

@@ -2,6 +2,7 @@
 // Pantry, Today, and Together, and the heart / never-again controls that every recipe list shows.
 import { checkRecipe } from '../engine/checker.js';
 import { round } from '../engine/nutrition.js';
+import { CUISINES, CUISINE_LABEL, cuisineSkipped } from '../engine/cuisine.js';
 import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiModal, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiNutrientLabel, uiVerdictWord, uiTagLabel, uiPageHeader, uiChip, uiIcon, uiNoticeHTML, uiEmptyState } from './common.js';
 import { todayAddDiaryEntry, todayIsFavorite, todayToggleFavorite } from './today.js';
 import { weekGet, weekSetOverride } from './week.js';
@@ -37,16 +38,15 @@ function recipesIndex() {
   const cuisineCount = {};
   for (const r of pool) {
     const cats = r.wikibooks_categories || [];
-    let cuisine = '';
-    for (const c of cats) { const m = /^(.*) recipes$/.exec(c); if (m && !RECIPES_NOT_CUISINE.test(m[1])) { cuisine = m[1]; break; } }
-    if (cuisine) cuisineCount[cuisine] = (cuisineCount[cuisine] || 0) + 1;
+    const cuisine = r.cuisine_id || '';
+    if (cuisine && cuisine !== 'other') cuisineCount[cuisine] = (cuisineCount[cuisine] || 0) + 1;
     const tags = r.tags || [];
     const vegan = cats.some(c => /^Vegan/.test(c)) || tags.includes('vegan');
     const vegetarian = vegan || cats.some(c => /^(Vegetarian|Lacto|Ovo)/.test(c)) || tags.includes('vegetarian');
     const text = (r.name + ' ' + (r.ingredients || []).map(i => i.display || '').join(' ')).toLowerCase();
     rows.set(r.id, { text, name: r.name.toLowerCase(), cuisine, vegan, vegetarian, source: recipesSourceKey(r), nutrition: recipesHasNutrition(r) });
   }
-  const cuisines = Object.entries(cuisineCount).sort((a, b) => b[1] - a[1]).slice(0, 15).map(([c]) => c);
+  const cuisines = CUISINES.filter(c => cuisineCount[c.id]).map(c => c.id);
   recipesIndexCache = { pool, rows, cuisines };
   return recipesIndexCache;
 }
@@ -240,7 +240,7 @@ function recipesFiltered(person, plan) {
   const q = recipesUi.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
   const favs = new Set((person.favorites && person.favorites.recipes) || []);
   const out = [];
-  let more = false, checked = 0;
+  let more = false, checked = 0, skippedCount = 0;
   for (const r of uiState.data.recipes) {
     const row = idx.rows.get(r.id);
     if (!row) continue;
@@ -253,6 +253,7 @@ function recipesFiltered(person, plan) {
     if (recipesUi.veg === 'vegan' && !row.vegan) continue;
     if (recipesUi.meal && !(r.meal || []).includes(recipesUi.meal)) continue;
     if (recipesUi.cuisine && row.cuisine !== recipesUi.cuisine) continue;
+    if (!recipesUi.showSkipped && cuisineSkipped(r, person)) { skippedCount++; continue; }
     if (q.length && !q.every(w => row.text.includes(w))) continue;
     if (recipesUi.fits) {
       // computed only as far as the page needs, never for the whole pool at once
@@ -264,7 +265,7 @@ function recipesFiltered(person, plan) {
   }
   if (q.length) out.sort((a, b) => { const an = idx.rows.get(a.id).name.startsWith(q[0]) ? 0 : 1, bn = idx.rows.get(b.id).name.startsWith(q[0]) ? 0 : 1; return an - bn || (Number(favs.has(b.id)) - Number(favs.has(a.id))); });
   else out.sort((a, b) => Number(favs.has(b.id)) - Number(favs.has(a.id)) || Number(!!b.featured) - Number(!!a.featured) || 0);
-  return { rows: out, exact: !recipesUi.fits, more, checked };
+  return { rows: out, exact: !recipesUi.fits, more, checked , skippedCount };
 }
 
 function recipesCardHTML(r, person, plan) {
@@ -306,7 +307,7 @@ export function renderRecipesScreen(root) {
         ${chip('veg:vegetarian', 'Vegetarian', recipesUi.veg === 'vegetarian')}
         ${chip('veg:vegan', 'Vegan', recipesUi.veg === 'vegan')}
         <label class="filter-select"><span class="visually-hidden">Meal</span><select id="rc-meal"><option value="">Any meal</option>${['breakfast', 'lunch', 'dinner', 'snack'].map(s => `<option value="${s}" ${recipesUi.meal === s ? 'selected' : ''}>${RECIPES_SLOT_LABEL[s]}</option>`).join('')}</select></label>
-        <label class="filter-select"><span class="visually-hidden">Cuisine</span><select id="rc-cuisine"><option value="">Any cuisine</option>${idx.cuisines.map(c => `<option value="${uiEsc(c)}" ${recipesUi.cuisine === c ? 'selected' : ''}>${uiEsc(c)}</option>`).join('')}</select></label>
+        <label class="filter-select"><span class="visually-hidden">Cuisine</span><select id="rc-cuisine"><option value="">Any cuisine</option>${idx.cuisines.map(c => `<option value="${uiEsc(c)}" ${recipesUi.cuisine === c ? 'selected' : ''}>${uiEsc(CUISINE_LABEL[c] || c)}</option>`).join('')}</select></label>
         <button type="button" class="btn link small" id="rc-clear">Clear filters</button>
       </div>
     </div>
@@ -315,11 +316,11 @@ export function renderRecipesScreen(root) {
   `;
   const listEl = root.querySelector('#rc-list');
   const draw = () => {
-    const { rows, exact, more } = recipesFiltered(person, plan);
+    const { rows, exact, more, skippedCount } = recipesFiltered(person, plan);
     const shown = rows.slice(0, recipesUi.shown);
     const hasMore = exact ? rows.length > shown.length : more;
     const count = exact ? `${uiFmtNum(rows.length)} recipe${rows.length === 1 ? '' : 's'}${rows.length > shown.length ? `, showing ${shown.length}` : ''}` : `${shown.length} recipe${shown.length === 1 ? '' : 's'} that fit so far${hasMore ? '; more below' : ''}`;
-    listEl.innerHTML = shown.length ? `<p class="small muted" id="rc-count" aria-live="polite">${count}. Favorites first.</p>
+    listEl.innerHTML = shown.length ? `<p class="small muted" id="rc-count" aria-live="polite">${count}${skippedCount ? ` <button type="button" class="btn link small" id="rc-show-skipped">${uiFmtNum(skippedCount)} hidden by your cuisine settings; show them</button>` : recipesUi.showSkipped && (person.preferences && (person.preferences.cuisines_skip || []).length) ? ` <button type="button" class="btn link small" id="rc-hide-skipped">Hide skipped cuisines again</button>` : ''}. Favorites first.</p>
       <div class="list boxed">${shown.map(r => recipesCardHTML(r, person, plan)).join('')}</div>
       ${hasMore ? `<div class="btn-row"><button class="btn" type="button" id="rc-more">Show ${RECIPES_PAGE} more</button></div>` : ''}`
       : uiEmptyState(recipesUi.q || recipesUi.fav || recipesUi.source || recipesUi.fits ? 'No recipe matches these filters.' : 'No recipes are loaded.', recipesUi.fav ? '<button class="btn small" type="button" data-filter="fav">Show all recipes</button>' : '', 'list');
@@ -352,6 +353,8 @@ export function renderRecipesScreen(root) {
   }));
   root.querySelector('#rc-meal').addEventListener('change', e => { recipesUi.meal = e.target.value; recipesUi.shown = RECIPES_PAGE; draw(); });
   root.querySelector('#rc-cuisine').addEventListener('change', e => { recipesUi.cuisine = e.target.value; recipesUi.shown = RECIPES_PAGE; draw(); });
+  const showSk = root.querySelector('#rc-show-skipped'); if (showSk) showSk.addEventListener('click', () => { recipesUi.showSkipped = true; draw(); });
+  const hideSk = root.querySelector('#rc-hide-skipped'); if (hideSk) hideSk.addEventListener('click', () => { recipesUi.showSkipped = false; draw(); });
   root.querySelector('#rc-clear').addEventListener('click', () => { recipesUi = { q: '', fav: false, featured: false, nutrition: false, fits: false, quick: false, source: '', veg: '', meal: '', cuisine: '', shown: RECIPES_PAGE }; uiState.rerender(); });
   root.querySelector('#rc-new').addEventListener('click', () => recipesEdEditorModal(recipesEdBlankDraft(), { onSaved: rec => { recipesUi.source = 'mine'; recipesDetailModal(rec.id, person, null, { changed: true }); } }));
   root.querySelector('#rc-paste').addEventListener('click', () => recipesEdPasteModal({ onSaved: rec => { recipesUi.source = 'mine'; recipesDetailModal(rec.id, person, null, { changed: true }); } }));

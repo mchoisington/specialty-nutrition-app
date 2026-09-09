@@ -4,3 +4,4 @@ node_modules/
 dist/
 .DS_Store
 tools/open-recipes/
+tools/usda-recipes/
