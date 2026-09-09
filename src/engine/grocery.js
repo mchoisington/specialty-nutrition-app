@@ -35,3 +35,42 @@ export function buildGroceryList(week, recipesById, foodsById) {
   return { items, groups };
 }
 function roundNice(n) { if (n < 1) return Math.max(0.25, Math.round(n * 4) / 4); if (n < 10) return Math.round(n * 2) / 2; return Math.round(n); }
+
+// Apply the shopper's edits to a computed list and record what changed and why.
+// adjustments: { [foodId]: { quantity?: string, grams?: number, note?: string, removed?: boolean } }
+export function applyAdjustments(list, adjustments = {}) {
+  const items = list.items.map(it => {
+    const adj = adjustments[it.food];
+    if (!adj) return it;
+    return { ...it, adjusted: true, quantity: adj.quantity || it.quantity, grams: adj.grams != null ? adj.grams : it.grams, note: adj.note || '', removed: !!adj.removed, original: { quantity: it.quantity, grams: it.grams } };
+  });
+  const groups = {};
+  for (const it of items) (groups[it.group] ||= []).push(it);
+  return { items, groups };
+}
+
+// Differences between two computed lists (for example after adding a serving to a meal). Each change carries a reason.
+export function diffGrocery(prev, next, reason = 'Plan changed') {
+  const changes = [];
+  const prevBy = new Map((prev ? prev.items : []).map(i => [i.food, i]));
+  const nextBy = new Map((next ? next.items : []).map(i => [i.food, i]));
+  for (const [food, n] of nextBy) {
+    const p = prevBy.get(food);
+    if (!p) changes.push({ food, name: n.name, type: 'added', from: null, to: n.quantity, reason });
+    else if (Math.abs((p.grams || 0) - (n.grams || 0)) >= 5) changes.push({ food, name: n.name, type: 'changed', from: p.quantity, to: n.quantity, reason });
+  }
+  for (const [food, p] of prevBy) if (!nextBy.has(food)) changes.push({ food, name: p.name, type: 'removed', from: p.quantity, to: null, reason });
+  return changes;
+}
+
+// Plain-text rendering for copy, share sheets, and notes apps.
+export function groceryText(list, { title = 'Grocery list', changes = [] } = {}) {
+  const lines = [title, ''];
+  for (const [group, items] of Object.entries(list.groups)) {
+    lines.push(group.toUpperCase());
+    for (const it of items) if (!it.removed) lines.push(`${it.checked ? '[x]' : '[ ]'} ${it.name}: ${it.quantity}${it.note ? ' (' + it.note + ')' : ''}`);
+    lines.push('');
+  }
+  if (changes.length) { lines.push('CHANGES'); for (const c of changes) lines.push(`- ${c.name}: ${c.type} ${c.from ? 'from ' + c.from + ' ' : ''}${c.to ? 'to ' + c.to : ''}. ${c.reason}`); }
+  return lines.join('\n');
+}

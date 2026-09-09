@@ -11,11 +11,14 @@ import { renderGroceryScreen } from './ui/grocery.js';
 import { renderLogScreen } from './ui/log.js';
 import { renderLearnScreen } from './ui/learn.js';
 import { renderSettingsScreen } from './ui/settings.js';
+import { renderTodayScreen } from './ui/today.js';
+import { renderPantryScreen } from './ui/pantry.js';
+import { renderTogetherScreen } from './ui/together.js';
 
-const APP_DATA_FILES = ['sources', 'conditions', 'dictionaries', 'foods', 'recipes'];
+const APP_DATA_FILES = ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'articles'];
 
 function appEmptyFor(name) {
-  return name === 'dictionaries' ? { tags: {}, entries: [] } : [];
+  return name === 'dictionaries' ? { tags: {}, entries: [] } : name === 'articles' ? {} : [];
 }
 
 export async function loadData() {
@@ -55,6 +58,7 @@ function appNormalizeData(data) {
   if (!Array.isArray(data.sources)) data.sources = [];
   if (!Array.isArray(data.foods)) data.foods = [];
   if (!Array.isArray(data.recipes)) data.recipes = [];
+  if (!data.articles || typeof data.articles !== 'object' || Array.isArray(data.articles)) data.articles = {};
   if (!data.dictionaries || typeof data.dictionaries !== 'object') data.dictionaries = { tags: {}, entries: [] };
   if (!data.dictionaries.tags) data.dictionaries.tags = {};
   if (!Array.isArray(data.dictionaries.entries)) data.dictionaries.entries = [];
@@ -66,13 +70,16 @@ const APP_SCREENS = [
   { id: 'people', label: 'People', icon: 'M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0zM4 21a8 8 0 0 1 16 0' },
   { id: 'plan', label: 'Plan', icon: 'M6 3h12v18H6zM9 8h6M9 12h6M9 16h4' },
   { id: 'check', label: 'Check', icon: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm-4 9l3 3 5-6' },
+  { id: 'today', label: 'Today', icon: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2' },
   { id: 'week', label: 'Week', icon: 'M4 5h16v15H4zM4 10h16M8 3v4M16 3v4' },
   { id: 'grocery', label: 'Grocery', icon: 'M3 4h3l2 11h10l2-8H7M9 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z' },
+  { id: 'pantry', label: 'Pantry', icon: 'M4 7h16v13H4zM4 7l2-4h12l2 4M9 12h6' },
+  { id: 'together', label: 'Together', icon: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM2 21a7 7 0 0 1 14 0M14 21a6 6 0 0 1 8-5' },
   { id: 'log', label: 'Log', icon: 'M5 3h14v18H5zM8 8h8M8 12h8M8 16h5' },
   { id: 'learn', label: 'Learn', icon: 'M4 5a2 2 0 0 1 2-2h6v18H6a2 2 0 0 0-2 2zM12 3h6a2 2 0 0 1 2 2v16a2 2 0 0 0-2-2h-6' },
   { id: 'settings', label: 'Settings', icon: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm8 4l2-1-1-3-2 .3-1.5-1.5.3-2-3-1-1 2h-2l-1-2-3 1 .3 2L6.6 8.3 4.6 8l-1 3 2 1v2l-2 1 1 3 2-.3 1.5 1.5-.3 2 3 1 1-2h2l1 2 3-1-.3-2 1.5-1.5 2 .3 1-3-2-1z' }
 ];
-const APP_TAB_PRIMARY = ['home', 'plan', 'check', 'week'];
+const APP_TAB_PRIMARY = ['home', 'today', 'check', 'week'];
 
 function appIcon(path) {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${path}"/></svg>`;
@@ -126,7 +133,10 @@ export function appRender() {
       case 'people': renderPeopleScreen(main, ctx); break;
       case 'plan': renderPlanScreen(main, ctx); break;
       case 'check': renderCheckScreen(main, ctx); break;
+      case 'today': renderTodayScreen(main, ctx); break;
       case 'week': renderWeekScreen(main, ctx); break;
+      case 'pantry': renderPantryScreen(main, ctx); break;
+      case 'together': renderTogetherScreen(main, ctx); break;
       case 'grocery': renderGroceryScreen(main, ctx); break;
       case 'log': renderLogScreen(main, ctx); break;
       case 'learn': renderLearnScreen(main, ctx); break;

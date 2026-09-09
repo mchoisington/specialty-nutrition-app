@@ -22,7 +22,7 @@ export function minutesAvailable(cooking, dayIdx) {
   return Number(m) || 20;
 }
 
-export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, recentIds, dayTotals, plan, foodsById }) {
+export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, recentIds, dayTotals, plan, foodsById, weekFoods }) {
   if (check.verdict === 'fail') return { score: -Infinity, reasons: ['hard exclusion'] };
   const reasons = [];
   let score = 100;
@@ -46,6 +46,14 @@ export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, recentIds
   // equipment
   const eq = new Set(cooking.equipment || []);
   for (const e of recipe.equipment || []) if (e !== 'none' && !eq.has(e)) { score -= 45; reasons.push(`needs ${e}`); }
+  // budget: reward recipes that reuse ingredients already on this week's list (fewer distinct items to buy)
+  if (cooking.budget && weekFoods && weekFoods.size) {
+    const ings = (recipe.ingredients || []).map(i => i.food);
+    const shared = ings.filter(f => weekFoods.has(f)).length;
+    const bonus = Math.min(20, Math.round((shared / Math.max(1, ings.length)) * 25));
+    score += bonus;
+    if (shared) reasons.push(`reuses ${shared} ingredient${shared === 1 ? '' : 's'} already on the list`);
+  }
   // variety
   const seen = recentIds.filter(id => id === recipe.id).length;
   const tol = cooking.leftovers === 'good' ? 6 : cooking.leftovers === 'poor' ? 40 : 18;
@@ -74,30 +82,34 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
   const recentIds = [];
   const leftovers = []; // {recipeId, servings, madeOn}
   const household = Math.max(1, Number(cooking.household) || 1);
+  const perDay = person.servings_by_day || {}; // { 'sun': 4 } overrides for guests
   const cookDays = new Set(cooking.cook_days && cooking.cook_days.length ? cooking.cook_days : DAYS);
   const unmet = [];
+  const weekFoods = new Set();
 
   for (let i = 0; i < 7; i++) {
     const date = new Date(startDate.getTime() + i * 86400000);
     const dayIdx = date.getDay();
     const canCook = cookDays.has(DAYS[dayIdx]);
+    const dateKey = date.toISOString().slice(0, 10);
+    const eaters = Math.max(1, Number(perDay[dateKey] || perDay[DAYS[dayIdx]] || household));
     let dayTotals = emptyTotals();
     const meals = [];
     for (const slot of slots) {
       // use leftovers first on no-cook days, or when leftovers tolerance is good
-      const lo = leftovers.find(l => l.servings >= household && (i - l.madeOn) <= 3 && recipeMeal(l.recipe, slot));
+      const lo = leftovers.find(l => l.servings >= eaters && (i - l.madeOn) <= 3 && recipeMeal(l.recipe, slot));
       if (lo && (!canCook || cooking.leftovers === 'good' && rnd() < 0.5)) {
-        lo.servings -= household;
+        lo.servings -= eaters;
         const per = recipeTotals(lo.recipe, foodsById).perServing;
         dayTotals = addTotals(dayTotals, per);
-        meals.push({ slot, recipe: lo.recipe.id, name: lo.recipe.name, source: 'leftover', servings: household, check: summarize(checks.get(lo.recipe.id)) });
+        meals.push({ slot, recipe: lo.recipe.id, name: lo.recipe.name, source: 'leftover', servings: eaters, check: summarize(checks.get(lo.recipe.id)) });
         recentIds.push(lo.recipe.id);
         continue;
       }
       const candidates = eligible.filter(r => recipeMeal(r, slot));
       const scored = candidates.map(r => {
         const check = checks.get(r.id);
-        const s = scoreRecipe({ recipe: r, check, cooking, dayIdx, canCook, recentIds, dayTotals, plan, foodsById });
+        const s = scoreRecipe({ recipe: r, check, cooking, dayIdx, canCook, recentIds, dayTotals, plan, foodsById, weekFoods });
         return { r, check, score: s.score + rnd() * 4, reasons: s.reasons };
       }).filter(x => x.score > -Infinity).sort((a, b) => b.score - a.score);
       if (!scored.length) { unmet.push({ date: date.toISOString().slice(0, 10), slot, why: 'no recipe fits' }); meals.push({ slot, recipe: null, source: 'none' }); continue; }
@@ -105,12 +117,13 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
       const per = recipeTotals(pick.r, foodsById).perServing;
       dayTotals = addTotals(dayTotals, per);
       const batch = canCook && (cooking.leftovers !== 'poor') && (pick.r.leftovers === 'good' || pick.r.leftovers === 'ok');
-      const servingsMade = batch ? Math.max(pick.r.servings || household, household * 2) : household;
-      if (servingsMade > household) leftovers.push({ recipe: pick.r, servings: servingsMade - household, madeOn: i });
-      meals.push({ slot, recipe: pick.r.id, name: pick.r.name, source: pick.r.assembly_only ? 'assembly' : 'cook', servings: household, servingsMade, score: Math.round(pick.score), reasons: pick.reasons, check: summarize(pick.check) });
+      const servingsMade = batch ? Math.max(pick.r.servings || eaters, eaters * 2) : eaters;
+      if (servingsMade > eaters) leftovers.push({ recipe: pick.r, servings: servingsMade - eaters, madeOn: i });
+      for (const ing of pick.r.ingredients || []) weekFoods.add(ing.food);
+      meals.push({ slot, recipe: pick.r.id, name: pick.r.name, source: pick.r.assembly_only ? 'assembly' : 'cook', servings: eaters, servingsMade, score: Math.round(pick.score), reasons: pick.reasons, check: summarize(pick.check) });
       recentIds.push(pick.r.id);
     }
-    days.push({ date: date.toISOString().slice(0, 10), day: DAYS[dayIdx], canCook, minutes: minutesAvailable(cooking, dayIdx), meals, totals: dayTotals });
+    days.push({ date: dateKey, day: DAYS[dayIdx], canCook, eaters, minutes: minutesAvailable(cooking, dayIdx), meals, totals: dayTotals });
   }
   return { days, excluded, unmet, eligibleCount: eligible.length, seed };
 }

@@ -120,7 +120,7 @@ test('allergens are hard even if also a preference', () => {
 });
 
 test('restriction load warns at three eliminations', () => {
-  const plan = buildPlan({ person: person({ modules: ['ibs-low-fodmap', 'mcas', 'gluten-free-non-celiac'] }), conditions });
+  const plan = buildPlan({ person: person({ modules: ['ibs-low-fodmap', 'mcas', 'low-carb-ketogenic'] }), conditions });
   assert.equal(plan.restrictionLoad.warn, true);
   assert.ok(plan.notices.some(n => n.code === 'restriction-load'));
 });

@@ -20,9 +20,9 @@ function stripModuleSyntax(code) {
 }
 
 const data = {};
-for (const f of ['sources', 'conditions', 'dictionaries', 'foods', 'recipes']) {
+for (const f of ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'articles']) {
   const p = new URL('data/' + f + '.json', root);
-  data[f] = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : (f === 'dictionaries' ? { tags: {}, entries: [] } : []);
+  data[f] = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : (f === 'dictionaries' ? { tags: {}, entries: [] } : f === 'articles' ? {} : []);
 }
 const html = R('index.html');
 const iconSvg = fs.existsSync(new URL('icon.svg', root)) ? R('icon.svg') : '';

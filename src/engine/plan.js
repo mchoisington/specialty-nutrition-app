@@ -12,7 +12,7 @@ export const FEATURE_MODULES = {
   'calorie-targets': []
 };
 
-export const ELIMINATION_MODULES = ['ibs-low-fodmap', 'mcas', 'gluten-free-non-celiac', 'low-carb-ketogenic'];
+export const ELIMINATION_MODULES = ['ibs-low-fodmap', 'mcas', 'low-carb-ketogenic', 'time-restricted-eating'];
 
 const DAY_MS = 86400000;
 
@@ -112,6 +112,18 @@ function ruleApplies(rule, m, person, ctx) {
 
 export function buildPlan({ person, conditions, dictionaries, today = new Date() }) {
   conditions = normalizeConditions(conditions);
+  // User-defined patterns live on the person and behave like modules with a 'user-defined' source.
+  const custom = (person.custom_modules || []).map(cm => ({
+    id: cm.id, name: cm.name, category: 'custom', evidence: { rating: 'user-defined', summary: cm.summary || 'Defined by you. Not evidence-rated.' }, sources: ['user-defined'],
+    rules: [
+      ...(cm.avoid_tags && cm.avoid_tags.length ? [{ id: cm.id + '-avoid', kind: 'avoid', tags: cm.avoid_tags, tier: 1, strength: 'should', text: `${cm.name}: avoid ${cm.avoid_tags.join(', ')}.`, sources: ['user-defined'] }] : []),
+      ...(cm.prefer_tags && cm.prefer_tags.length ? [{ id: cm.id + '-prefer', kind: 'prefer', tags: cm.prefer_tags, tier: 1, strength: 'should', text: `${cm.name}: prefer ${cm.prefer_tags.join(', ')}.`, sources: ['user-defined'] }] : []),
+      ...Object.entries(cm.limits || {}).filter(([, v]) => typeof v === 'number').map(([n, v]) => ({ id: cm.id + '-limit-' + n, kind: 'limit', nutrient: n, op: '<=', value: v, per: 'day', tier: 1, strength: 'should', text: `${cm.name}: ${n.replace(/_/g, ' ')} at most ${v} per day.`, sources: ['user-defined'] })),
+      ...Object.entries(cm.targets || {}).filter(([, v]) => typeof v === 'number').map(([n, v]) => ({ id: cm.id + '-target-' + n, kind: 'target', nutrient: n, op: '>=', value: v, per: 'day', tier: 1, strength: 'should', text: `${cm.name}: ${n.replace(/_/g, ' ')} at least ${v} per day.`, sources: ['user-defined'] })),
+      ...(cm.notes ? [{ id: cm.id + '-notes', kind: 'info', tier: 1, strength: 'may', text: cm.notes, sources: ['user-defined'] }] : [])
+    ], conflicts: [], education: { plain: cm.summary || '', evidence: [], contested: [], do_not_claim: [] }
+  }));
+  conditions = conditions.concat(custom);
   const byId = new Map(conditions.map(m => [m.id, m]));
   const notices = [];
   const selected = new Set(person.modules || []);
@@ -480,7 +492,7 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
   const dairyFreePref = (prefAvoid.includes('allergen-milk') || (prefAvoid.includes('full-fat-dairy') && prefAvoid.includes('low-fat-dairy'))) && !(person.allergens || []).includes('allergen-milk');
   const elim = countIds.filter(id => id === 'dairy-free-non-allergy' ? dairyFreePref : activeIds.has(id));
   const restrictionLoad = { count: elim.length, modules: elim, warn: elim.length >= threshold, threshold };
-  if (restrictionLoad.warn) notices.push({ level: 'warn', code: 'restriction-load', text: `You have ${elim.length} elimination-style restrictions running at once. That is a lot of restriction, and the guidelines behind these protocols warn about it. Consider working with a dietitian, and do one elimination at a time where you can.` });
+  if (restrictionLoad.warn) notices.push({ level: 'info', code: 'restriction-load', text: `Stacked restrictions: ${elim.length} diets that each cut out whole food groups are running at once (${elim.join(', ')}). Together they make it harder to get enough fiber, calcium, protein and variety. Where you can, run one at a time, and keep the reintroduction steps.` });
 
   for (const t of tier2Missing) notices.push({ level: 'warn', code: 'tier2-missing', module: t.module, text: `${t.moduleName}: ${t.label} was not applied. The app does not set this number. Enter the value your clinician gave you.${t.consensus ? ' Published range: ' + t.consensus : ''}` });
   for (const c of conflicts) {
