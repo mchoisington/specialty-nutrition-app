@@ -832,7 +832,7 @@
       },
       {
         "label": "Swiss Interest Group Histamine Intolerance (SIGHI)",
-        "url": "https://www.histaminintoleranz.ch/en/",
+        "url": "https://www.histaminintoleranz.ch/en/introduction_outline.html",
         "kind": "patient-material"
       }
     ],
@@ -855,7 +855,7 @@
       {
         "id": "sighi-list",
         "citation": "Swiss Interest Group Histamine Intolerance (SIGHI) food compatibility list. Not peer-reviewed; based on clinical experience and food-chemistry data.",
-        "url": "https://www.histaminintoleranz.ch/en/"
+        "url": "https://www.histaminintoleranz.ch/en/introduction_outline.html"
       },
       {
         "id": "valent-mcas-2019",
