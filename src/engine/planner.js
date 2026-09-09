@@ -22,10 +22,13 @@ export function minutesAvailable(cooking, dayIdx) {
   return Number(m) || 20;
 }
 
-export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, recentIds, dayTotals, plan, foodsById, weekFoods }) {
+export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked }) {
   if (check.verdict === 'fail') return { score: -Infinity, reasons: ['hard exclusion'] };
+  if (disliked && disliked.includes(recipe.id)) return { score: -Infinity, reasons: ['marked never again'] };
   const reasons = [];
   let score = 100;
+  // taste: the only signal that matters for a family. Favorites get a solid bonus.
+  if (favorites && favorites.includes(recipe.id)) { score += 35; reasons.push('a favorite'); }
   // soft avoid
   for (const h of check.hits) { score -= 25; reasons.push(`contains ${h.label} (avoid)`); }
   for (const t of check.termHits || []) { score -= 15; reasons.push(`contains "${t.term}" (your preference)`); }
@@ -74,9 +77,11 @@ export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, recentIds
 
 export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, startDate = new Date(), seed = 0, slots = ['breakfast', 'lunch', 'dinner'] }) {
   const cooking = person.cooking || {};
+  const favorites = (person.favorites && person.favorites.recipes) || [];
+  const disliked = (person.disliked && person.disliked.recipes) || [];
   const rnd = mulberry32(hashStr(person.id + '|' + startDate.toISOString().slice(0, 10) + '|' + seed));
   const checks = new Map(recipes.map(r => [r.id, checkRecipe(r, plan, matcher, foodsById, person)]));
-  const eligible = recipes.filter(r => checks.get(r.id).verdict !== 'fail');
+  const eligible = recipes.filter(r => checks.get(r.id).verdict !== 'fail' && !disliked.includes(r.id));
   const excluded = recipes.filter(r => checks.get(r.id).verdict === 'fail').map(r => ({ id: r.id, name: r.name, why: checks.get(r.id).hits.filter(h => h.hard).map(h => h.label) }));
   const days = [];
   const recentIds = [];
@@ -109,7 +114,7 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
       const candidates = eligible.filter(r => recipeMeal(r, slot));
       const scored = candidates.map(r => {
         const check = checks.get(r.id);
-        const s = scoreRecipe({ recipe: r, check, cooking, dayIdx, canCook, recentIds, dayTotals, plan, foodsById, weekFoods });
+        const s = scoreRecipe({ recipe: r, check, cooking, dayIdx, canCook, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked });
         return { r, check, score: s.score + rnd() * 4, reasons: s.reasons };
       }).filter(x => x.score > -Infinity).sort((a, b) => b.score - a.score);
       if (!scored.length) { unmet.push({ date: date.toISOString().slice(0, 10), slot, why: 'no recipe fits' }); meals.push({ slot, recipe: null, source: 'none' }); continue; }

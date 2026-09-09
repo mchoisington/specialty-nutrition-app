@@ -51,3 +51,11 @@ test('grocery list sums grams across cooked meals and converts to portions', () 
   assert.ok(oats && oats.grams > 0 && /x 1 cup/.test(oats.quantity));
   assert.ok(!g.items.some(i => i.food === 'f-peanut'));
 });
+
+test('favorites score up and never-again recipes are excluded', () => {
+  const p2 = { ...person, favorites: { recipes: ['chicken-broccoli'] }, disliked: { recipes: ['salt-bomb'] } };
+  const week = buildWeekPlan({ person: p2, plan, recipes, foodsById: foods, matcher, startDate: new Date('2026-09-06'), seed: 1 });
+  for (const d of week.days) for (const m of d.meals) assert.notEqual(m.recipe, 'salt-bomb');
+  const dinners = week.days.flatMap(d => d.meals.filter(m => m.slot === 'dinner' && m.source !== 'leftover'));
+  assert.ok(dinners.every(m => m.recipe === 'chicken-broccoli'));
+});
