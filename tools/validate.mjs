@@ -77,7 +77,7 @@ for (const r of recipes) {
     if (!foodIds.has(ing.food)) err(`recipe ${r.id} references unknown food ${ing.food}`);
     if (!(Number(ing.grams) > 0)) err(`recipe ${r.id} ingredient ${ing.food} has no grams`);
   }
-  if (imported && (!r.nutrition_per_serving || typeof r.nutrition_per_serving.kcal !== 'number')) err(`recipe ${r.id} is imported but has no per-serving kcal`);
+  if (r.nutrition_source && (!r.nutrition_per_serving || typeof r.nutrition_per_serving.kcal !== 'number')) err(`recipe ${r.id} declares a nutrition source but has no per-serving kcal`);
   if (r.source && r.source !== 'Peace Meal' && (!r.source_url || !r.license || !r.attribution)) err(`recipe ${r.id} from ${r.source} lacks source_url, license, or attribution`);
   for (const t of r.tags || []) if (!knownTag(t)) err(`recipe ${r.id} uses undeclared tag ${t}`);
   if (!imported && Object.keys(r).some(k => /nutri|kcal|sodium/i.test(k))) err(`recipe ${r.id} carries nutrient numbers; nutrients are computed, not stored`);
