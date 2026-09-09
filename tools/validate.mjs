@@ -8,7 +8,7 @@ const sources = read('data/sources.json');
 const conditions = read('data/conditions.json');
 const dictionaries = read('data/dictionaries.json');
 const foods = fs.existsSync(new URL('../data/foods.json', import.meta.url)) ? read('data/foods.json') : [];
-const recipes = [ ...(fs.existsSync(new URL('../data/recipes.json', import.meta.url)) ? read('data/recipes.json') : []), ...(fs.existsSync(new URL('../data/recipes-open.json', import.meta.url)) ? read('data/recipes-open.json') : []) ];
+const recipes = [ ...(fs.existsSync(new URL('../data/recipes.json', import.meta.url)) ? read('data/recipes.json') : []), ...(fs.existsSync(new URL('../data/recipes-open.json', import.meta.url)) ? read('data/recipes-open.json') : []), ...(fs.existsSync(new URL('../data/recipes-usda.json', import.meta.url)) ? read('data/recipes-usda.json') : []) ];
 const articles = fs.existsSync(new URL('../data/articles.json', import.meta.url)) ? read('data/articles.json') : {};
 
 const sourceIds = new Set(sources.map(s => s.id));
