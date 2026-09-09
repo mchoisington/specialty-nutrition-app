@@ -455,14 +455,17 @@ export function uiIcon(name, opts = {}) {
   return `<svg class="${cls}" viewBox="0 0 24 24" fill="${fill}" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" ${a11y}${opts.style ? ` style="${uiEsc(opts.style)}"` : ''}><path d="${d}"/></svg>`;
 }
 
-// Brand mark: a dove over a plate. Two colors at most (currentColor and the surface). Reads at 32px.
+// Brand mark: an olive branch resting in a bowl. One color (currentColor). Reads at 32px.
 export function uiBrandMark(opts = {}) {
   const a11y = opts.label ? `role="img" aria-label="${uiEsc(opts.label)}"` : 'aria-hidden="true"';
   return `<svg class="brand-mark${opts.cls ? ' ' + opts.cls : ''}" viewBox="0 0 64 64" ${a11y}>
-    <path d="M8 39c6-6 16-9 26-9 4-5 9-7.5 14-6.5l5.5 2-5 2c.5 5.5-3.5 10.5-11.5 13-7 2-17 2.5-24 4l-7 2.5 3-4z" fill="currentColor"/>
-    <path d="M28 31c-1-9 5-17 16-19-5 5-7 12-6 18-3.5 0-7 .3-10 1z" fill="currentColor"/>
-    <ellipse cx="32" cy="51" rx="22" ry="5.5" fill="none" stroke="currentColor" stroke-width="3"/>
-    <ellipse cx="32" cy="51" rx="12" ry="2.4" fill="none" stroke="currentColor" stroke-width="1.75" opacity="0.55"/>
+    <path d="M10 38h44c0 10-8 17-22 17S10 48 10 38z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M18 34c6-8 14-14 30-20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    <g fill="currentColor">
+      <path d="M22.5 29.5c-4 .2-7-1.6-8.5-5 4-.3 7 1.5 8.5 5z"/><path d="M29 25c-4.4.4-7.4-1.4-9-5 4.4-.4 7.4 1.4 9 5z"/><path d="M36.5 20.8c-4.5.4-7.5-1.5-9-5.2 4.5-.4 7.5 1.5 9 5.2z"/>
+      <path d="M26 30.2c1.7-3.9 4.9-5.5 9-5-1.6 3.8-4.8 5.5-9 5z"/><path d="M33.5 26.2c1.6-4 4.8-5.7 9.2-5.2-1.6 4-4.8 5.7-9.2 5.2z"/>
+    </g>
+    <circle cx="46" cy="16.5" r="2.2" fill="currentColor"/>
   </svg>`;
 }
 
