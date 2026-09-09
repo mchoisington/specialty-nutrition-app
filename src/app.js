@@ -202,6 +202,24 @@ export function appRender() {
   window.scrollTo(0, 0);
 }
 
+// The recipe pool = shipped recipes, with any ingredient links the household added to imported recipes
+// (profile.recipe_links[recipeId] = [{food, grams, display}]), plus recipes the household wrote (profile.custom_recipes).
+// Call uiState.refreshRecipes() after editing either.
+function appAssembleRecipes() {
+  const profile = uiState.profile || {};
+  const links = profile.recipe_links || {};
+  const out = [];
+  for (const r of uiState.baseRecipes || []) {
+    const linked = links[r.id];
+    if (Array.isArray(linked) && linked.length) out.push({ ...r, ingredients: linked, linked_by_household: true });
+    else out.push(r);
+  }
+  for (const cr of profile.custom_recipes || []) if (cr && cr.id) out.push({ source: 'Peace Meal', ...cr, custom: true });
+  uiState.data.recipes = out;
+  uiState.recipesById = new Map(out.map(r => [r.id, r]));
+  return out;
+}
+
 async function appBoot() {
   uiState.profile = load();
   if (!uiState.profile.activePerson && uiState.profile.people.length) uiState.profile.activePerson = uiState.profile.people[0].id;
@@ -214,7 +232,9 @@ async function appBoot() {
   uiState.conditionsById = new Map(uiState.data.conditions.map(m => [m.id, m]));
   uiState.sourcesById = new Map(uiState.data.sources.map(s => [s.id, s]));
   uiState.foodsById = new Map(uiState.data.foods.map(f => [f.id, f]));
-  uiState.recipesById = new Map(uiState.data.recipes.map(r => [r.id, r]));
+  uiState.baseRecipes = uiState.data.recipes;
+  uiState.refreshRecipes = appAssembleRecipes;
+  appAssembleRecipes();
   uiState.rerender = appRender;
   window.addEventListener('hashchange', appRender);
   if (!location.hash) location.hash = '#/home';
