@@ -59,3 +59,19 @@ test('favorites score up and never-again recipes are excluded', () => {
   const dinners = week.days.flatMap(d => d.meals.filter(m => m.slot === 'dinner' && m.source !== 'leftover'));
   assert.ok(dinners.every(m => m.recipe === 'chicken-broccoli'));
 });
+
+test('text-only ingredients from imported recipes appear on the grocery list by name', () => {
+  const week = { days: [{ date: '2026-09-06', meals: [{ slot: 'dinner', recipe: 'nhs-x', source: 'cook', servings: 2, servingsMade: 2 }, { slot: 'lunch', recipe: 'oatmeal', source: 'cook', servings: 1, servingsMade: 1 }] }] };
+  const rec = new Map([
+    ['nhs-x', { id: 'nhs-x', name: 'Lentil soup', servings: 2, source: 'NHS website', ingredients: [{ display: '1 onion, chopped' }, { display: '200g red lentils' }, { display: '1 tbsp olive oil' }] }],
+    ['oatmeal', recipes[0]]
+  ]);
+  const g = buildGroceryList(week, rec, foods);
+  const names = g.items.map(i => i.name);
+  assert.ok(names.includes('Onion') && names.includes('Red lentil') && names.includes('Olive oil'), names.join(','));
+  assert.ok(g.items.some(i => i.food === 'f-oats'));
+  assert.ok(!g.items.some(i => i.name === 'undefined' || i.food === 'undefined'));
+  const onion = g.items.find(i => i.name === 'Onion');
+  assert.equal(onion.group, 'From recipe text (check amounts)');
+  assert.ok(/1 onion, chopped \(Lentil soup\)/.test(onion.quantity));
+});

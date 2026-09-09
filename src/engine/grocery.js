@@ -8,16 +8,25 @@ export function buildGroceryList(week, recipesById, foodsById) {
       if (!r) continue;
       const factor = (m.servingsMade || m.servings || r.servings) / (r.servings || 1);
       for (const ing of r.ingredients || []) {
-        const cur = need.get(ing.food) || { grams: 0, uses: new Set(), displays: new Set() };
+        // Ingredients that link to a food are summed in grams. Text-only ingredients (imported or pasted recipes whose
+        // lines are not linked yet) are listed by name with the recipe's own wording, since amounts cannot be summed.
+        const key = ing.food ? ing.food : 'text:' + groceryTextKey(ing.display);
+        if (!ing.food && !groceryTextKey(ing.display)) continue;
+        const cur = need.get(key) || { grams: 0, uses: new Set(), displays: new Set(), textOnly: !ing.food, lines: [] };
         cur.grams += (Number(ing.grams) || 0) * factor;
         cur.uses.add(r.name);
         if (ing.display) cur.displays.add(ing.display);
-        need.set(ing.food, cur);
+        if (!ing.food && ing.display) cur.lines.push(factor !== 1 ? `${ing.display} (x${Math.round(factor * 10) / 10} for ${r.name})` : `${ing.display} (${r.name})`);
+        need.set(key, cur);
       }
     }
   }
   const items = [];
   for (const [foodId, v] of need) {
+    if (v.textOnly) {
+      items.push({ food: foodId, name: groceryTextName(foodId.slice(5)), group: 'From recipe text (check amounts)', grams: 0, quantity: v.lines.join('; '), uses: [...v.uses], displays: [...v.displays], tags: [], textOnly: true });
+      continue;
+    }
     const food = foodsById.get(foodId);
     const name = food ? (food.short || food.name) : foodId;
     const group = food ? food.group : 'Other';
@@ -34,6 +43,12 @@ export function buildGroceryList(week, recipesById, foodsById) {
   for (const it of items) (groups[it.group] ||= []).push(it);
   return { items, groups };
 }
+// Strip quantities, units, and prep words from an ingredient line so "2 cups chopped onion" and "1 onion, diced" share a key.
+const GROCERY_NOISE = /\b(\d+[\d\/.,½¼¾⅓⅔-]*|cups?|tbsps?|tablespoons?|tsps?|teaspoons?|oz|ounces?|lbs?|pounds?|g|grams?|kg|ml|l|litres?|liters?|cans?|jars?|packages?|pkg|cloves?|slices?|pieces?|pinch|dash|handful|large|medium|small|extra|about|approx\w*|to taste|optional|fresh|frozen|canned|dried|dry|chopped|diced|minced|sliced|cubed|shredded|grated|crushed|rinsed|drained|cooked|raw|peeled|seeded|halved|quartered|trimmed|thawed|softened|melted|divided|packed|heaping|level|thinly|thickly|finely|coarsely|roughly|plus|or|of|and|for|the|a|an)\b/gi;
+export function groceryTextKey(display) {
+  return String(display || '').toLowerCase().replace(/\([^)]*\)/g, ' ').replace(/[^a-z0-9\s]/g, ' ').replace(GROCERY_NOISE, ' ').replace(/\s+/g, ' ').trim().replace(/s\b/g, '');
+}
+function groceryTextName(key) { return key ? key.charAt(0).toUpperCase() + key.slice(1) : 'Ingredient'; }
 function roundNice(n) { if (n < 1) return Math.max(0.25, Math.round(n * 4) / 4); if (n < 10) return Math.round(n * 2) / 2; return Math.round(n); }
 
 // Apply the shopper's edits to a computed list and record what changed and why.
