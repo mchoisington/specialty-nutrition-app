@@ -4,9 +4,11 @@ import { buildGroupPlan, exportPersonForSharing } from '../engine/group.js';
 import { buildWeekPlan } from '../engine/planner.js';
 import { buildGroceryList } from '../engine/grocery.js';
 import { newPerson } from '../store.js';
-import { uiState, uiEsc, uiActivePerson, uiPersist, uiToast, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiNutrientLabel, uiVerdictWord, uiVerdictChip, uiTagLabel, uiDownload, uiCopyText, uiEnsurePerson, uiSegmented, uiNoticeHTML, uiPageHeader, uiSection, uiChip, uiIcon, uiAvatar, uiEmptyState } from './common.js';
-import { weekRecipeModal } from './week.js';
-import { groceryIcsForWeek } from './grocery.js';
+import { uiState, uiEsc, uiActivePerson, uiPersist, uiToast, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiNutrientLabel, uiVerdictWord, uiVerdictChip, uiTagLabel, uiDownload, uiCopyText, uiEnsurePerson, uiSegmented, uiNoticeHTML, uiPageHeader, uiSection, uiChip, uiIcon, uiAvatar, uiEmptyState, uiPlanFor, uiMultiPills } from './common.js';
+import { weekRecipeModal, weekGet } from './week.js';
+import { groceryIcsForWeek, groceryComputeList } from './grocery.js';
+import { SHARE_PARTS, sendShare, listSharesForMe, openShare, listDevices } from '../engine/sync.js';
+import { sharingState, sharingLocalHTML, sharingPendingHTML, sharingSafe, sharingDeviceName, sharingPersonModal } from './sharing.js';
 
 const TOGETHER_SLOT_LABEL = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' };
 
@@ -80,7 +82,10 @@ export function renderTogetherScreen(root) {
       <div class="field"><label for="tg-paste">Paste shared profile</label><textarea id="tg-paste" style="min-height:70px" placeholder='{"shared":true,"name":"..."}'></textarea></div>
       <div class="btn-row"><button class="btn" type="button" id="tg-add-paste">Add guest from text</button><label for="tg-file" class="btn">Choose a file</label><input id="tg-file" type="file" accept="application/json,.json" class="visually-hidden"></div>
     </div>`, { id: 'tg-share-h' })}
+    ${uiSection('Share with someone', `<div class="card" id="tg-store-share">${togetherStoreShellHTML()}</div>`, { id: 'tg-store-h' })}
+    ${uiSection('Shared with me', `<div class="card" id="tg-store-inbox">${togetherStoreShellHTML()}</div>`, { id: 'tg-inbox-h' })}
   `;
+  togetherLoadStore(root);
   root.querySelectorAll('[data-person]').forEach(c => c.addEventListener('change', () => {
     togetherUi.people = [...root.querySelectorAll('[data-person]')].filter(x => x.checked).map(x => x.dataset.person);
     togetherUi.eaters = null; togetherUi.built = false; uiState.rerender();
@@ -138,6 +143,7 @@ function togetherResultHTML(selected, eaters, start, count) {
   const week = uiState.data.recipes.length ? buildWeekPlan({ person: gp, plan: group, recipes: uiState.data.recipes, foodsById: uiState.foodsById, matcher: uiState.matcher, startDate, seed: togetherUi.seed }) : null;
   const days = week ? week.days.slice(0, count) : [];
   const list = week ? buildGroceryList({ days }, uiState.recipesById, uiState.foodsById) : null;
+  if (list) { list.items = list.items.filter(i => i.food && i.food !== 'undefined'); list.groups = {}; for (const it of list.items) (list.groups[it.group] ||= []).push(it); }
   togetherLast = { group, gp, week, days, list };
   const hard = Object.entries(group.avoid).filter(([, a]) => a.hard);
   const soft = Object.entries(group.avoid).filter(([, a]) => !a.hard);
@@ -178,4 +184,84 @@ function togetherBindResult(root) {
     const ok = uiDownload(`meals-together-${days[0].date}.ics`, groceryIcsForWeek(week, gp, { days, uidTag: 'together' }), 'text/calendar');
     uiToast(ok ? 'Calendar file started.' : 'Download blocked here.');
   });
+}
+
+// ---- Sharing through the shared store (claude.ai version only) ----
+let togetherShareUi = { person: null, device: '', parts: ['rules'], days: [], expiry: 30 };
+
+function togetherStoreShellHTML() {
+  const s = sharingState();
+  if (!s.ready) return sharingPendingHTML();
+  if (!s.db || !s.identity) return sharingLocalHTML();
+  return '<p class="small muted">Loading...</p>';
+}
+
+async function togetherLoadStore(root) {
+  const s = sharingState();
+  if (!s.ready || !s.db || !s.identity) return;
+  const [devices, shares] = await Promise.all([
+    sharingSafe(() => listDevices(s.db), [], 'The device list could not be read.'),
+    sharingSafe(() => listSharesForMe(s.db, s.identity), [], 'Shares could not be read right now.')
+  ]);
+  if (!root.isConnected) return;
+  togetherRenderShareForm(root.querySelector('#tg-store-share'), devices);
+  togetherRenderInbox(root.querySelector('#tg-store-inbox'), shares, devices);
+}
+
+function togetherRenderShareForm(box, devices) {
+  const s = sharingState();
+  const mine = uiState.profile.people.filter(p => !p.guest);
+  const others = devices.filter(d => d && d.fingerprint && d.fingerprint !== s.identity.fingerprint);
+  if (!mine.length) { box.innerHTML = '<p class="small muted">Add a person first.</p>'; return; }
+  if (!togetherShareUi.person || !mine.find(p => p.id === togetherShareUi.person)) togetherShareUi.person = (uiActivePerson() && !uiActivePerson().guest ? uiActivePerson().id : mine[0].id);
+  if (!others.find(d => d.fingerprint === togetherShareUi.device)) togetherShareUi.device = others[0] ? others[0].fingerprint : '';
+  const person = mine.find(p => p.id === togetherShareUi.person);
+  let week = null;
+  try { week = uiState.data.recipes.length ? weekGet(person, uiPlanFor(person)) : null; } catch { week = null; }
+  const dayOpts = week ? week.days.map(d => ({ value: d.date, label: uiFmtDate(d.date) })) : [];
+  const wantWeek = togetherShareUi.parts.includes('week');
+  box.innerHTML = `
+    <p class="small">Send parts of a profile to one other device. The package is encrypted for that device only and expires on its own.</p>
+    <div class="grid-2">
+      <div class="field"><label for="ts-person">Whose profile</label><select id="ts-person">${mine.map(p => `<option value="${uiEsc(p.id)}" ${p.id === togetherShareUi.person ? 'selected' : ''}>${uiEsc(p.name)}</option>`).join('')}</select></div>
+      <div class="field"><label for="ts-device">Send to</label><select id="ts-device" ${others.length ? '' : 'disabled'}>${others.length ? others.map(d => `<option value="${uiEsc(d.fingerprint)}" ${d.fingerprint === togetherShareUi.device ? 'selected' : ''}>${uiEsc(d.name || 'Device')}</option>`).join('') : '<option value="">No other device has opened Peace Meal yet</option>'}</select></div>
+    </div>
+    <div class="field"><span class="label">What to share</span><div class="choice-list">${SHARE_PARTS.map(p => `<label class="choice"><input type="checkbox" data-part="${p.id}" ${togetherShareUi.parts.includes(p.id) ? 'checked' : ''}><span class="choice-body"><span class="choice-title">${uiEsc(p.label)}</span></span></label>`).join('')}</div></div>
+    <div class="field" id="ts-days" ${wantWeek ? '' : 'hidden'}><span class="label">Which days</span>${dayOpts.length ? uiMultiPills('ts-days', dayOpts, togetherShareUi.days.length ? togetherShareUi.days : dayOpts.map(d => d.value), { label: 'Days to share' }) : '<p class="small muted">No week plan is available for this person.</p>'}</div>
+    <div class="field"><span class="label">Expires after</span>${uiSegmented('ts-expiry', [{ value: 7, label: '7 days' }, { value: 30, label: '30 days' }, { value: 90, label: '90 days' }], togetherShareUi.expiry)}</div>
+    <div class="btn-row"><button class="btn primary" type="button" id="ts-send" ${others.length ? '' : 'disabled'}>${uiIcon('share')}Send</button></div>`;
+  if (!togetherShareUi.days.length) togetherShareUi.days = dayOpts.map(d => d.value);
+  box.querySelector('#ts-person').addEventListener('change', e => { togetherShareUi.person = e.target.value; togetherShareUi.days = []; togetherRenderShareForm(box, devices); });
+  const dev = box.querySelector('#ts-device');
+  if (dev) dev.addEventListener('change', e => { togetherShareUi.device = e.target.value; });
+  box.querySelectorAll('[data-part]').forEach(c => c.addEventListener('change', () => { togetherShareUi.parts = [...box.querySelectorAll('[data-part]')].filter(x => x.checked).map(x => x.dataset.part); box.querySelector('#ts-days').hidden = !togetherShareUi.parts.includes('week'); }));
+  box.querySelectorAll('[data-multi="ts-days"]').forEach(c => c.addEventListener('change', () => { togetherShareUi.days = [...box.querySelectorAll('[data-multi="ts-days"]')].filter(x => x.checked).map(x => x.value); c.parentElement.classList.toggle('on', c.checked); }));
+  box.querySelectorAll('[data-seg="ts-expiry"]').forEach(r => r.addEventListener('change', () => { togetherShareUi.expiry = Number(r.value); box.querySelectorAll('[data-seg="ts-expiry"]').forEach(x => x.parentElement.classList.toggle('on', x.checked)); }));
+  box.querySelector('#ts-send').addEventListener('click', async () => {
+    const target = others.find(d => d.fingerprint === togetherShareUi.device);
+    if (!target) { uiToast('Choose a device to send to.'); return; }
+    if (!togetherShareUi.parts.length) { uiToast('Choose at least one part to share.'); return; }
+    const extra = {};
+    if (togetherShareUi.parts.includes('week') && week) extra.week = { start: week.days[0].date, days: week.days.filter(d => togetherShareUi.days.includes(d.date)).map(d => ({ date: d.date, day: d.day, meals: d.meals.map(m => ({ slot: m.slot, recipe: m.recipe, name: m.name, source: m.source, servings: m.servings })) })) };
+    if (togetherShareUi.parts.includes('grocery')) { const g = uiState.data.recipes.length ? groceryComputeList(person) : null; extra.grocery = g ? { week: g.week.days[0].date, items: g.list.items.map(i => ({ food: i.food, name: i.name, group: i.group, quantity: i.quantity, grams: i.grams, removed: !!i.removed })) } : null; }
+    const btn = box.querySelector('#ts-send'); btn.disabled = true;
+    const res = await sharingSafe(() => sendShare(s.db, s.identity, target, person, togetherShareUi.parts, extra, togetherShareUi.expiry), { ok: false, reason: 'error' });
+    btn.disabled = false;
+    uiToast(res.ok ? `Sent to ${target.name || 'that device'}. It expires in ${togetherShareUi.expiry} days.` : 'The share could not be sent: ' + (res.reason || 'error'));
+  });
+}
+
+function togetherRenderInbox(box, shares, devices) {
+  const s = sharingState();
+  const partLabel = id => { const p = SHARE_PARTS.find(x => x.id === id); return p ? p.label : id; };
+  const rows = shares.slice().sort((a, b) => String(b.created || '').localeCompare(String(a.created || '')));
+  box.innerHTML = rows.length ? `<div class="list">${rows.map(sh => `<div class="list-row"><div class="list-main"><div class="list-title">${uiIcon('lock')} ${uiEsc(sh.personName || 'Profile')} <span class="muted" style="font-weight:400">from ${uiEsc(sh.fromName || sharingDeviceName(devices, sh.from))}</span></div><div class="list-sub">${(sh.parts || []).map(partLabel).map(uiEsc).join(', ')} · expires ${uiEsc(String(sh.expires || '').slice(0, 10))}</div></div><div class="list-actions"><button class="btn small" type="button" data-open-share="${uiEsc(sh.id)}">Open</button></div></div>`).join('')}</div>`
+    : '<p class="small muted">Nothing has been shared with this device yet.</p>';
+  box.querySelectorAll('[data-open-share]').forEach(b => b.addEventListener('click', async () => {
+    const sh = rows.find(x => x.id === b.dataset.openShare);
+    if (!sh) return;
+    const pkg = await sharingSafe(() => openShare(s.db, s.identity, sh), null, 'That share could not be opened.');
+    if (!pkg) { uiToast('That share could not be decrypted on this device.'); return; }
+    sharingPersonModal(pkg, { subtitle: `Shared by ${sh.fromName || sharingDeviceName(devices, sh.from)}; expires ${String(sh.expires || '').slice(0, 10)}.`, sourceKey: 'share:' + (sh.personName || '') + ':' + sh.from });
+  }));
 }

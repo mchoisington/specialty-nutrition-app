@@ -4,6 +4,7 @@ import { matchRecipes } from '../engine/pantry.js';
 import { checkRecipe } from '../engine/checker.js';
 import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiVerdictWord, uiVerdictChip, uiPageHeader, uiSection, uiIcon, uiEmptyState } from './common.js';
 import { weekRecipeModal } from './week.js';
+import { recipesTasteHTML, recipesBindTaste, recipesIsNever } from './recipes.js';
 import { groceryAddExtra } from './grocery.js';
 
 let pantryResults = null;
@@ -45,28 +46,30 @@ export function renderPantryScreen(root) {
   pantryBindResults(root, person, plan);
 }
 
-function pantryHitHTML(m) {
+function pantryHitHTML(m, person) {
   const r = m.recipe, v = m.check.verdict;
   return `<div class="pantry-hit">
     <div class="row between"><div><span class="dot ${v}" aria-hidden="true"></span><span class="visually-hidden">${uiVerdictWord(v)}: </span><strong>${uiEsc(r.name)}</strong> ${uiVerdictChip(v)}</div>
       <span class="small muted">${m.missingCount === 0 ? 'nothing missing' : `${m.missingCount} missing`} · ${r.active_min} min active, ${r.total_min} total</span></div>
     ${m.check.hits && m.check.hits.length ? `<div class="small">${v === 'fail' ? 'Hard exclusion' : 'Caution'}: ${m.check.hits.map(h => uiEsc(h.label)).join(', ')}</div>` : ''}
     <div class="lists"><div><span class="k">You have</span><br>${m.present.map(uiEsc).join(', ') || '<span class="muted">nothing matched</span>'}</div><div><span class="k">Missing</span><br>${m.missing.map(uiEsc).join(', ') || '<span class="muted">nothing</span>'}</div></div>
-    <div class="btn-row" style="margin-top:8px"><button class="btn small" type="button" data-open="${uiEsc(r.id)}">${uiIcon('book')}Open recipe</button>${m.missingCount && v !== 'fail' ? `<button class="btn small" type="button" data-missing="${uiEsc(r.id)}">${uiIcon('cart')}Add missing to grocery list</button>` : ''}</div>
+    <div class="btn-row" style="margin-top:8px"><button class="btn small" type="button" data-open="${uiEsc(r.id)}">${uiIcon('book')}Open recipe</button>${m.missingCount && v !== 'fail' ? `<button class="btn small" type="button" data-missing="${uiEsc(r.id)}">${uiIcon('cart')}Add missing to grocery list</button>` : ''}${recipesTasteHTML(person, r.id)}</div>
   </div>`;
 }
 
 function pantryResultsHTML(results, person) {
-  const ok = results.rows.filter(m => m.check.verdict !== 'fail');
+  const ok = results.rows.filter(m => m.check.verdict !== 'fail' && !recipesIsNever(person, m.recipe.id));
   const bad = results.rows.filter(m => m.check.verdict === 'fail');
+  const never = results.rows.filter(m => m.check.verdict !== 'fail' && recipesIsNever(person, m.recipe.id)).length;
   if (!results.rows.length) return uiEmptyState('No recipe uses at least half of what you listed. Try broader words, for example "chicken" rather than "chicken thighs".');
   return `${uiSection(`${ok.length} recipe${ok.length === 1 ? '' : 's'} you could make`, `<p class="small muted">Ranked by fewest missing ingredients. Searched for: ${results.have.map(uiEsc).join(', ')}.</p>
-      <div class="list boxed">${ok.map(pantryHitHTML).join('') || '<p class="muted small" style="padding:12px 0">Every match has a hard exclusion for this person.</p>'}</div>`, { id: 'pantry-res-h' })}
-    ${bad.length ? `<details class="card"><summary>Not allowed for ${uiEsc(person.name)} (${bad.length})</summary><p class="small muted">These match your pantry but hit a hard exclusion (allergen or a rule marked hard). They are never suggested.</p>${bad.map(pantryHitHTML).join('')}</details>` : ''}`;
+      <div class="list boxed">${ok.map(m => pantryHitHTML(m, person)).join('') || '<p class="muted small" style="padding:12px 0">Every match has a hard exclusion for this person.</p>'}</div>${never ? `<p class="small muted">${never} match${never === 1 ? '' : 'es'} marked never again ${never === 1 ? 'is' : 'are'} not shown.</p>` : ''}`, { id: 'pantry-res-h' })}
+    ${bad.length ? `<details class="card"><summary>Not allowed for ${uiEsc(person.name)} (${bad.length})</summary><p class="small muted">These match your pantry but hit a hard exclusion (allergen or a rule marked hard). They are never suggested.</p>${bad.map(m => pantryHitHTML(m, person)).join('')}</details>` : ''}`;
 }
 
 function pantryBindResults(root, person, plan) {
   root.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => weekRecipeModal(b.dataset.open, person, plan)));
+  recipesBindTaste(root, person);
   root.querySelectorAll('[data-missing]').forEach(b => b.addEventListener('click', () => {
     const row = pantryResults && pantryResults.rows.find(m => m.recipe.id === b.dataset.missing);
     if (!row) return;

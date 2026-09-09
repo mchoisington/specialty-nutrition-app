@@ -5,6 +5,7 @@ import { nutrientsForGrams, recipeTotals, scaleTotals, addTotals, emptyTotals, c
 import { checkRecipe, checkFood } from '../engine/checker.js';
 import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiModal, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiNutrientLabel, uiVerdictWord, uiVerdictChip, uiSegmented, uiPageHeader, uiSection, uiChip, uiIcon, uiRing, uiMeter, uiStatTile, uiNoticeHTML, uiEmptyState, uiSwitch } from './common.js';
 import { weekGet } from './week.js';
+import { recipesTasteHTML, recipesBindTaste, recipesIsNever } from './recipes.js';
 
 const TODAY_MEALS = [{ id: 'breakfast', label: 'Breakfast' }, { id: 'lunch', label: 'Lunch' }, { id: 'dinner', label: 'Dinner' }, { id: 'snacks', label: 'Snacks' }];
 const TODAY_TRACKED = ['protein_g', 'carb_g', 'fiber_g', 'sodium_mg', 'satfat_g'];
@@ -381,7 +382,7 @@ function todaySearchItems(person, plan, query, favOnly) {
   const match = name => q.every(w => name.toLowerCase().includes(w));
   const favR = new Set(person.favorites.recipes), favF = new Set(person.favorites.foods);
   const items = [];
-  for (const r of uiState.data.recipes) if (match(r.name) && (!favOnly || favR.has(r.id))) items.push({ kind: 'recipe', id: r.id, name: r.name, sub: `Recipe · ${r.active_min} min active · ${r.servings} servings`, fav: favR.has(r.id), obj: r });
+  for (const r of uiState.data.recipes) if (match(r.name) && (!favOnly || favR.has(r.id)) && !recipesIsNever(person, r.id)) items.push({ kind: 'recipe', id: r.id, name: r.name, sub: `Recipe · ${r.active_min} min active · ${r.servings} servings`, fav: favR.has(r.id), obj: r });
   for (const f of uiState.data.foods) if (match(f.name + ' ' + (f.short || '')) && (!favOnly || favF.has(f.id))) items.push({ kind: 'food', id: f.id, name: f.short || f.name, sub: `Food · ${f.group || 'Other'}`, fav: favF.has(f.id), obj: f });
   items.sort((a, b) => Number(b.fav) - Number(a.fav));
   const out = items.slice(0, 40);
@@ -407,11 +408,12 @@ function todayAddModal(person, plan, date, meal) {
   const results = el.querySelector('#today-results');
   const draw = () => {
     const { out, total } = todaySearchItems(person, plan, state.q, state.fav);
-    results.innerHTML = out.length ? `<p class="small muted" style="margin:0 0 .25rem">${total} match${total === 1 ? '' : 'es'}${total > out.length ? ', showing the first ' + out.length : ''}. Favorites first.</p>` + out.map(it => `<div class="today-result">
-      <button class="heart-btn ${it.fav ? 'on' : ''}" type="button" data-fav="${it.kind}:${uiEsc(it.id)}" aria-pressed="${it.fav}" aria-label="${it.fav ? 'Remove from favorites' : 'Add to favorites'}">${uiIcon('heart', { fill: it.fav })}</button>
+    results.innerHTML = out.length ? `<p class="small muted" style="margin:0 0 .25rem">${total} match${total === 1 ? '' : 'es'}${total > out.length ? ', showing the first ' + out.length : ''}. Favorites first. Recipes marked never again are not listed.</p>` + out.map(it => `<div class="today-result">
+      ${it.kind === 'recipe' ? recipesTasteHTML(person, it.id) : `<button class="heart-btn ${it.fav ? 'on' : ''}" type="button" data-fav-food="${uiEsc(it.id)}" aria-pressed="${it.fav}" aria-label="${it.fav ? 'Remove from favorites' : 'Add to favorites'}">${uiIcon('heart', { fill: it.fav })}</button>`}
       <button class="pick" type="button" data-pick="${it.kind}:${uiEsc(it.id)}"><span class="dot ${it.verdict}" aria-hidden="true"></span><span class="visually-hidden">${uiVerdictWord(it.verdict)}: </span><strong>${uiEsc(it.name)}</strong><br><span class="small muted">${uiEsc(it.sub)}</span></button>
     </div>`).join('') : uiEmptyState(state.fav ? 'No favorites match. Tap the heart on any recipe or food to add one.' : 'No recipe or food matches.', '', 'list');
-    results.querySelectorAll('[data-fav]').forEach(b => b.addEventListener('click', () => { const [k, id] = b.dataset.fav.split(':'); todayToggleFavorite(person, k, id); draw(); }));
+    results.querySelectorAll('[data-fav-food]').forEach(b => b.addEventListener('click', () => { todayToggleFavorite(person, 'food', b.dataset.favFood); draw(); }));
+    recipesBindTaste(results, person, () => draw());
     results.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => { const [k, id] = b.dataset.pick.split(':'); m.close(); todayAmountModal(person, plan, { date, meal, kind: k, ref: id }); }));
   };
   el.querySelector('#today-q').addEventListener('input', e => { state.q = e.target.value; draw(); });

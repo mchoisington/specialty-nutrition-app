@@ -4,6 +4,14 @@ import { newPerson } from '../store.js';
 import { lbToKg, kgToLb, ftInToCm, cmToFtIn, ACTIVITY_LEVELS } from '../engine/energy.js';
 import { uiState, uiEsc, uiPersist, uiActivePerson, uiSetActive, uiPlanFor, uiRatingBadge, uiSegmented, uiMultiPills, uiYesNo, uiNavigate, uiToast, uiModal, uiFindPersonById, UI_ALLERGENS, uiTagLabel, uiModuleName, uiNutrientLabel, uiEnsurePerson, uiParamUnit, uiBigChoices, uiBigToggles, uiEnsureUserDefinedSource, uiUserDefinedBadge, uiWeightHeightText, uiPageHeader, uiSection, uiChip, uiIcon, uiAvatar, uiEmptyState, uiNoticeHTML } from './common.js';
 import { learnArticleHTML } from './learn.js';
+import { listDirectory, openPerson } from '../engine/sync.js';
+import { sharingState, sharingLocalHTML, sharingPendingHTML, sharingSafe, sharingPublishIfShared, sharingPersonModal } from './sharing.js';
+
+// Every save of a person goes through here so a person kept in the shared store is republished (encrypted) after each change.
+function peoplePersist(person) {
+  uiPersist();
+  sharingPublishIfShared(person);
+}
 
 const PEOPLE_STEPS = [
   { id: 'basics', label: 'Basics' },
@@ -170,7 +178,9 @@ function peopleRenderList(root) {
         ${p.setup_complete ? `<div class="edit-row" role="group" aria-label="Edit ${uiEsc(p.name)}"><span class="small muted edit-label">${uiIcon('edit')}Edit</span>${peopleStepsFor(p).map(s => `<a class="chip neutral" href="#/people/${uiEsc(p.id)}/${s.id}${s.id === 'cooking' ? '/time' : ''}">${s.label}</a>`).join('')}</div>` : ''}
       </div>`;
     }).join('')}</div>` : uiEmptyState('No people yet. Add the first person to build a plan.', `<a class="btn primary" href="#/people/new">Add a person</a>`)}
+    ${uiSection('Other people using Peace Meal', `<div class="card" id="people-directory">${peopleDirectoryShellHTML()}</div>`, { id: 'people-dir-h' })}
   `;
+  peopleLoadDirectory(root.querySelector('#people-directory'));
   root.querySelectorAll('[data-activate]').forEach(b => b.addEventListener('click', () => { uiSetActive(b.dataset.activate); uiToast('Active person changed.'); uiState.rerender(); }));
   root.querySelectorAll('[data-delete]').forEach(b => b.addEventListener('click', () => {
     const p = uiFindPersonById(b.dataset.delete);
@@ -242,12 +252,12 @@ function peopleRenderStepper(root, person, stepId, sub) {
     const target = b.dataset.step === 'cooking' ? 'cooking/time' : b.dataset.step;
     uiNavigate(`#/people/${person.id}/${target}`);
   }));
-  root.querySelector('#people-save').addEventListener('click', () => { uiPersist(); uiToast('Saved.'); });
+  root.querySelector('#people-save').addEventListener('click', () => { peoplePersist(person); uiToast('Saved.'); });
   peopleRenderStep(root.querySelector('#people-step'), person, stepId, sub);
 }
 
 function peopleRefresh(container, person, stepId, focusSel, sub) {
-  uiPersist();
+  peoplePersist(person);
   peopleRenderStep(container, person, stepId, sub || (stepId === 'cooking' ? container.dataset.sub : null));
   if (focusSel) { const el = container.querySelector(focusSel); if (el) el.focus({ preventScroll: true }); }
 }
@@ -269,14 +279,14 @@ function peopleRenderStep(container, person, stepId, sub) {
 function peopleBindSeg(container, person, stepId, name, apply, opts = {}) {
   container.querySelectorAll(`input[data-seg="${name}"]`).forEach(inp => inp.addEventListener('change', () => {
     apply(inp.value);
-    if (opts.rerender === false) { uiPersist(); container.querySelectorAll(`input[data-seg="${name}"]`).forEach(i => i.closest('label').classList.toggle('on', i.checked)); }
+    if (opts.rerender === false) { peoplePersist(person); container.querySelectorAll(`input[data-seg="${name}"]`).forEach(i => i.closest('label').classList.toggle('on', i.checked)); }
     else peopleRefresh(container, person, stepId, `input[data-seg="${name}"][value="${inp.value}"]`);
   }));
 }
 function peopleBindMulti(container, person, stepId, name, apply, opts = {}) {
   container.querySelectorAll(`input[data-multi="${name}"]`).forEach(inp => inp.addEventListener('change', () => {
     apply(inp.value, inp.checked);
-    if (opts.rerender === false) { uiPersist(); inp.closest('label').classList.toggle('on', inp.checked); }
+    if (opts.rerender === false) { peoplePersist(person); inp.closest('label').classList.toggle('on', inp.checked); }
     else peopleRefresh(container, person, stepId, `input[data-multi="${name}"][value="${inp.value}"]`);
   }));
 }
@@ -312,7 +322,7 @@ function peopleStepBasics(container, person) {
       <div class="field"><span class="label">Breastfeeding?</span>${uiYesNo('breastfeeding', !!person.breastfeeding)}
         <div class="hint">Either answer turns on the pregnancy and breastfeeding rules and turns off weight-loss, ketogenic, low-carbohydrate, fasting, and elimination protocols other than allergen and celiac.</div></div>`}
     </div>`;
-  const bindText = (sel, fn) => container.querySelector(sel).addEventListener('change', e => { fn(e.target.value); uiPersist(); });
+  const bindText = (sel, fn) => container.querySelector(sel).addEventListener('change', e => { fn(e.target.value); peoplePersist(person); });
   bindText('#pb-name', v => { if (v.trim()) person.name = v.trim(); });
   bindText('#pb-age', v => { person.age = v === '' ? null : Number(v); });
   bindText('#pb-weight', v => { person.weight_kg = v === '' ? null : lbToKg(v); });
@@ -328,7 +338,7 @@ function peopleStepBasics(container, person) {
       person.modules = (person.modules || []).filter(id => { const m = uiState.conditionsById.get(id); return m && peopleIsCaregiverModule(m); });
       person.pregnancy = false; person.breastfeeding = false;
     }
-    uiPersist();
+    peoplePersist(person);
     uiState.rerender(); // the step list changes with this answer
   }));
   peopleBindSeg(container, person, 'basics', 'sex', v => { person.sex = v; }, { rerender: false });
@@ -433,7 +443,7 @@ function peopleBindModulePanels(container, person, stepId) {
     const cur = new Set(person.variants[mid] || []);
     if (inp.checked) cur.add(inp.value); else cur.delete(inp.value);
     person.variants[mid] = [...cur];
-    uiPersist(); inp.closest('label').classList.toggle('on', inp.checked);
+    peoplePersist(person); inp.closest('label').classList.toggle('on', inp.checked);
   }));
   container.querySelectorAll('input[data-seg^="flag-"]').forEach(inp => inp.addEventListener('change', () => {
     person.flags[inp.dataset.seg.slice('flag-'.length)] = inp.value === 'yes';
@@ -481,7 +491,7 @@ function peopleStepAllergens(container, person) {
     const t = inp.dataset.allergen;
     if (inp.checked && !person.allergens.includes(t)) person.allergens.push(t);
     if (!inp.checked) person.allergens = person.allergens.filter(x => x !== t);
-    uiPersist();
+    peoplePersist(person);
   }));
   peopleBindModulePanels(container, person, 'allergens');
 }
@@ -533,7 +543,7 @@ function peopleStepPreferences(container, person) {
   container.querySelector('#pp-terms').addEventListener('change', e => {
     const manual = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
     prefs.avoid_terms = Array.from(new Set(manual));
-    uiPersist();
+    peoplePersist(person);
   });
   peopleBindCustomDiet(container, person);
 }
@@ -901,10 +911,10 @@ function peopleStepCooking(container, person, sub) {
     peopleBindSeg(container, person, 'cooking', 'leftovers', v => { c.leftovers = v; }, { rerender: false });
     peopleBindSeg(container, person, 'cooking', 'grocery', v => { c.grocery = v; }, { rerender: false });
     const out = container.querySelector('#pc-household');
-    const setHousehold = n => { c.household = Math.min(12, Math.max(1, n)); out.textContent = c.household; uiPersist(); };
+    const setHousehold = n => { c.household = Math.min(12, Math.max(1, n)); out.textContent = c.household; peoplePersist(person); };
     container.querySelector('#pc-minus').addEventListener('click', () => setHousehold((Number(c.household) || 1) - 1));
     container.querySelector('#pc-plus').addEventListener('click', () => setHousehold((Number(c.household) || 1) + 1));
-    container.querySelector('#pc-budget').addEventListener('change', e => { c.budget = !!e.target.checked; uiPersist(); });
+    container.querySelector('#pc-budget').addEventListener('change', e => { c.budget = !!e.target.checked; peoplePersist(person); });
     peopleBindTypical(container, person, () => { c.equipment = ['stove', 'oven', 'microwave']; c.leftovers = 'ok'; c.household = Math.max(2, Number(c.household) || 0); c.grocery = 'supermarket'; }, nextHash);
   }
 }
@@ -914,7 +924,7 @@ function peopleTypicalHTML(what) {
 function peopleBindTypical(container, person, fill, nextHash) {
   container.querySelector('#pc-typical').addEventListener('click', () => {
     fill();
-    uiPersist();
+    peoplePersist(person);
     uiToast('Typical answers filled in.');
     uiNavigate(`#/people/${person.id}/${nextHash}`);
   });
@@ -955,8 +965,36 @@ function peopleStepReview(container, person) {
   container.querySelector('#pr-save').addEventListener('click', () => {
     person.setup_complete = true;
     uiSetActive(person.id);
-    uiPersist();
+    peoplePersist(person);
     uiToast('Saved.');
     uiNavigate('#/plan');
   });
+}
+
+// ---- Directory of people in the shared store (names and initials only; the owner can open a profile) ----
+function peopleDirectoryShellHTML() {
+  const s = sharingState();
+  if (!s.ready) return sharingPendingHTML();
+  if (!s.db || !s.identity) return sharingLocalHTML();
+  return '<p class="small muted">Loading the directory...</p>';
+}
+
+async function peopleLoadDirectory(box) {
+  const s = sharingState();
+  if (!box || !s.ready || !s.db || !s.identity) return;
+  const rows = await sharingSafe(() => listDirectory(s.db), [], 'The directory could not be read right now.');
+  if (!box.isConnected) return;
+  const mineIds = new Set(uiState.profile.people.map(p => p.id));
+  const list = rows.filter(r => r && r.personId).sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+  box.innerHTML = `<p class="small muted">Names only. Each profile is encrypted; only the device that published it and the owner can open it.${s.isOwner ? ' You are the owner, so you can open any of them.' : ''}</p>
+    ${list.length ? `<div class="list">${list.map(r => { const yours = r.deviceFingerprint === s.identity.fingerprint || mineIds.has(r.personId); return `<div class="list-row"><span class="avatar" aria-hidden="true">${uiEsc(r.initials || '?')}</span><div class="list-main"><div class="list-title">${uiIcon('lock')} ${uiEsc(r.name || 'Someone')} ${yours ? uiChip('yours', 'plum') : ''}</div><div class="list-sub">${r.updated ? 'Updated ' + uiEsc(String(r.updated).slice(0, 10)) : ''}</div></div>${s.isOwner ? `<div class="list-actions"><button class="btn small" type="button" data-open-person="${uiEsc(r.personId)}">Open</button></div>` : ''}</div>`; }).join('')}</div>` : '<p class="small muted">Nobody has put a profile in the shared store yet. Switch one on under Settings, Sharing and privacy.</p>'}`;
+  box.querySelectorAll('[data-open-person]').forEach(b => b.addEventListener('click', () => peopleOpenSharedPerson(b.dataset.openPerson)));
+}
+
+export async function peopleOpenSharedPerson(personId) {
+  const s = sharingState();
+  const res = await sharingSafe(() => openPerson(s.db, s.identity, personId), null, 'That profile could not be opened right now.');
+  if (!res) { uiToast('That profile is not in the shared store any more.'); return; }
+  if (res.locked) { uiToast('That profile is encrypted for another device. Only its device and the owner can open it.'); return; }
+  sharingPersonModal(res.person, { subtitle: `From the shared store, updated ${String(res.updated || '').slice(0, 10)}. Read-only.`, sourceKey: 'store:' + personId });
 }

@@ -15,6 +15,9 @@ import { renderTodayScreen } from './ui/today.js';
 import { renderPantryScreen } from './ui/pantry.js';
 import { renderTogetherScreen } from './ui/together.js';
 import { renderBreatheScreen } from './ui/breathe.js';
+import { renderRecipesScreen } from './ui/recipes.js';
+import { renderOwnerScreen } from './ui/owner.js';
+import { getDb, ensureDeviceIdentity, registerDevice, readOwner, isOwner } from './engine/sync.js';
 
 const APP_DATA_FILES = ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'recipes-open', 'articles'];
 
@@ -75,6 +78,7 @@ const APP_SCREENS = [
   { id: 'check', label: 'Check', icon: 'check-circle' },
   { id: 'today', label: 'Today', icon: 'clock' },
   { id: 'week', label: 'Week', icon: 'calendar' },
+  { id: 'recipes', label: 'Recipes', icon: 'leaf' },
   { id: 'grocery', label: 'Grocery', icon: 'cart' },
   { id: 'pantry', label: 'Pantry', icon: 'jar' },
   { id: 'together', label: 'Together', icon: 'people' },
@@ -89,7 +93,7 @@ function appParseRoute() {
   const h = (location.hash || '#/home').replace(/^#\/?/, '');
   const parts = h.split('/').filter(Boolean);
   const screen = parts.shift() || 'home';
-  if (screen === 'welcome') return { screen: 'welcome', parts };
+  if (screen === 'welcome' || screen === 'owner') return { screen, parts };
   return { screen: APP_SCREENS.some(s => s.id === screen) ? screen : 'home', parts };
 }
 
@@ -154,6 +158,8 @@ export function appRender() {
     return;
   }
   if (profile.people.length && uiState.route.screen === 'welcome') { uiState.navReplaceNext = true; location.replace('#/home'); return; }
+  // The owner dashboard exists only for the device that holds the owner key of a shared store.
+  if (uiState.route.screen === 'owner' && uiState.sync.ready && !uiState.sync.isOwner) { uiState.navReplaceNext = true; uiToast('The owner dashboard is only for the owner device.'); location.replace('#/home'); return; }
   if (uiState.modalClose) uiState.modalClose({ silent: true });
   appRenderNav();
   main.innerHTML = '';
@@ -171,6 +177,8 @@ export function appRender() {
       case 'pantry': renderPantryScreen(main, ctx); break;
       case 'together': renderTogetherScreen(main, ctx); break;
       case 'breathe': renderBreatheScreen(main, ctx); break;
+      case 'recipes': renderRecipesScreen(main, ctx); break;
+      case 'owner': if (uiState.sync.ready) renderOwnerScreen(main, ctx); else main.innerHTML = '<p class="small muted">Checking the shared store...</p>'; break;
       case 'grocery': renderGroceryScreen(main, ctx); break;
       case 'log': renderLogScreen(main, ctx); break;
       case 'learn': renderLearnScreen(main, ctx); break;
@@ -220,7 +228,32 @@ function appAssembleRecipes() {
   return out;
 }
 
+// Shared store (claude.ai version only). Never blocks rendering; the screens that show it update when this resolves.
+async function appBootSync() {
+  const s = uiState.sync;
+  s.ready = false;
+  try {
+    const db = await getDb();
+    s.db = db;
+    if (db) {
+      const identity = await ensureDeviceIdentity();
+      s.identity = identity;
+      if (identity) await registerDevice(db, identity);
+      s.owner = await readOwner(db);
+      s.isOwner = isOwner(identity, s.owner);
+    } else { s.identity = null; s.owner = null; s.isOwner = false; }
+  } catch (e) {
+    console.warn(e);
+    s.db = null; s.identity = null; s.owner = null; s.isOwner = false;
+    uiToast('The shared store could not be reached. Everything stays on this device.');
+  }
+  s.ready = true;
+  if (['settings', 'people', 'together', 'owner'].includes(uiState.route.screen) && !uiState.modalClose) uiState.rerender();
+}
+
 async function appBoot() {
+  uiState.sync = { db: null, identity: null, owner: null, isOwner: false, ready: false };
+  uiState.syncRefresh = appBootSync;
   uiState.profile = load();
   if (!uiState.profile.activePerson && uiState.profile.people.length) uiState.profile.activePerson = uiState.profile.people[0].id;
   if (!Array.isArray(uiState.profile.log)) uiState.profile.log = [];
@@ -240,6 +273,7 @@ async function appBoot() {
   if (!location.hash) location.hash = '#/home';
   appRender();
   if (problems.length) uiToast('Some data files did not load.');
+  appBootSync();
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', appBoot);

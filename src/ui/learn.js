@@ -1,5 +1,6 @@
 // Learn: one article page per module (data/articles.json, falling back to the module's education block), plus "How this app decides".
-import { uiState, uiEsc, uiRatingBadge, uiRatingBase, uiSourcesHTML, uiRuleHTML, uiArticleFor, uiPageHeader, uiSection, uiChip, uiIcon, uiEmptyState } from './common.js';
+import { uiState, uiEsc, uiRatingBadge, uiRatingBase, uiSourcesHTML, uiRuleHTML, uiArticleFor, uiPageHeader, uiSection, uiChip, uiIcon, uiEmptyState, uiFmtNum, uiNoticeHTML, uiStatTile } from './common.js';
+import { recipesSourceCounts } from './recipes.js';
 
 const LEARN_RATING_SENTENCE = {
   strong: 'Strong: multiple randomized trials or a major society guideline with Class 1 / Level A backing.',
@@ -11,6 +12,7 @@ const LEARN_RATING_SENTENCE = {
 export function renderLearnScreen(root, ctx) {
   const id = ctx.route.parts[0];
   if (id === 'how') return learnRenderHow(root);
+  if (id === 'sources') return learnRenderSources(root);
   if (id) {
     const m = uiState.conditionsById.get(id);
     if (m) {
@@ -23,6 +25,7 @@ export function renderLearnScreen(root, ctx) {
   root.innerHTML = `
     ${uiPageHeader('Learn', 'The evidence behind every module, in plain language, with its sources.')}
     <div class="card"><h2>How this app decides</h2><p>Two tiers, hard conflicts, allergens as absolute, unknown is not safe, no language model in the safety path. Read this first.</p><div><a class="btn" href="#/learn/how">${uiIcon('book')}Read</a></div></div>
+    <div class="card"><h2>Where the recipes come from</h2><p>Every outside recipe collection in the app, the licence each one carries, the attribution it requires, and what nutrition data it provides.</p><div><a class="btn" href="#/learn/sources">${uiIcon('leaf')}Read</a></div></div>
     ${groups.map(([key, title]) => {
       const list = mods.filter(m => m.category === key);
       if (!list.length) return '';
@@ -103,6 +106,66 @@ function learnRenderHow(root) {
       <p>Running several diets that each cut out whole food groups at the same time makes it harder to get enough fiber, calcium, protein, and variety. When three or more are active at once the plan says so and suggests running one at a time where you can.</p>
       <h2>Where this comes from</h2>
       <p>The evidence review behind every module is <strong>docs/PHASE-1-evidence-and-regulatory-foundation.md</strong> (Phase 1: Evidence and Regulatory Foundation), and the build decisions are in <strong>docs/PHASE-2-prd-and-architecture.md</strong>. Items marked VERIFY in Phase 1 are shown with that flag in the app until they are cleared in docs/VERIFY-log.md.</p>
+      <p class="small muted">This app is for general wellness and education. It does not diagnose or treat any condition. Your clinician sets any therapeutic numbers.</p>
+    </article>`;
+}
+
+// Recipe sources and attribution. The text follows docs/RECIPE-SOURCES.md; the counts are computed from the pool that is loaded.
+function learnRenderSources(root) {
+  const c = recipesSourceCounts();
+  const ext = (url, label) => `<a href="${uiEsc(url)}" target="_blank" rel="noopener noreferrer">${uiEsc(label || url)}</a>`;
+  const OGL = 'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/';
+  const CC = 'https://creativecommons.org/licenses/by-sa/4.0/';
+  root.innerHTML = `
+    ${uiPageHeader('Where the recipes come from', 'Every outside recipe collection imported into the app, the licence each one carries, the exact attribution wording the licence requires, what nutrition data each source provides, and the import counts.', `<a class="btn small" href="#/learn">${uiIcon('book')}All topics</a><a class="btn small" href="#/recipes">${uiIcon('leaf')}Recipes</a>`)}
+    ${uiNoticeHTML({ level: 'info', text: 'Information from the NHS website is licensed under the Open Government Licence v3.0.' }).replace('</div></div>', ` ${ext(OGL, 'Read the licence')}.</div></div>`)}
+    <div class="tiles" aria-label="Recipe counts, computed from the loaded pool">
+      ${uiStatTile({ value: uiFmtNum(c.total), label: 'Shipped recipes', note: `${uiFmtNum(c.peaceMeal)} Peace Meal` })}
+      ${uiStatTile({ value: uiFmtNum(c.nhs), label: 'NHS website', note: `${uiFmtNum(c.nhsWithNutrition)} with nutrition` })}
+      ${uiStatTile({ value: uiFmtNum(c.wikibooks), label: 'Wikibooks Cookbook', note: `${uiFmtNum(c.wikibooksFeatured)} featured` })}
+    </div>
+    <p class="small muted">Live from the pool on this device: ${uiFmtNum(c.pool)} recipes in all, ${uiFmtNum(c.withNutrition)} with known nutrition, ${uiFmtNum(c.mine)} written in this household, ${uiFmtNum(c.linked)} imported recipe${c.linked === 1 ? '' : 's'} with ingredients linked by you.</p>
+    <article class="article">
+      <p>This page lists every outside recipe collection imported into the app, the licence each one carries, the exact attribution wording the licence requires, what nutrition data each source provides, and the import counts. The importer is <code>tools/import-open-recipes.mjs</code>; fetched pages are cached under <code>tools/open-recipes/</code> (not committed). No source here is a US federal publication.</p>
+      <p class="small muted">Last import: 2026-09-09. File size: 4.00 MB (budget 4 MB). Total recipes at import: 2,457.</p>
+
+      <h2>1. NHS website (United Kingdom)</h2>
+      <p><strong>Information from the NHS website is licensed under the ${ext(OGL, 'Open Government Licence v3.0')}.</strong></p>
+      <ul>
+        <li>Source: NHS "Healthier Families" recipes, ${ext('https://www.nhs.uk/healthier-families/recipes/')} (index page and its breakfast, lunch, dinner, puddings-and-snacks, lunchbox, and BBQ collections; the site map was checked for other recipe pages under the same path).</li>
+        <li>Licence: Open Government Licence v3.0, ${ext(OGL)}</li>
+        <li>Attribution line stored on every recipe (<code>attribution</code> field) and shown wherever the recipe is displayed: <em>Contains public sector information licensed under the Open Government Licence v3.0</em></li>
+        <li>robots.txt: fetched first (<code>tools/open-recipes/nhs-robots.txt</code>). The <code>User-agent: *</code> group does not disallow <code>/healthier-families/recipes/</code>, so the crawl went ahead. Every imported NHS recipe was checked again against the disallow list at verification time; 0 page(s) were blocked.</li>
+        <li>Recipe ids: <code>nhs-&lt;page-slug&gt;</code>; <code>source_url</code> is the page the text came from.</li>
+        <li>Nutrition data: the NHS pages publish per-serving energy (kJ/kcal), protein, carbohydrate (with sugars), fat (with saturates), fibre, and salt. These are stored as-is in <code>nutrition_per_serving</code> (<code>kcal</code>, <code>protein_g</code>, <code>carb_g</code>, <code>sugar_g</code>, <code>fat_g</code>, <code>satfat_g</code>, <code>fiber_g</code>, plus <code>salt_g</code> as published) with <code>nutrition_source: "nhs-website"</code>. <strong>Sodium is not published by the NHS; it is computed as salt grams x 400 mg</strong> and each recipe carries <code>conversion_note: "sodium computed from salt at 400 mg per gram"</code>. Values the page does not state are <code>null</code>. Numbers are copied from the page, not recomputed; where a page's own figures are internally inconsistent the importer logs it and keeps the published value.</li>
+        <li>Text is adapted: headings, tips, and layout were removed; ingredient lines and method steps are stored as display text. Times come from the page's stated prep and cook times where present (<code>times_estimated: true</code> otherwise).</li>
+        <li>Counts at import: 203 pages fetched, 196 recipe pages found, <strong>189 recipes imported</strong> (188 with stated times, 1 estimated). Loaded now: ${uiFmtNum(c.nhs)}.</li>
+      </ul>
+
+      <h2>2. Wikibooks Cookbook (worldwide, community written)</h2>
+      <ul>
+        <li>Source: the Wikibooks Cookbook, ${ext('https://en.wikibooks.org/wiki/Cookbook:Table_of_Contents')}, read through the MediaWiki API (<code>https://en.wikibooks.org/w/api.php</code>): members of <code>Category:Recipes</code>, <code>Category:Incomplete recipes</code>, and <code>Category:Featured recipes</code> in the <code>Cookbook:</code> namespace, with wikitext and category links fetched in batches of 50. No HTML was scraped.</li>
+        <li>Licence: Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), ${ext(CC)}. Wikibooks text is also available under CC BY-SA 3.0 for older revisions; we attribute under 4.0, the current site licence.</li>
+        <li>Attribution stored on every recipe (<code>attribution</code> field), with the recipe title, "from the Wikibooks Cookbook", the page URL, and the licence with its link. Example: <em>"20-Minute Beef Stroganoff" from the Wikibooks Cookbook, ${ext('https://en.wikibooks.org/wiki/Cookbook:20-Minute_Beef_Stroganoff')}, licensed under CC BY-SA 4.0 (${ext(CC)})</em></li>
+        <li>ShareAlike: the recipe text (ingredients and steps) is redistributed by this app under the same licence, CC BY-SA 4.0. Anyone who copies the Wikibooks recipes out of this app must keep that attribution and licence.</li>
+        <li>Recipe ids: <code>wb-&lt;title-slug&gt;</code>; <code>source_url</code> is the Cookbook page.</li>
+        <li>Fields taken from the page: the recipe summary template (category or cuisine, servings, time, difficulty), the ingredients list (bulleted or table), the procedure, and the page's category links (<code>wikibooks_categories</code>, which include cuisine, course, and diet categories such as vegan or gluten-free). Difficulty 1-2 maps to <code>beginner</code>, 3 to <code>comfortable</code>, 4-5 to <code>confident</code>; where the page states no difficulty the skill is estimated from the step count (<code>skill_estimated: true</code>). Where no time is stated it is estimated from the steps (<code>times_estimated: true</code>); where no servings value is stated it is set to 4 with <code>servings_estimated: true</code>. Recipes in <code>Category:Featured recipes</code> carry <code>featured: true</code>.</li>
+        <li>Excluded: ingredient articles, techniques, disambiguation and index pages (no ingredients list or no procedure), cocktails and other alcoholic drinks, candy and confectionery, pages with fewer than 3 ingredients or fewer than 2 steps, titles containing "test", "template", or "sandbox", and pages whose procedure is not in English.</li>
+        <li><strong>Nutrition data: none.</strong> The Wikibooks Cookbook does not publish nutrition figures, and this app never derives numbers from text. Wikibooks recipes therefore have no <code>nutrition_per_serving</code> and no <code>nutrition_source</code>, and the app shows "nutrition not available" for them until a person links each ingredient to a food in the recipe editor, after which nutrients are computed from <code>foods.json</code> by grams like any other recipe.</li>
+        <li>Counts at import: 3812 candidate pages listed, 3535 passed the filters, 1267 dropped to stay under the size budget (recipes without a stated servings value first, then the longest step text), <strong>2268 recipes imported</strong> (1202 with stated times, 1066 estimated; 1421 with a stated servings value; 2177 with a stated difficulty; 40 featured). Skipped by reason: few-ingredients 86, cocktail-or-candy 84, few-steps 64, no-procedure 25, disambiguation 12, no-ingredients 4, non-english 1, title-filter 1. Loaded now: ${uiFmtNum(c.wikibooks)} (${uiFmtNum(c.wikibooksFeatured)} featured, ${uiFmtNum(c.wikibooksTimesEstimated)} with estimated times).</li>
+      </ul>
+
+      <h2>How the app uses these recipes</h2>
+      <ul>
+        <li>Ingredients are display-only (<code>{ "display": "..." }</code>, no <code>food</code> link, no grams). The dictionary tags ingredient text at run time for allergen and diet checks, and anything unrecognised is reported as such, never treated as safe.</li>
+        <li>NHS recipes show the stored per-serving nutrition (<code>recipeTotals</code> in <code>src/engine/nutrition.js</code> uses it when a recipe has <code>nutrition_source</code> and <code>nutrition_per_serving</code> and no linked foods).</li>
+        <li>Wikibooks recipes show no nutrition until ingredients are linked in the editor.</li>
+        <li><code>tags</code> is empty on every imported recipe because the tag vocabulary is controlled; tags are added by hand or by the dictionary at run time.</li>
+        <li>Recipes you write yourself ("Mine") and ingredient links you add are stored on this device in your profile, never in the data files.</li>
+      </ul>
+
+      <h2>Peace Meal recipes</h2>
+      <p>The ${uiFmtNum(c.peaceMeal)} recipes written for Peace Meal link every ingredient to a USDA FoodData Central record, so their nutrients are summed from <code>foods.json</code> by grams. They carry no outside licence.</p>
       <p class="small muted">This app is for general wellness and education. It does not diagnose or treat any condition. Your clinician sets any therapeutic numbers.</p>
     </article>`;
 }

@@ -16,6 +16,7 @@ export const uiState = {
   planCache: new Map(),
   weekCache: new Map(),
   route: { screen: 'home', parts: [] },
+  sync: { db: null, identity: null, owner: null, isOwner: false, ready: false },
   rerender: () => {},
   version: '1.0.0'
 };
@@ -226,7 +227,7 @@ export function uiModal(html, opts = {}) {
     if (uiState.modalClose === close) { uiState.modalClose = null; uiState.modalInHistory = false; }
     if (inHistory && !o.fromPop && !o.silent) { try { history.back(); } catch { /* ignore */ } }
     inHistory = false;
-    if (opts.onClose) opts.onClose();
+    if (opts.onClose) opts.onClose(o);
   };
   uiState.modalClose = close;
   const onKey = e => { if (e.key === 'Escape') close(); };
@@ -433,7 +434,13 @@ const UI_ICON_PATHS = {
   bowl: 'M3.5 11h17a8.5 8.5 0 0 1-17 0zM12 3.5v3M8.5 4.5l1 2.5M15.5 4.5l-1 2.5',
   scale: 'M12 3v18M5 7l14-2M5 7l-2.5 7a2.5 2.5 0 0 0 5 0zM19 5l-2.5 7a2.5 2.5 0 0 0 5 0z',
   cite: 'M7 15.5c0-3.5 1.5-6 5-7.5M7 15.5A1.5 1.5 0 1 0 8.5 14M15 15.5c0-3.5 1.5-6 5-7.5M15 15.5a1.5 1.5 0 1 0 1.5-1.5',
-  'chevron-down': 'M6 9l6 6 6-6'
+  'chevron-down': 'M6 9l6 6 6-6',
+  ban: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM5.6 5.6l12.8 12.8',
+  star: 'M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.9l-5.3 2.8 1.1-5.9-4.3-4.1 5.9-.8z',
+  lock: 'M6.5 11V8a5.5 5.5 0 0 1 11 0v3M5 11h14v9.5H5zM12 15v2',
+  link: 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.2 1.2M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.2-1.2',
+  key: 'M14.5 13.5a5 5 0 1 0-4.7-3.4L3 16.9V21h4v-2h2v-2h2l1.6-1.6a5 5 0 0 0 1.9.1zM15.5 8.5h.01',
+  paste: 'M9 4.5h6v3H9zM15 5.5h2.5v15h-11v-15H9M9 12h6M9 16h4'
 };
 
 // Icon markup. Pass { label } for a standalone icon (gets role="img"); omit it when the icon sits next to text (aria-hidden).

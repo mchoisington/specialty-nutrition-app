@@ -42,6 +42,10 @@ export function grocerySyncChanges(person, reason = 'Plan changed') {
   const plan = uiPlanFor(person);
   const week = weekGet(person, plan);
   const base = buildGroceryList(week, uiState.recipesById, uiState.foodsById);
+  // Display-only ingredient lines (imported recipes not yet linked to foods) carry no food id; the app cannot put them on a list.
+  base.items = base.items.filter(i => i.food && i.food !== 'undefined');
+  base.groups = {};
+  for (const it of base.items) (base.groups[it.group] ||= []).push(it);
   const { key, changes, snapshots } = groceryStore(person);
   const prev = snapshots[key];
   let dirty = !prev;
