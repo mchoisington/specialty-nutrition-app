@@ -163,7 +163,7 @@ const TAG_VOCABULARY = new Set([
   // Texture
   'large-particle', 'skin-or-seed', 'raw-vegetable', 'tough-meat', 'bezoar-risk',
   // Thyroid timing
-  'iron-supplement', 'calcium-rich', 'high-fiber', 'coffee',
+  'iron-supplement', 'calcium-rich', 'high-fiber', 'coffee', 'tea', 'basic-ingredient', 'chocolate', 'citrus', 'tomato', 'spicy', 'carbonated', 'mint', 'msg', 'aspartame', 'iron-rich', 'vitamin-c-rich', 'emulsifier-additive', 'smoked-seafood-refrigerated', 'may-contain',
 ]);
 
 // Foundation measure units that are not real household portions.
