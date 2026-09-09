@@ -8,7 +8,7 @@ const sources = read('data/sources.json');
 const conditions = read('data/conditions.json');
 const dictionaries = read('data/dictionaries.json');
 const foods = fs.existsSync(new URL('../data/foods.json', import.meta.url)) ? read('data/foods.json') : [];
-const recipes = fs.existsSync(new URL('../data/recipes.json', import.meta.url)) ? read('data/recipes.json') : [];
+const recipes = [ ...(fs.existsSync(new URL('../data/recipes.json', import.meta.url)) ? read('data/recipes.json') : []), ...(fs.existsSync(new URL('../data/recipes-open.json', import.meta.url)) ? read('data/recipes-open.json') : []) ];
 const articles = fs.existsSync(new URL('../data/articles.json', import.meta.url)) ? read('data/articles.json') : {};
 
 const sourceIds = new Set(sources.map(s => s.id));
@@ -71,14 +71,14 @@ for (const r of recipes) {
   if (!r.name || !r.servings || !Array.isArray(r.ingredients) || !r.ingredients.length) err(`recipe ${r.id} malformed`);
   if (typeof r.active_min !== 'number' || typeof r.total_min !== 'number') err(`recipe ${r.id} missing times`);
   if (!['beginner', 'comfortable', 'confident'].includes(r.skill)) err(`recipe ${r.id} bad skill`);
-  const imported = !!r.nutrition_source;
+  const imported = !!r.nutrition_source || (!!r.source && r.source !== 'Peace Meal');
   for (const ing of r.ingredients || []) {
     if (imported && !ing.food) { if (!ing.display) err(`recipe ${r.id} imported ingredient without display text`); continue; }
     if (!foodIds.has(ing.food)) err(`recipe ${r.id} references unknown food ${ing.food}`);
     if (!(Number(ing.grams) > 0)) err(`recipe ${r.id} ingredient ${ing.food} has no grams`);
   }
   if (imported && (!r.nutrition_per_serving || typeof r.nutrition_per_serving.kcal !== 'number')) err(`recipe ${r.id} is imported but has no per-serving kcal`);
-  if (imported && !r.source_url) err(`recipe ${r.id} is imported but has no source_url`);
+  if (r.source && r.source !== 'Peace Meal' && (!r.source_url || !r.license || !r.attribution)) err(`recipe ${r.id} from ${r.source} lacks source_url, license, or attribution`);
   for (const t of r.tags || []) if (!knownTag(t)) err(`recipe ${r.id} uses undeclared tag ${t}`);
   if (!imported && Object.keys(r).some(k => /nutri|kcal|sodium/i.test(k))) err(`recipe ${r.id} carries nutrient numbers; nutrients are computed, not stored`);
 }

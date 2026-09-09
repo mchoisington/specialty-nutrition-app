@@ -1,8 +1,8 @@
 // Router and top-level state. Loads data from window.__APP_DATA__ (single-file bundle) or fetch('data/*.json') over http.
 import { load } from './store.js';
 import { buildMatcher } from './engine/dictionary.js';
-import { uiState, uiEsc, uiActivePerson, uiToast, uiEnsurePerson } from './ui/common.js';
-import { renderHomeScreen } from './ui/home.js';
+import { uiState, uiEsc, uiActivePerson, uiToast, uiEnsurePerson, uiIcon, uiBrandMark, uiAvatar, uiNavRecord, uiCanGoBack, uiGoBack, uiBackButtonHTML } from './ui/common.js';
+import { renderHomeScreen, renderWelcomeScreen } from './ui/home.js';
 import { renderPeopleScreen } from './ui/people.js';
 import { renderPlanScreen } from './ui/plan.js';
 import { renderCheckScreen } from './ui/check.js';
@@ -16,7 +16,7 @@ import { renderPantryScreen } from './ui/pantry.js';
 import { renderTogetherScreen } from './ui/together.js';
 import { renderBreatheScreen } from './ui/breathe.js';
 
-const APP_DATA_FILES = ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'articles'];
+const APP_DATA_FILES = ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'recipes-open', 'articles'];
 
 function appEmptyFor(name) {
   return name === 'dictionaries' ? { tags: {}, entries: [] } : name === 'articles' ? {} : [];
@@ -59,6 +59,8 @@ function appNormalizeData(data) {
   if (!Array.isArray(data.sources)) data.sources = [];
   if (!Array.isArray(data.foods)) data.foods = [];
   if (!Array.isArray(data.recipes)) data.recipes = [];
+  if (Array.isArray(data['recipes-open'])) { const seen = new Set(data.recipes.map(r => r.id)); for (const r of data['recipes-open']) if (!seen.has(r.id)) data.recipes.push(r); }
+  delete data['recipes-open'];
   if (!data.articles || typeof data.articles !== 'object' || Array.isArray(data.articles)) data.articles = {};
   if (!data.dictionaries || typeof data.dictionaries !== 'object') data.dictionaries = { tags: {}, entries: [] };
   if (!data.dictionaries.tags) data.dictionaries.tags = {};
@@ -67,34 +69,36 @@ function appNormalizeData(data) {
 }
 
 const APP_SCREENS = [
-  { id: 'home', label: 'Home', icon: 'M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z' },
-  { id: 'people', label: 'People', icon: 'M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0zM4 21a8 8 0 0 1 16 0' },
-  { id: 'plan', label: 'Plan', icon: 'M6 3h12v18H6zM9 8h6M9 12h6M9 16h4' },
-  { id: 'check', label: 'Check', icon: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm-4 9l3 3 5-6' },
-  { id: 'today', label: 'Today', icon: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2' },
-  { id: 'week', label: 'Week', icon: 'M4 5h16v15H4zM4 10h16M8 3v4M16 3v4' },
-  { id: 'grocery', label: 'Grocery', icon: 'M3 4h3l2 11h10l2-8H7M9 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z' },
-  { id: 'pantry', label: 'Pantry', icon: 'M4 7h16v13H4zM4 7l2-4h12l2 4M9 12h6' },
-  { id: 'together', label: 'Together', icon: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM2 21a7 7 0 0 1 14 0M14 21a6 6 0 0 1 8-5' },
-  { id: 'log', label: 'Log', icon: 'M5 3h14v18H5zM8 8h8M8 12h8M8 16h5' },
-  { id: 'breathe', label: 'Breathe', icon: 'M12 21c-4-3-8-6.5-8-11a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 4.5-4 8-8 11z' },
-  { id: 'learn', label: 'Learn', icon: 'M4 5a2 2 0 0 1 2-2h6v18H6a2 2 0 0 0-2 2zM12 3h6a2 2 0 0 1 2 2v16a2 2 0 0 0-2-2h-6' },
-  { id: 'settings', label: 'Settings', icon: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm8 4l2-1-1-3-2 .3-1.5-1.5.3-2-3-1-1 2h-2l-1-2-3 1 .3 2L6.6 8.3 4.6 8l-1 3 2 1v2l-2 1 1 3 2-.3 1.5 1.5-.3 2 3 1 1-2h2l1 2 3-1-.3-2 1.5-1.5 2 .3 1-3-2-1z' }
+  { id: 'home', label: 'Home', icon: 'home' },
+  { id: 'people', label: 'People', icon: 'person' },
+  { id: 'plan', label: 'Plan', icon: 'list' },
+  { id: 'check', label: 'Check', icon: 'check-circle' },
+  { id: 'today', label: 'Today', icon: 'clock' },
+  { id: 'week', label: 'Week', icon: 'calendar' },
+  { id: 'grocery', label: 'Grocery', icon: 'cart' },
+  { id: 'pantry', label: 'Pantry', icon: 'jar' },
+  { id: 'together', label: 'Together', icon: 'people' },
+  { id: 'log', label: 'Log', icon: 'note' },
+  { id: 'breathe', label: 'Breathe', icon: 'breathe' },
+  { id: 'learn', label: 'Learn', icon: 'book' },
+  { id: 'settings', label: 'Settings', icon: 'gear' }
 ];
 const APP_TAB_PRIMARY = ['home', 'today', 'check', 'week'];
-
-function appIcon(path) {
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${path}"/></svg>`;
-}
 
 function appParseRoute() {
   const h = (location.hash || '#/home').replace(/^#\/?/, '');
   const parts = h.split('/').filter(Boolean);
   const screen = parts.shift() || 'home';
+  if (screen === 'welcome') return { screen: 'welcome', parts };
   return { screen: APP_SCREENS.some(s => s.id === screen) ? screen : 'home', parts };
 }
 
 let appMoreOpen = false;
+let appLastScreen = null;
+
+function appNavLink(s, cur) {
+  return `<a href="#/${s.id}" ${cur === s.id ? 'aria-current="page"' : ''}>${uiIcon(s.icon)}<span>${s.label}</span></a>`;
+}
 
 function appRenderNav() {
   const cur = uiState.route.screen;
@@ -102,35 +106,62 @@ function appRenderNav() {
   const tabs = document.getElementById('tabbar');
   const top = document.getElementById('topbar');
   const person = uiActivePerson();
-  top.innerHTML = `<div class="brand"><svg viewBox="0 0 128 128" aria-hidden="true"><rect width="128" height="128" rx="28" fill="#2f6f8f"/><circle cx="64" cy="66" r="34" fill="none" stroke="#fff" stroke-width="8"/><path d="M46 68l12 12 24-26" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>Peace Meal</div><div class="spacer"></div>${person ? `<span class="small muted">Active: <strong>${uiEsc(person.name)}</strong></span>` : ''}`;
-  side.innerHTML = APP_SCREENS.map(s => `<a href="#/${s.id}" ${cur === s.id ? 'aria-current="page"' : ''}>${appIcon(s.icon)}<span>${s.label}</span></a>`).join('');
+  const welcome = cur === 'welcome';
+  const canBack = uiCanGoBack() && !welcome;
+  const who = person ? `<a class="who" href="#/people" aria-label="Active person: ${uiEsc(person.name)}. Open People.">${uiAvatar(person.name)}<span class="who-name">${uiEsc(person.name)}</span></a>` : '';
+
+  // Phone top bar: Back (when there is somewhere to go), brand, active person.
+  top.innerHTML = `${canBack ? uiBackButtonHTML('back-phone') : ''}<a class="brand" href="#/home">${uiBrandMark({ label: 'Peace Meal' })}<span class="brand-name">Peace Meal</span></a><div class="spacer"></div>${who}`;
+
+  // Desktop rail: brand at top, nav, active person at the bottom.
+  side.innerHTML = `<a class="rail-brand" href="#/home">${uiBrandMark({ label: 'Peace Meal' })}<span class="brand-name">Peace Meal</span></a>
+    <div class="rail-nav">${APP_SCREENS.map(s => appNavLink(s, cur)).join('')}</div>
+    ${person ? `<a class="rail-person" href="#/people" aria-label="Active person: ${uiEsc(person.name)}. Open People.">${uiAvatar(person.name)}<span class="rail-person-text"><span class="eyebrow">Active person</span><span class="rail-person-name">${uiEsc(person.name)}</span></span></a>` : ''}`;
+
+  // Phone tab bar: four primary tabs and a More sheet with the rest.
   const primary = APP_SCREENS.filter(s => APP_TAB_PRIMARY.includes(s.id));
   const more = APP_SCREENS.filter(s => !APP_TAB_PRIMARY.includes(s.id));
   const moreActive = more.some(s => s.id === cur);
-  tabs.innerHTML = primary.map(s => `<a href="#/${s.id}" ${cur === s.id ? 'aria-current="page"' : ''}>${appIcon(s.icon)}<span>${s.label}</span></a>`).join('') +
-    `<button type="button" id="more-btn" aria-expanded="${appMoreOpen}" aria-controls="more-sheet" ${moreActive ? 'style="color:var(--accent);font-weight:600"' : ''}>${appIcon('M5 12h.01M12 12h.01M19 12h.01')}<span>More</span></button>`;
+  tabs.innerHTML = primary.map(s => appNavLink(s, cur)).join('') +
+    `<button type="button" id="more-btn" class="${moreActive ? 'on' : ''}" aria-expanded="${appMoreOpen}" aria-controls="more-sheet" aria-haspopup="true">${uiIcon('more')}<span>More</span></button>`;
+  let scrim = document.getElementById('more-scrim');
+  if (!scrim) { scrim = document.createElement('button'); scrim.id = 'more-scrim'; scrim.className = 'more-scrim'; scrim.type = 'button'; scrim.setAttribute('aria-label', 'Close the More menu'); document.getElementById('app').appendChild(scrim); }
   let sheet = document.getElementById('more-sheet');
-  if (!sheet) { sheet = document.createElement('div'); sheet.id = 'more-sheet'; sheet.className = 'more-sheet'; document.getElementById('app').appendChild(sheet); }
+  if (!sheet) { sheet = document.createElement('div'); sheet.id = 'more-sheet'; sheet.className = 'more-sheet'; sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-label', 'More screens'); document.getElementById('app').appendChild(sheet); }
   sheet.hidden = !appMoreOpen;
-  sheet.innerHTML = more.map(s => `<a href="#/${s.id}" ${cur === s.id ? 'aria-current="page"' : ''}>${appIcon(s.icon)}<span>${s.label}</span></a>`).join('');
-  document.getElementById('more-btn').addEventListener('click', () => { appMoreOpen = !appMoreOpen; appRenderNav(); });
+  scrim.hidden = !appMoreOpen;
+  sheet.innerHTML = `<div class="sheet-title"><span class="eyebrow">More</span><button type="button" class="btn small icon" id="more-close" aria-label="Close the More menu">${uiIcon('close')}</button></div>` + more.map(s => appNavLink(s, cur)).join('');
+  const toggleMore = open => { appMoreOpen = open; appRenderNav(); if (open) { const first = sheet.querySelector('a'); if (first) first.focus(); } else { const b = document.getElementById('more-btn'); if (b) b.focus(); } };
+  document.getElementById('more-btn').addEventListener('click', () => toggleMore(!appMoreOpen));
+  sheet.querySelector('#more-close').addEventListener('click', () => toggleMore(false));
+  scrim.onclick = () => toggleMore(false);
+  sheet.onkeydown = e => { if (e.key === 'Escape') { e.preventDefault(); toggleMore(false); } };
   sheet.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { appMoreOpen = false; }));
+  uiState.closeMoreSheet = () => { if (!appMoreOpen) return false; toggleMore(false); return true; };
+  top.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', uiGoBack));
 }
 
 export function appRender() {
   uiState.route = appParseRoute();
+  uiNavRecord(location.hash || '#/home', !!uiState.navReplaceNext);
+  uiState.navReplaceNext = false;
   const main = document.getElementById('main');
   const profile = uiState.profile;
-  // If there are no people, onboarding is the only useful place.
-  if (!profile.people.length && !['people', 'learn', 'settings'].includes(uiState.route.screen)) {
-    location.hash = '#/people/new';
+  // If there are no people, the welcome screen and onboarding are the only useful places.
+  if (!profile.people.length && !['people', 'learn', 'settings', 'welcome'].includes(uiState.route.screen)) {
+    uiState.navReplaceNext = true;
+    location.replace('#/welcome');
     return;
   }
+  if (profile.people.length && uiState.route.screen === 'welcome') { uiState.navReplaceNext = true; location.replace('#/home'); return; }
+  if (uiState.modalClose) uiState.modalClose();
   appRenderNav();
   main.innerHTML = '';
+  main.classList.toggle('print-sheet', false);
   const ctx = { route: uiState.route };
   try {
     switch (uiState.route.screen) {
+      case 'welcome': renderWelcomeScreen(main, ctx); break;
       case 'home': renderHomeScreen(main, ctx); break;
       case 'people': renderPeopleScreen(main, ctx); break;
       case 'plan': renderPlanScreen(main, ctx); break;
@@ -148,14 +179,26 @@ export function appRender() {
     }
   } catch (e) {
     console.error(e);
-    main.innerHTML = `<div class="notice block"><div class="notice-head">Stop</div><div>This screen failed to render: ${uiEsc(e.message)}</div></div>`;
+    main.innerHTML = `<div class="notice block">${uiIcon('stop', { cls: 'notice-icon' })}<div class="notice-head">Stop</div><div class="notice-body">This screen failed to render: ${uiEsc(e.message)}</div></div>`;
+  }
+  // Desktop Back control sits at the top of the content column; the phone one is in the top bar.
+  if (uiCanGoBack() && uiState.route.screen !== 'welcome') {
+    main.insertAdjacentHTML('afterbegin', `<div class="backbar">${uiBackButtonHTML('back-desktop')}</div>`);
+    main.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', uiGoBack));
   }
   if (uiState.dataProblems.length && uiState.route.screen !== 'settings') {
     const box = document.createElement('div');
     box.className = 'section';
-    box.innerHTML = uiState.dataProblems.map(p => `<div class="notice warn"><div class="notice-head">Caution</div><div>${uiEsc(p)}</div></div>`).join('');
+    box.innerHTML = uiState.dataProblems.map(p => `<div class="notice warn">${uiIcon('alert', { cls: 'notice-icon' })}<div class="notice-head">Caution</div><div class="notice-body">${uiEsc(p)}</div></div>`).join('');
     main.appendChild(box);
   }
+  // Cross-fade with a small rise when the screen changes (not on same-screen re-renders). Motion is gated in CSS.
+  if (appLastScreen !== uiState.route.screen) {
+    main.classList.remove('enter');
+    void main.offsetWidth;
+    main.classList.add('enter');
+  }
+  appLastScreen = uiState.route.screen;
   window.scrollTo(0, 0);
 }
 

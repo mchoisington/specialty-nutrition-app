@@ -115,7 +115,17 @@ export function buildMatcher(dictionaries) {
     return { segment, tags, mayContain, unknownRisk, matchedTerms, notes };
   }
 
+  const cache = new Map(); // text -> result; ingredient lines repeat heavily across thousands of recipes
   function tagText(text) {
+    const key = String(text || '');
+    const hit = cache.get(key);
+    if (hit) return hit;
+    const result = tagTextUncached(key);
+    if (cache.size > 20000) cache.clear();
+    cache.set(key, result);
+    return result;
+  }
+  function tagTextUncached(text) {
     const segments = segmentText(text);
     const tags = new Map();
     const mayContain = new Map();

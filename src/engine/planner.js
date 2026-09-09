@@ -80,9 +80,14 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
   const favorites = (person.favorites && person.favorites.recipes) || [];
   const disliked = (person.disliked && person.disliked.recipes) || [];
   const rnd = mulberry32(hashStr(person.id + '|' + startDate.toISOString().slice(0, 10) + '|' + seed));
-  const checks = new Map(recipes.map(r => [r.id, checkRecipe(r, plan, matcher, foodsById, person)]));
-  const eligible = recipes.filter(r => checks.get(r.id).verdict !== 'fail' && !disliked.includes(r.id));
-  const excluded = recipes.filter(r => checks.get(r.id).verdict === 'fail').map(r => ({ id: r.id, name: r.name, why: checks.get(r.id).hits.filter(h => h.hard).map(h => h.label) }));
+  // Only recipes with known nutrition can be held to daily limits. Recipes without it (community imports whose
+  // ingredients are not yet linked to foods) are scheduled only when the person has favorited them, and are flagged.
+  const hasNutrition = r => !!(r.nutrition_per_serving && r.nutrition_source) || (r.ingredients || []).some(i => i.food);
+  const pool = recipes.filter(r => hasNutrition(r) || favorites.includes(r.id) || cooking.include_unknown_nutrition);
+  const checks = new Map(pool.map(r => [r.id, checkRecipe(r, plan, matcher, foodsById, person)]));
+  const eligible = pool.filter(r => checks.get(r.id).verdict !== 'fail' && !disliked.includes(r.id));
+  const excluded = pool.filter(r => checks.get(r.id).verdict === 'fail').map(r => ({ id: r.id, name: r.name, why: checks.get(r.id).hits.filter(h => h.hard).map(h => h.label) }));
+  const skippedNoNutrition = recipes.length - pool.length;
   const days = [];
   const recentIds = [];
   const leftovers = []; // {recipeId, servings, madeOn}
@@ -130,8 +135,8 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
     }
     days.push({ date: dateKey, day: DAYS[dayIdx], canCook, eaters, minutes: minutesAvailable(cooking, dayIdx), meals, totals: dayTotals });
   }
-  return { days, excluded, unmet, eligibleCount: eligible.length, seed };
+  return { days, excluded, unmet, eligibleCount: eligible.length, skippedNoNutrition, seed };
 }
 
 function recipeMeal(r, slot) { return !r.meal || !r.meal.length || r.meal.includes(slot); }
-function summarize(c) { return { verdict: c.verdict, hits: c.hits.map(h => ({ tag: h.tag, label: h.label, hard: h.hard })), exceeds: c.exceeds.map(e => e.nutrient) }; }
+function summarize(c) { return { verdict: c.verdict, hits: c.hits.map(h => ({ tag: h.tag, label: h.label, hard: h.hard })), exceeds: c.exceeds.map(e => e.nutrient), nutritionUnknown: !!(c.perServing && c.perServing._missing && c.perServing._missing.kcal) && !c.perServing.kcal }; }
