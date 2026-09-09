@@ -15,7 +15,8 @@
 // 400 ms apart, retried once after 2 s on network errors; HTTP 429/5xx back off and retry.
 // Through the session proxy Node's fetch needs NODE_USE_ENV_PROXY=1; the script re-executes itself with it set.
 //
-// Usage: node tools/import-usda-recipes.mjs [--limit N] [--mirror-only] [--offline]
+// Usage: node tools/import-usda-recipes.mjs [--limit N] [--mirror-only] [--offline] [--keep-same-title]
+//   --keep-same-title keeps distinct recipes that share a title (USDA published e.g. two different "Potato Soup"s); by default only the first id is kept.
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
@@ -35,6 +36,7 @@ const flag = n => args.includes(n);
 const LIMIT = Number(args[args.indexOf('--limit') + 1]) || 0;
 const MIRROR_ONLY = flag('--mirror-only');
 const OFFLINE = flag('--offline');
+const KEEP_SAME_TITLE = flag('--keep-same-title');
 
 const UA = 'PeaceMeal-recipe-import/1.0 (personal family app)';
 const DELAY_MS = 400;
@@ -428,11 +430,13 @@ async function main() {
     const k = r.name.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
     const prev = byTitle.get(k);
     if (!prev) { byTitle.set(k, r); continue; }
+    const sameRecipe = prev.ingredients.length === r.ingredients.length && Math.abs(prev.nutrition_per_serving.kcal - r.nutrition_per_serving.kcal) < 0.5;
+    if (KEEP_SAME_TITLE && !sameRecipe) { byTitle.set(k + ' #' + r.id, r); problem(`same title, distinct recipe: "${r.name}": ${prev.id} / ${r.id}; kept both (--keep-same-title)`); continue; }
     dupes++;
     // Keep the Wayback-sourced copy; otherwise the first id.
     const prevWb = /web\.archive\.org/.test(prev.source_url), curWb = /web\.archive\.org/.test(r.source_url);
     if (curWb && !prevWb) byTitle.set(k, r);
-    problem(`duplicate title "${r.name}": ${prev.id} / ${r.id}; kept ${byTitle.get(k).id}`);
+    problem(`duplicate title "${r.name}" (${sameRecipe ? 'same recipe' : 'distinct recipe'}): ${prev.id} / ${r.id}; kept ${byTitle.get(k).id}`);
   }
   const final = [...byTitle.values()].sort((a, b) => a.id < b.id ? -1 : 1);
   const ids = new Set(final.map(r => r.id));
