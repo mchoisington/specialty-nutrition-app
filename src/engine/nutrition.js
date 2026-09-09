@@ -37,6 +37,12 @@ export function scaleTotals(a, factor) {
 export function recipeTotals(recipe, foodsById) {
   let total = emptyTotals();
   const missingFoods = [];
+  // Imported recipes (for example USDA MyPlate Kitchen) carry USDA-computed per-serving nutrition instead of food links.
+  if (recipe.nutrition_per_serving && recipe.nutrition_source && !(recipe.ingredients || []).some(i => i.food)) {
+    const per = emptyTotals();
+    for (const k of NUTRIENT_KEYS) { const v = recipe.nutrition_per_serving[k]; if (v == null) per._missing[k] = 1; else per[k] = Number(v) || 0; }
+    return { total: scaleTotals(per, recipe.servings || 1), perServing: per, missingFoods, imported: recipe.nutrition_source };
+  }
   for (const ing of recipe.ingredients || []) {
     const food = foodsById.get(ing.food);
     if (!food) { missingFoods.push(ing.food); continue; }

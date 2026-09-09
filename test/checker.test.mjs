@@ -94,3 +94,13 @@ test('quantity and prep words alone are not reported as unrecognized', () => {
   const r2 = m.tagText('2 cups mystery powder, diced');
   assert.deepEqual(r2.unrecognized, ['2 cups mystery powder']);
 });
+
+test('imported recipes use their USDA per-serving nutrition and dictionary-tag their ingredient text', () => {
+  const r = { id: 'mp-1', name: 'Bean soup', servings: 4, nutrition_source: 'usda-myplate-kitchen', source_url: 'https://example.org', nutrition_per_serving: { kcal: 210, sodium_mg: 480, fiber_g: 9 }, ingredients: [{ display: '1 can black beans, rinsed' }, { display: '1 cup wheat flour' }] };
+  const t = recipeTotals(r, new Map());
+  assert.equal(t.perServing.kcal, 210);
+  assert.equal(Math.round(t.total.sodium_mg), 1920);
+  const p = { avoid: { 'allergen-wheat': { hard: true, rules: [] } }, prefer: {}, limits: {}, targets: {} };
+  const c = checkRecipe(r, p, matcher, new Map(), { allergens: ['allergen-wheat'] });
+  assert.equal(c.verdict, 'fail');
+});

@@ -71,9 +71,16 @@ for (const r of recipes) {
   if (!r.name || !r.servings || !Array.isArray(r.ingredients) || !r.ingredients.length) err(`recipe ${r.id} malformed`);
   if (typeof r.active_min !== 'number' || typeof r.total_min !== 'number') err(`recipe ${r.id} missing times`);
   if (!['beginner', 'comfortable', 'confident'].includes(r.skill)) err(`recipe ${r.id} bad skill`);
-  for (const ing of r.ingredients || []) { if (!foodIds.has(ing.food)) err(`recipe ${r.id} references unknown food ${ing.food}`); if (!(Number(ing.grams) > 0)) err(`recipe ${r.id} ingredient ${ing.food} has no grams`); }
+  const imported = !!r.nutrition_source;
+  for (const ing of r.ingredients || []) {
+    if (imported && !ing.food) { if (!ing.display) err(`recipe ${r.id} imported ingredient without display text`); continue; }
+    if (!foodIds.has(ing.food)) err(`recipe ${r.id} references unknown food ${ing.food}`);
+    if (!(Number(ing.grams) > 0)) err(`recipe ${r.id} ingredient ${ing.food} has no grams`);
+  }
+  if (imported && (!r.nutrition_per_serving || typeof r.nutrition_per_serving.kcal !== 'number')) err(`recipe ${r.id} is imported but has no per-serving kcal`);
+  if (imported && !r.source_url) err(`recipe ${r.id} is imported but has no source_url`);
   for (const t of r.tags || []) if (!knownTag(t)) err(`recipe ${r.id} uses undeclared tag ${t}`);
-  if (Object.keys(r).some(k => /nutri|kcal|sodium/i.test(k))) err(`recipe ${r.id} carries nutrient numbers; nutrients are computed, not stored`);
+  if (!imported && Object.keys(r).some(k => /nutri|kcal|sodium/i.test(k))) err(`recipe ${r.id} carries nutrient numbers; nutrients are computed, not stored`);
 }
 
 for (const m of modList) {
