@@ -113,7 +113,10 @@ export function uiSourcesHTML(sourceIds, ruleVerify = false) {
     const s = uiState.sourcesById.get(id);
     const verify = ruleVerify || (s && s.verify);
     const cite = s ? s.citation : `${id} (citation not found in sources.json)`;
-    return `<li>${uiEsc(cite)}${s && s.type ? ` <span class="muted">[${uiEsc(s.type)}${s.year ? ', ' + s.year : ''}]</span>` : ''}${verify ? ' <span class="chip caution">verify</span>' : ''}${s && s.verify_note ? `<div class="small muted">${uiEsc(s.verify_note)}</div>` : ''}</li>`;
+    const url = s && /^https:\/\//.test(s.url || '') ? s.url : '';
+    const citeHTML = url ? `<a href="${uiEsc(url)}" target="_blank" rel="noopener noreferrer">${uiEsc(cite)}</a>` : uiEsc(cite);
+    const kind = url ? (/doi\.org/.test(url) ? 'article page' : /pubmed/.test(url) ? 'PubMed' : 'website') : '';
+    return `<li>${citeHTML}${s && s.type ? ` <span class="muted">[${uiEsc(s.type)}${s.year ? ', ' + s.year : ''}]</span>` : ''}${kind ? ` <span class="muted small">(${kind})</span>` : ''}${verify ? ' <span class="chip caution">verify</span>' : ''}${s && s.verify_note ? `<div class="small muted">${uiEsc(s.verify_note)}</div>` : ''}</li>`;
   }).join('');
   return `<ol class="refs sources">${items}</ol>`;
 }
