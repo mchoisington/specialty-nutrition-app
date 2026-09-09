@@ -5,6 +5,7 @@ import { uiState, uiEsc, uiPersist, uiDownload, uiToast, uiNavigate, uiIsoDate, 
 export function renderSettingsScreen(root) {
   const profile = uiState.profile;
   const d = uiState.data;
+  const guests = profile.people.filter(p => p.guest);
   root.innerHTML = `
     <h1>Settings</h1>
     <div class="card">
@@ -17,6 +18,15 @@ export function renderSettingsScreen(root) {
       <p>Importing replaces everything on this device with the contents of the file. You will be asked to confirm.</p>
       <label for="set-import" class="btn">Choose a file to import</label>
       <input id="set-import" type="file" accept="application/json,.json" class="visually-hidden">
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0">Manage guests</h2>
+      <p class="small">Guests are profiles other people shared with you (Together screen). They can be picked when cooking together and removed here.</p>
+      ${guests.length ? guests.map(g => `<div class="row between" style="padding:.4rem 0;border-top:1px solid var(--border)"><span><strong>${uiEsc(g.name)}</strong> <span class="badge blue outline">Guest</span> <span class="small muted">${(g.allergens || []).length ? 'allergens: ' + g.allergens.length : 'no allergens'}, ${(g.modules || []).length} module${(g.modules || []).length === 1 ? '' : 's'}</span></span><button class="btn small danger" type="button" data-remove-guest="${uiEsc(g.id)}">Remove</button></div>`).join('') : '<p class="small muted">No guests. Add one on the Together screen by pasting a shared profile or choosing a file.</p>'}
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0">Calendar export</h2>
+      <p class="small">"Add to calendar (.ics)" on the Grocery and Together screens saves a standard calendar file with one all-day event per day listing that day's meals. Import it into Google Calendar (Settings, Import and export), Apple Calendar, Outlook, or a Skylight calendar. There is no direct Google Keep or Skylight list integration; use Share or Copy for the grocery list itself.</p>
     </div>
     <div class="card">
       <h2 style="margin-top:0">Clear all data</h2>
@@ -37,6 +47,13 @@ export function renderSettingsScreen(root) {
       ${uiState.dataProblems.length ? `<div class="notice warn"><div class="notice-head">Caution</div><div>${uiState.dataProblems.map(uiEsc).join('<br>')}</div></div>` : ''}
     </div>
   `;
+  root.querySelectorAll('[data-remove-guest]').forEach(b => b.addEventListener('click', () => {
+    const g = profile.people.find(p => p.id === b.dataset.removeGuest);
+    if (!g || !window.confirm(`Remove guest ${g.name}?`)) return;
+    profile.people = profile.people.filter(p => p.id !== g.id);
+    if (profile.activePerson === g.id) profile.activePerson = profile.people[0] ? profile.people[0].id : null;
+    uiPersist(); uiToast(`Removed ${g.name}.`); uiState.rerender();
+  }));
   root.querySelector('#set-export').addEventListener('click', () => {
     const ok = uiDownload(`specialty-nutrition-${uiIsoDate()}.json`, exportJSON(profile));
     uiToast(ok ? 'Export started.' : 'Download blocked here. Use "Copy JSON" instead.');

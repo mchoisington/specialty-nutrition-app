@@ -477,7 +477,8 @@ function todayAmountModal(person, plan, { date, meal, kind, ref, entry = null })
   const obj = kind === 'recipe' ? uiState.recipesById.get(ref) : uiState.foodsById.get(ref);
   if (!obj) { uiToast('Not found in the data files.'); return; }
   const name = kind === 'recipe' ? obj.name : (obj.short || obj.name);
-  const portions = kind === 'food' ? (obj.portions || []).filter(p => p.grams > 0) : [];
+  // Every USDA food lists a "100 g" pseudo-portion first; real portions ("1 large") come after it. Grams are always offered separately.
+  const portions = kind === 'food' ? (obj.portions || []).filter(p => p.grams > 0 && !/^100 g$/.test(p.label)) : [];
   const draft = entry ? { amount: entry.amount, unit: entry.unit, grams: entry.grams, meal: entry.meal, note: entry.note || '' }
     : kind === 'recipe' ? { amount: 1, unit: 'serving', grams: null, meal, note: '' }
       : { amount: 1, unit: portions.length ? portions[0].label : 'g', grams: portions.length ? portions[0].grams : 100, meal, note: '' };

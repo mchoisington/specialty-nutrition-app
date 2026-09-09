@@ -13,6 +13,7 @@ const WEEK_CSS = `
 .week-heart.on { color:var(--red); }
 .week-eaters { display:inline-flex; align-items:center; gap:.3rem; font-size:.85rem; color:var(--muted); margin-left:auto; }
 .week-eaters input { width:64px; min-height:36px; padding:.2rem .4rem; }
+@media (max-width: 520px) { .meal { grid-template-columns: 1fr; } .meal .meal-actions { justify-content: flex-start; } }
 `;
 
 function weekStyle() {
