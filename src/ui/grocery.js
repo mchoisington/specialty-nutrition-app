@@ -142,7 +142,7 @@ function groceryIcsEscape(s) { return String(s || '').replace(/\\/g, '\\\\').rep
 export function groceryIcsForWeek(week, person, opts = {}) {
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
   const days = opts.days || week.days;
-  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Specialty Nutrition//Meals//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH'];
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Peace Meal//Meals//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH'];
   for (const d of days) {
     const meals = d.meals.filter(m => m.recipe);
     if (!meals.length) continue;
@@ -151,7 +151,7 @@ export function groceryIcsForWeek(week, person, opts = {}) {
     const next = uiIsoDate(new Date(y, mo - 1, da + 1)).replace(/-/g, '');
     const slots = meals.map(m => GROCERY_SLOT_LABEL[m.slot] ? GROCERY_SLOT_LABEL[m.slot].toLowerCase() : m.slot).join(', ');
     const desc = meals.map(m => `${GROCERY_SLOT_LABEL[m.slot] || m.slot}: ${m.name}${m.source === 'leftover' ? ' (leftovers)' : ''}${m.servings ? `, ${m.servings} serving${m.servings === 1 ? '' : 's'}` : ''}`).join('\n');
-    lines.push('BEGIN:VEVENT', `UID:${start}-${(opts.uidTag || person.id)}@specialty-nutrition`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${start}`, `DTEND;VALUE=DATE:${next}`, `SUMMARY:${groceryIcsEscape('Meals: ' + slots)}`, `DESCRIPTION:${groceryIcsEscape(desc)}`, 'TRANSP:TRANSPARENT', 'END:VEVENT');
+    lines.push('BEGIN:VEVENT', `UID:${start}-${(opts.uidTag || person.id)}@peace-meal`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${start}`, `DTEND;VALUE=DATE:${next}`, `SUMMARY:${groceryIcsEscape('Meals: ' + slots)}`, `DESCRIPTION:${groceryIcsEscape(desc)}`, 'TRANSP:TRANSPARENT', 'END:VEVENT');
   }
   lines.push('END:VCALENDAR');
   return lines.join('\r\n') + '\r\n';

@@ -1,7 +1,7 @@
 {
-  "name": "Specialty Nutrition",
-  "short_name": "Nutrition",
-  "description": "Evidence-based specialty nutrition planning. Data stays on this device.",
+  "name": "Peace Meal",
+  "short_name": "Peace Meal",
+  "description": "Peace Meal: one table, everyone's rules, every rule cited. Data stays on this device.",
   "start_url": "./index.html#/home",
   "scope": "./",
   "display": "standalone",

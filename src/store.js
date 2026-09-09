@@ -1,5 +1,6 @@
 // On-device persistence. Nothing leaves the device unless the user exports it.
-const KEY = 'specialty-nutrition-app:v1';
+const KEY = 'peace-meal:v1';
+const OLD_KEY = 'specialty-nutrition-app:v1';
 
 export function defaultProfile() {
   return { version: 2, people: [], log: [], diary: [], weights: [], exercise: [], pantry: [], grocery_adjustments: {}, grocery_changes: {}, activePerson: null, created: new Date().toISOString() };
@@ -26,7 +27,7 @@ export function newPerson(name = 'Me') {
 
 export function load() {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(KEY) || localStorage.getItem(OLD_KEY);
     if (!raw) return defaultProfile();
     const p = JSON.parse(raw);
     if (!p || !Array.isArray(p.people)) return defaultProfile();
@@ -62,4 +63,4 @@ export function importJSON(text) {
   return migrate(p);
 }
 
-export function clearAll() { try { localStorage.removeItem(KEY); } catch { /* ignore */ } }
+export function clearAll() { try { localStorage.removeItem(KEY); localStorage.removeItem(OLD_KEY); } catch { /* ignore */ } }

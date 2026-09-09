@@ -102,7 +102,7 @@ function appRenderNav() {
   const tabs = document.getElementById('tabbar');
   const top = document.getElementById('topbar');
   const person = uiActivePerson();
-  top.innerHTML = `<div class="brand"><svg viewBox="0 0 128 128" aria-hidden="true"><rect width="128" height="128" rx="28" fill="#2f6f8f"/><circle cx="64" cy="66" r="34" fill="none" stroke="#fff" stroke-width="8"/><path d="M46 68l12 12 24-26" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>Specialty Nutrition</div><div class="spacer"></div>${person ? `<span class="small muted">Active: <strong>${uiEsc(person.name)}</strong></span>` : ''}`;
+  top.innerHTML = `<div class="brand"><svg viewBox="0 0 128 128" aria-hidden="true"><rect width="128" height="128" rx="28" fill="#2f6f8f"/><circle cx="64" cy="66" r="34" fill="none" stroke="#fff" stroke-width="8"/><path d="M46 68l12 12 24-26" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>Peace Meal</div><div class="spacer"></div>${person ? `<span class="small muted">Active: <strong>${uiEsc(person.name)}</strong></span>` : ''}`;
   side.innerHTML = APP_SCREENS.map(s => `<a href="#/${s.id}" ${cur === s.id ? 'aria-current="page"' : ''}>${appIcon(s.icon)}<span>${s.label}</span></a>`).join('');
   const primary = APP_SCREENS.filter(s => APP_TAB_PRIMARY.includes(s.id));
   const more = APP_SCREENS.filter(s => !APP_TAB_PRIMARY.includes(s.id));

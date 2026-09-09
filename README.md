@@ -1,4 +1,4 @@
-# Specialty Nutrition App
+# Peace Meal
 
 A personal, evidence-based nutrition planner for a household where people have different medical conditions, allergies, eating patterns, and amounts of time to cook. Every rule the app applies cites its source. The app never invents a therapeutic number: if a guideline says a clinician must set it, the app asks for that number and applies it as given.
 

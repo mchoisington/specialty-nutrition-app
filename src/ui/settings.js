@@ -55,7 +55,7 @@ export function renderSettingsScreen(root) {
     uiPersist(); uiToast(`Removed ${g.name}.`); uiState.rerender();
   }));
   root.querySelector('#set-export').addEventListener('click', () => {
-    const ok = uiDownload(`specialty-nutrition-${uiIsoDate()}.json`, exportJSON(profile));
+    const ok = uiDownload(`peace-meal-${uiIsoDate()}.json`, exportJSON(profile));
     uiToast(ok ? 'Export started.' : 'Download blocked here. Use "Copy JSON" instead.');
   });
   root.querySelector('#set-copy').addEventListener('click', async () => {

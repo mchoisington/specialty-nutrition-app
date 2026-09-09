@@ -1,8 +1,8 @@
 {
-  "name": "specialty-nutrition-app",
+  "name": "peace-meal",
   "version": "0.1.0",
   "private": true,
-  "description": "Evidence-based specialty nutrition planner for personal and family use. Every rule cites its source.",
+  "description": "Peace Meal: an evidence-based family nutrition planner. Every rule cites its source.",
   "type": "module",
   "scripts": {
     "test": "node --test test/*.test.mjs",
