@@ -864,3 +864,5 @@ td.num, th.num { text-align: right; white-space: nowrap; }
 /* About button beside each condition or diet on the Conditions step */
 .choice .about-btn { margin-left: .25rem; padding: .15rem .55rem; font-size: .85em; }
 .choice .rating-open { padding: 0; border: 0; background: none; }
+
+.invite-preview { white-space: pre-wrap; font: inherit; font-size: .95em; background: var(--surface-2, var(--tint-olive, #f3f5f0)); padding: .75rem; border-radius: 8px; }

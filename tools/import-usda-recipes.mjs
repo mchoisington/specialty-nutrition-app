@@ -244,7 +244,15 @@ function ldNutrition(n) {
 function listItems(html) { return [...html.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)].map(m => stripTags(m[1])).filter(Boolean); }
 function paragraphs(html) { return html.split(/<\/p>|<br\s*\/?>|\n/).map(stripTags).filter(Boolean); }
 function stepsFrom(html, ldSteps) {
-  let steps = listItems(html);
+  let steps;
+  if (/<ol[\s>]/i.test(html)) {
+    // Numbered steps; anything after the list (a footnote paragraph, sometimes with a sub-list such as a home-made sauce) becomes one final step.
+    steps = [...html.matchAll(/<ol[^>]*>([\s\S]*?)<\/ol>/gi)].flatMap(m => listItems(m[1]));
+    const rest = html.replace(/<ol[^>]*>[\s\S]*?<\/ol>/gi, '');
+    const paras = paragraphs(rest.replace(/<ul[^>]*>[\s\S]*?<\/ul>/gi, '')), items = listItems(rest);
+    const tail = [paras.join(' '), items.join('; ')].filter(Boolean).join(' ');
+    if (tail) steps.push(tail);
+  } else steps = listItems(html);
   if (!steps.length) steps = paragraphs(html);
   if (!steps.length && ldSteps) steps = ldSteps;
   return steps.map(s => s.replace(/^\d+[.)]\s+/, '')).filter(s => s.length > 1);

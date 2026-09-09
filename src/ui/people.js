@@ -2,7 +2,7 @@
 // Weight and height are entered in pounds and feet/inches and stored in kilograms and centimetres.
 import { newPerson } from '../store.js';
 import { lbToKg, kgToLb, ftInToCm, cmToFtIn, ACTIVITY_LEVELS } from '../engine/energy.js';
-import { uiState, uiEsc, uiPersist, uiActivePerson, uiSetActive, uiPlanFor, uiRatingBadge, uiSegmented, uiMultiPills, uiYesNo, uiNavigate, uiToast, uiModal, uiFindPersonById, UI_ALLERGENS, uiTagLabel, uiModuleName, uiNutrientLabel, uiEnsurePerson, uiParamUnit, uiBigChoices, uiBigToggles, uiEnsureUserDefinedSource, uiUserDefinedBadge, uiWeightHeightText, uiPageHeader, uiSection, uiChip, uiIcon, uiAvatar, uiEmptyState, uiNoticeHTML } from './common.js';
+import { uiCopyText, uiState, uiEsc, uiPersist, uiActivePerson, uiSetActive, uiPlanFor, uiRatingBadge, uiSegmented, uiMultiPills, uiYesNo, uiNavigate, uiToast, uiModal, uiFindPersonById, UI_ALLERGENS, uiTagLabel, uiModuleName, uiNutrientLabel, uiEnsurePerson, uiParamUnit, uiBigChoices, uiBigToggles, uiEnsureUserDefinedSource, uiUserDefinedBadge, uiWeightHeightText, uiPageHeader, uiSection, uiChip, uiIcon, uiAvatar, uiEmptyState, uiNoticeHTML } from './common.js';
 import { learnArticleHTML } from './learn.js';
 import { CUISINES } from '../engine/cuisine.js';
 import { listDirectory, openPerson } from '../engine/sync.js';
@@ -179,9 +179,11 @@ function peopleRenderList(root) {
         ${p.setup_complete ? `<div class="edit-row" role="group" aria-label="Edit ${uiEsc(p.name)}"><span class="small muted edit-label">${uiIcon('edit')}Edit</span>${peopleStepsFor(p).map(s => `<a class="chip neutral" href="#/people/${uiEsc(p.id)}/${s.id}${s.id === 'cooking' ? '/time' : ''}">${s.label}</a>`).join('')}</div>` : ''}
       </div>`;
     }).join('')}</div>` : uiEmptyState('No people yet. Add the first person to build a plan.', `<a class="btn primary" href="#/people/new">Add a person</a>`)}
+    ${uiSection('Invite someone', peopleInviteHTML(), { id: 'people-invite-h' })}
     ${uiSection('Other people using Peace Meal', `<div class="card" id="people-directory">${peopleDirectoryShellHTML()}</div>`, { id: 'people-dir-h' })}
   `;
   peopleLoadDirectory(root.querySelector('#people-directory'));
+  peopleBindInvite(root);
   root.querySelectorAll('[data-activate]').forEach(b => b.addEventListener('click', () => { uiSetActive(b.dataset.activate); uiToast('Active person changed.'); uiState.rerender(); }));
   root.querySelectorAll('[data-delete]').forEach(b => b.addEventListener('click', () => {
     const p = uiFindPersonById(b.dataset.delete);
@@ -1015,4 +1017,59 @@ export async function peopleOpenSharedPerson(personId) {
   if (!res) { uiToast('That profile is not in the shared store any more.'); return; }
   if (res.locked) { uiToast('That profile is encrypted for another device. Only its device and the owner can open it.'); return; }
   sharingPersonModal(res.person, { subtitle: `From the shared store, updated ${String(res.updated || '').slice(0, 10)}. Read-only.`, sourceKey: 'store:' + personId });
+}
+
+
+// ---- Invite someone by email. The app has no mail server, so this opens the person's own mail app with the
+// invitation written, or copies the text for a text message or the share sheet. ----
+function peopleAppLink() {
+  const href = String(location.href || '').split('#')[0];
+  if (/^https?:/.test(href)) return href;
+  return '';
+}
+function peopleInviteText(toName) {
+  const link = peopleAppLink();
+  const who = toName ? `Hi ${toName},` : 'Hi,';
+  const lines = [who, '',
+    'I set up Peace Meal for our family: one place for everyone\'s food rules, meal plans, and grocery lists. Every rule shows the medical guideline behind it, and your information stays on your own device.',
+    '',
+    link ? `Open it here: ${link}` : 'I\'ll send you the app file separately; open it in any web browser (it works on a phone too).',
+    '',
+    'When it opens: tap "Set up the first person", answer the short questions (conditions, allergies, how much time you have to cook), and tap "Save and see my plan". You can change anything later from the People screen.',
+    '',
+    'If we cook together, you can share just the parts you want (your food rules, a grocery list, or a meal plan) from the Together screen.',
+    '',
+    'Have a peaceful meal!'];
+  return lines.join('\n');
+}
+function peopleInviteHTML() {
+  const link = peopleAppLink();
+  return `<div class="card">
+    <p class="small">Sends an invitation from your own email app. Nothing is sent by Peace Meal itself, and no address is stored.</p>
+    <div class="grid two">
+      <label class="field"><span class="label">Their name (optional)</span><input id="inv-name" type="text" autocomplete="off" placeholder="Dad"></label>
+      <label class="field"><span class="label">Email address</span><input id="inv-email" type="email" autocomplete="off" placeholder="name@example.com" inputmode="email"></label>
+    </div>
+    <details class="small"><summary>Preview the message</summary><pre class="invite-preview" id="inv-preview">${uiEsc(peopleInviteText(''))}</pre></details>
+    <div class="row gap wrap" style="margin-top:.75rem">
+      <a class="btn primary" id="inv-mail" href="#" rel="noopener">${uiIcon('share')}Open in my email app</a>
+      <button class="btn" type="button" id="inv-copy">Copy invitation</button>
+      ${navigator.share ? `<button class="btn" type="button" id="inv-share">Share…</button>` : ''}
+    </div>
+    ${link ? '' : `<p class="small muted" style="margin-top:.5rem">You are using the single-file version, so the message has no link. Attach the app file to the email, or send the claude.ai link if you have one.</p>`}
+  </div>`;
+}
+function peopleBindInvite(root) {
+  const name = root.querySelector('#inv-name'), email = root.querySelector('#inv-email'), mail = root.querySelector('#inv-mail'), prev = root.querySelector('#inv-preview');
+  if (!name || !email || !mail) return;
+  const subject = 'An invitation to Peace Meal';
+  const refresh = () => {
+    const text = peopleInviteText(name.value.trim());
+    if (prev) prev.textContent = text;
+    mail.href = `mailto:${encodeURIComponent(email.value.trim())}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+  };
+  name.addEventListener('input', refresh); email.addEventListener('input', refresh); refresh();
+  mail.addEventListener('click', (e) => { if (!email.value.trim()) { e.preventDefault(); uiToast('Enter an email address first.'); email.focus(); } });
+  const copy = root.querySelector('#inv-copy'); if (copy) copy.addEventListener('click', async () => { const ok = await uiCopyText(peopleInviteText(name.value.trim())); uiToast(ok ? 'Invitation copied.' : 'Could not copy.'); });
+  const share = root.querySelector('#inv-share'); if (share) share.addEventListener('click', async () => { try { await navigator.share({ title: subject, text: peopleInviteText(name.value.trim()) }); } catch { /* cancelled */ } });
 }
