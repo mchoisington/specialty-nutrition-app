@@ -1,7 +1,7 @@
 {
   "name": "Peace Meal",
   "short_name": "Peace Meal",
-  "description": "Peace Meal: one table, everyone's rules, every rule cited. Data stays on this device.",
+  "description": "Peace Meal: one table, everyone's funky dietary needs, every recommendation cited. Data stays on this device.",
   "start_url": "./index.html#/home",
   "scope": "./",
   "display": "standalone",

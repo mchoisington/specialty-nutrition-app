@@ -25,7 +25,7 @@ All data stays in the browser on that device. Use Settings to export a backup fi
 | `data/recipes.json` | Seed recipes with time, skill, equipment, and ingredient links to foods. Nutrients are computed, not stored |
 | `src/engine/` | The deterministic rules engine, checker, planner, and grocery builder |
 | `src/ui/` | Screens |
-| `tools/` | USDA importer, validator, single-file bundler |
+| `tools/` | USDA importer, recipe importers, meal-slot fixer, validator, single-file bundler |
 | `test/` | Engine tests |
 | `docs/` | Phase 1 evidence, Phase 2 architecture, VERIFY log, screenshots |
 

@@ -59,7 +59,7 @@ function todayAmountText(entry) {
 // Adds a diary entry for a person and persists it. Used here and by the Week screen's "Add to Today".
 export function todayAddDiaryEntry(person, { date, meal, kind, ref, amount = 1, unit = 'serving', grams = null, note = '', name = '', nutrients = null }) {
   todayEnsure(person);
-  const entry = { id: todayNewId('d'), date, person: person.id, meal: meal === 'snack' ? 'snacks' : meal, kind, ref, amount, unit, grams, note, name };
+  const entry = { id: todayNewId('d'), date, person: person.id, meal: /^snack/.test(String(meal)) || meal === 'component' ? 'snacks' : meal, kind, ref, amount, unit, grams, note, name };
   if (kind === 'custom') entry.nutrients = nutrients || {};
   entry.nutrients = todayNutrientsFor(entry);
   uiState.profile.diary.push(entry);

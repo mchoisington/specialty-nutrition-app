@@ -11,6 +11,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { fixMeal } from './lib/meal-components.mjs';
 
 const ROOT = new URL('../', import.meta.url);
 const CACHE = new URL('./open-recipes/', import.meta.url);
@@ -555,7 +556,7 @@ async function importWikibooks() {
 }
 
 // ---------------------------------------------------------------- output
-function serialize(list) { return '[\n' + list.map(r => JSON.stringify(r)).join(',\n') + '\n]\n'; }
+function serialize(list) { for (const r of list) r.meal = fixMeal(r); return '[\n' + list.map(r => JSON.stringify(r)).join(',\n') + '\n]\n'; }
 function trimToBudget(nhs, wb) {
   let all = [...nhs, ...wb];
   let size = Buffer.byteLength(serialize(all));

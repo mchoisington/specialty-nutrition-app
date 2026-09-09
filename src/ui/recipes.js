@@ -3,13 +3,15 @@
 import { checkRecipe } from '../engine/checker.js';
 import { round } from '../engine/nutrition.js';
 import { CUISINES, CUISINE_LABEL, cuisineSkipped } from '../engine/cuisine.js';
+import { recipeHeat, spiceSkipped, spicePreference } from '../engine/spice.js';
+import { isComponent } from '../engine/planner.js';
 import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiModal, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiNutrientLabel, uiVerdictWord, uiTagLabel, uiPageHeader, uiChip, uiIcon, uiNoticeHTML, uiEmptyState } from './common.js';
 import { todayAddDiaryEntry, todayIsFavorite, todayToggleFavorite } from './today.js';
 import { weekGet, weekSetOverride } from './week.js';
 import { recipesEdLinkSheet, recipesEdEditorModal, recipesEdDraftFrom, recipesEdBlankDraft, recipesEdPasteModal, recipesEdDeleteCustom } from './recipes-edit.js';
 
 const RECIPES_PAGE = 50;
-const RECIPES_SLOT_LABEL = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snack' };
+const RECIPES_SLOT_LABEL = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snack', component: 'Sauces and basics' };
 const RECIPES_DAY_NAMES = { sun: 'Sunday', mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday' };
 const RECIPES_LICENSE_URL = { 'Open Government Licence v3.0': 'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/', 'CC BY-SA 4.0': 'https://creativecommons.org/licenses/by-sa/4.0/' };
 // Wikibooks categories that are not cuisines (difficulty, course, technique, diet, dish type).
@@ -149,24 +151,27 @@ export function recipesDetailModal(recipeId, person, plan, opts = {}) {
   const imported = !!(r.nutrition_per_serving && r.nutrition_source && !linkedCount);
   const targetRows = Object.entries(plan.targets || {}).map(([n, t]) => ({ nutrient: n, perServing: round(per[n], 1), min: t.min, pct: t.min ? round(per[n] / t.min * 100) : null }));
   const swaps = ((r.notes && r.notes.swaps) || []).filter(s => plan.avoid && plan.avoid[s.if_tag]);
-  const mealOpts = (r.meal && r.meal.length ? r.meal : ['dinner']).map(s => `<option value="${uiEsc(s)}">${RECIPES_SLOT_LABEL[s] || s}</option>`).join('');
-  const weekSlots = ['breakfast', 'lunch', 'dinner'].filter(s => !r.meal || !r.meal.length || r.meal.includes(s));
+  const component = isComponent(r);
+  const mealOpts = (component ? ['snack'] : r.meal && r.meal.length ? r.meal : ['dinner']).map(s => `<option value="${uiEsc(s)}">${RECIPES_SLOT_LABEL[s] || s}</option>`).join('');
+  const weekSlots = component ? [] : ['breakfast', 'lunch', 'dinner'].filter(s => !r.meal || !r.meal.length || r.meal.includes(s));
+  const heat = recipeHeat(r);
   const slotOpts = (weekSlots.length ? weekSlots : ['breakfast', 'lunch', 'dinner']).map(s => `<option value="${s}">${RECIPES_SLOT_LABEL[s]}</option>`).join('');
   let week = null;
-  try { week = uiState.data.recipes.length && person && !person.guest && person.id !== 'group' ? weekGet(person, plan) : null; } catch { week = null; }
+  try { week = uiState.data.recipes.length && person && !person.guest && person.id !== 'group' && !component ? weekGet(person, plan) : null; } catch { week = null; }
   const dayOpts = week ? week.days.map((d, di) => { const [, mo, da] = d.date.split('-'); return `<option value="${di}">${RECIPES_DAY_NAMES[d.day] || uiFmtDate(d.date)} ${Number(mo)}/${Number(da)}</option>`; }).join('') : '';
   let changed = !!opts.changed;
   const canAct = person.id !== 'group';   // the Together group is a temporary combined person: no diary, no week of its own
   const canPlan = check.verdict !== 'fail';
   const m = uiModal(`
     <div class="verdict compact ${check.verdict}"><span class="verdict-word">${uiVerdictWord(check.verdict)}</span> <span class="small">${check.hits.length ? 'Matches: ' + check.hits.map(h => uiEsc(h.label) + (h.hard ? ' (hard)' : '')).join(', ') : 'No avoid tags matched.'}${check.exceeds.length ? ' One serving exceeds the daily ' + check.exceeds.map(e => uiEsc(uiNutrientLabel(e.nutrient))).join(', ') + '.' : ''}${check.verifyLabel && check.verifyLabel.length ? ' Check the label for: ' + check.verifyLabel.map(v => uiEsc(v.label)).join(', ') + '.' : ''}</span></div>
-    <div class="row recipe-meta">${recipesSourceChip(r)}${r.featured ? `<span class="featured-star">${uiIcon('star', { fill: true })}Featured</span>` : ''}${r.linked_by_household ? uiChip('linked by you', 'pass') : ''}${!hasNut ? uiChip('no nutrition data', 'caution') : ''}</div>
+    <div class="row recipe-meta">${recipesSourceChip(r)}${r.featured ? `<span class="featured-star">${uiIcon('star', { fill: true })}Featured</span>` : ''}${r.linked_by_household ? uiChip('linked by you', 'pass') : ''}${!hasNut ? uiChip('no nutrition data', 'caution') : ''}${component ? uiChip('sauce or basic', 'neutral', { attrs: 'title="A component: kept in the library, never scheduled as a meal on its own"' }) : ''}${heat.level ? uiChip(heat.label, heat.level >= 3 ? 'stop' : heat.level === 2 ? 'caution' : 'info', { soft: true, attrs: `title="Estimated from: ${uiEsc(heat.terms.join(', '))}"` }) : ''}</div>
     <dl class="kv">
       <dt>Time</dt><dd>${r.active_min} min active, ${r.total_min} min total${r.times_estimated ? ' <span class="muted">(estimated)</span>' : ''}</dd>
       <dt>Skill</dt><dd>${uiEsc(r.skill)}${r.skill_estimated ? ' <span class="muted">(estimated)</span>' : ''}</dd>
       <dt>Equipment</dt><dd>${(r.equipment || []).map(uiEsc).join(', ') || 'none'}</dd>
       <dt>Servings</dt><dd>${r.servings}${r.servings_estimated ? ' <span class="muted">(estimated)</span>' : ''}${r.leftovers ? `, leftovers ${uiEsc(r.leftovers)}` : ''}</dd>
-      ${r.meal ? `<dt>Meal</dt><dd>${r.meal.map(uiEsc).join(', ')}</dd>` : ''}
+      ${r.meal ? `<dt>Meal</dt><dd>${r.meal.map(s => RECIPES_SLOT_LABEL[s] || s).map(uiEsc).join(', ')}</dd>` : ''}
+      ${heat.level ? `<dt>Heat</dt><dd>${uiEsc(heat.label)} <span class="muted">(estimated from ${uiEsc(heat.terms.join(', '))})</span>${spiceSkipped(r, person) ? ' <span class="muted">Hidden from your week by your spice setting.</span>' : ''}</dd>` : ''}
     </dl>
     ${swaps.length ? `<div class="stack">${swaps.map(s => uiNoticeHTML({ level: 'warn', text: `${uiTagLabel(s.if_tag)} is on your avoid list. ${s.then}` })).join('')}</div>` : ''}
     <div class="recipe-actions">
@@ -253,8 +258,8 @@ function recipesFiltered(person, plan) {
     if (recipesUi.veg === 'vegan' && !row.vegan) continue;
     if (recipesUi.meal && !(r.meal || []).includes(recipesUi.meal)) continue;
     if (recipesUi.cuisine && row.cuisine !== recipesUi.cuisine) continue;
-    if (!recipesUi.showSkipped && cuisineSkipped(r, person)) { skippedCount++; continue; }
     if (q.length && !q.every(w => row.text.includes(w))) continue;
+    if (!recipesUi.showSkipped && (cuisineSkipped(r, person) || spiceSkipped(r, person))) { skippedCount++; continue; }
     if (recipesUi.fits) {
       // computed only as far as the page needs, never for the whole pool at once
       if (out.length >= recipesUi.shown) { more = true; break; }
@@ -268,6 +273,12 @@ function recipesFiltered(person, plan) {
   return { rows: out, exact: !recipesUi.fits, more, checked , skippedCount };
 }
 
+// Small heat word for list rows: nothing when the recipe has no heat.
+function recipesHeatSpan(r) {
+  const h = recipeHeat(r);
+  return h.level ? `<span class="heat-${h.level}" title="Estimated from: ${uiEsc(h.terms.join(', '))}">${uiEsc(h.label.toLowerCase())}</span>` : '';
+}
+
 function recipesCardHTML(r, person, plan) {
   const c = recipesCheck(r, person, plan);
   const v = c.verdict;
@@ -276,7 +287,7 @@ function recipesCardHTML(r, person, plan) {
       <span class="dot ${v}" aria-hidden="true"></span>
       <span class="recipe-body">
         <span class="recipe-name">${uiEsc(r.name)}${r.featured ? ` <span class="featured-star" title="Featured">${uiIcon('star', { fill: true })}</span>` : ''}</span>
-        <span class="recipe-sub">${recipesSourceChip(r)}<span>${r.total_min} min</span><span>${r.servings} serving${r.servings === 1 ? '' : 's'}</span><span class="verdict-word-sm ${v}">${uiVerdictWord(v)}</span>${!recipesHasNutrition(r) ? '<span class="muted">no nutrition data</span>' : ''}</span>
+        <span class="recipe-sub">${recipesSourceChip(r)}<span>${r.total_min} min</span><span>${r.servings} serving${r.servings === 1 ? '' : 's'}</span><span class="verdict-word-sm ${v}">${uiVerdictWord(v)}</span>${!recipesHasNutrition(r) ? '<span class="muted">no nutrition data</span>' : ''}${isComponent(r) ? '<span class="muted">sauce or basic</span>' : ''}${recipesHeatSpan(r)}</span>
       </span>
     </button>
     <div class="list-actions">${recipesTasteHTML(person, r.id)}</div>
@@ -306,7 +317,7 @@ export function renderRecipesScreen(root) {
         <span class="filter-sep" aria-hidden="true"></span>
         ${chip('veg:vegetarian', 'Vegetarian', recipesUi.veg === 'vegetarian')}
         ${chip('veg:vegan', 'Vegan', recipesUi.veg === 'vegan')}
-        <label class="filter-select"><span class="visually-hidden">Meal</span><select id="rc-meal"><option value="">Any meal</option>${['breakfast', 'lunch', 'dinner', 'snack'].map(s => `<option value="${s}" ${recipesUi.meal === s ? 'selected' : ''}>${RECIPES_SLOT_LABEL[s]}</option>`).join('')}</select></label>
+        <label class="filter-select"><span class="visually-hidden">Meal</span><select id="rc-meal"><option value="">Any meal</option>${['breakfast', 'lunch', 'dinner', 'snack', 'component'].map(s => `<option value="${s}" ${recipesUi.meal === s ? 'selected' : ''}>${RECIPES_SLOT_LABEL[s]}</option>`).join('')}</select></label>
         <label class="filter-select"><span class="visually-hidden">Cuisine</span><select id="rc-cuisine"><option value="">Any cuisine</option>${idx.cuisines.map(c => `<option value="${uiEsc(c)}" ${recipesUi.cuisine === c ? 'selected' : ''}>${uiEsc(CUISINE_LABEL[c] || c)}</option>`).join('')}</select></label>
         <button type="button" class="btn link small" id="rc-clear">Clear filters</button>
       </div>
@@ -320,11 +331,13 @@ export function renderRecipesScreen(root) {
     const shown = rows.slice(0, recipesUi.shown);
     const hasMore = exact ? rows.length > shown.length : more;
     const count = exact ? `${uiFmtNum(rows.length)} recipe${rows.length === 1 ? '' : 's'}${rows.length > shown.length ? `, showing ${shown.length}` : ''}` : `${shown.length} recipe${shown.length === 1 ? '' : 's'} that fit so far${hasMore ? '; more below' : ''}`;
-    listEl.innerHTML = shown.length ? `<p class="small muted" id="rc-count" aria-live="polite">${count}${skippedCount ? ` <button type="button" class="btn link small" id="rc-show-skipped">${uiFmtNum(skippedCount)} hidden by your cuisine settings; show them</button>` : recipesUi.showSkipped && (person.preferences && (person.preferences.cuisines_skip || []).length) ? ` <button type="button" class="btn link small" id="rc-hide-skipped">Hide skipped cuisines again</button>` : ''}. Favorites first.</p>
+    listEl.innerHTML = shown.length ? `<p class="small muted" id="rc-count" aria-live="polite">${count}${skippedCount ? ` <button type="button" class="btn link small" id="rc-show-skipped">${uiFmtNum(skippedCount)} hidden by your cuisine or spice settings; show them</button>` : recipesUi.showSkipped && (person.preferences && (person.preferences.cuisines_skip || []).length) ? ` <button type="button" class="btn link small" id="rc-hide-skipped">Hide skipped cuisines again</button>` : ''}. Favorites first.</p>
       <div class="list boxed">${shown.map(r => recipesCardHTML(r, person, plan)).join('')}</div>
       ${hasMore ? `<div class="btn-row"><button class="btn" type="button" id="rc-more">Show ${RECIPES_PAGE} more</button></div>` : ''}`
-      : uiEmptyState(recipesUi.q || recipesUi.fav || recipesUi.source || recipesUi.fits ? 'No recipe matches these filters.' : 'No recipes are loaded.', recipesUi.fav ? '<button class="btn small" type="button" data-filter="fav">Show all recipes</button>' : '', 'list');
+      : uiEmptyState(skippedCount ? `No recipe matches these filters, but ${uiFmtNum(skippedCount)} ${skippedCount === 1 ? 'is' : 'are'} hidden by your cuisine or spice settings.` : recipesUi.q || recipesUi.fav || recipesUi.source || recipesUi.fits ? 'No recipe matches these filters.' : 'No recipes are loaded.', skippedCount ? '<button class="btn small" type="button" id="rc-show-skipped">Show them</button>' : recipesUi.fav ? '<button class="btn small" type="button" data-filter="fav">Show all recipes</button>' : '', 'list');
     listEl.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => recipesDetailModal(b.dataset.open, person, plan)));
+    const sk = listEl.querySelector('#rc-show-skipped'); if (sk) sk.addEventListener('click', () => { recipesUi.showSkipped = true; draw(); });
+    const hk = listEl.querySelector('#rc-hide-skipped'); if (hk) hk.addEventListener('click', () => { recipesUi.showSkipped = false; draw(); });
     recipesBindTaste(listEl, person, (kind, id, on) => {
       const row = listEl.querySelector(`[data-row="${CSS.escape(id)}"]`);
       if (kind === 'never' && on && row) row.remove();
@@ -353,8 +366,6 @@ export function renderRecipesScreen(root) {
   }));
   root.querySelector('#rc-meal').addEventListener('change', e => { recipesUi.meal = e.target.value; recipesUi.shown = RECIPES_PAGE; draw(); });
   root.querySelector('#rc-cuisine').addEventListener('change', e => { recipesUi.cuisine = e.target.value; recipesUi.shown = RECIPES_PAGE; draw(); });
-  const showSk = root.querySelector('#rc-show-skipped'); if (showSk) showSk.addEventListener('click', () => { recipesUi.showSkipped = true; draw(); });
-  const hideSk = root.querySelector('#rc-hide-skipped'); if (hideSk) hideSk.addEventListener('click', () => { recipesUi.showSkipped = false; draw(); });
   root.querySelector('#rc-clear').addEventListener('click', () => { recipesUi = { q: '', fav: false, featured: false, nutrition: false, fits: false, quick: false, source: '', veg: '', meal: '', cuisine: '', shown: RECIPES_PAGE }; uiState.rerender(); });
   root.querySelector('#rc-new').addEventListener('click', () => recipesEdEditorModal(recipesEdBlankDraft(), { onSaved: rec => { recipesUi.source = 'mine'; recipesDetailModal(rec.id, person, null, { changed: true }); } }));
   root.querySelector('#rc-paste').addEventListener('click', () => recipesEdPasteModal({ onSaved: rec => { recipesUi.source = 'mine'; recipesDetailModal(rec.id, person, null, { changed: true }); } }));

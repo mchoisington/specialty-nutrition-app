@@ -616,6 +616,11 @@ td.num, th.num { text-align: right; white-space: nowrap; }
 .week-day-head .week-day-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: var(--fs-13); color: var(--muted); }
 .week-eaters { display: inline-flex; align-items: center; gap: 4px; font-size: var(--fs-13); color: var(--muted); font-weight: 700; margin: 0; }
 .week-eaters input { width: 52px; min-height: 32px; padding: 2px 6px; font-size: var(--fs-15); }
+.week-minutes { display: inline-flex; margin: 0; }
+.week-minutes select { min-height: 32px; padding: 2px 26px 2px 8px; font-size: var(--fs-13); font-weight: 700; width: auto; }
+.week-day-meta button.chip { cursor: pointer; font: inherit; font-size: var(--fs-13); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.week-day-meta button.chip:hover { filter: brightness(0.95); }
+.heat-1 { color: var(--info); } .heat-2 { color: var(--caution); } .heat-3 { color: var(--stop); }
 .week-meal { display: flex; flex-direction: column; gap: 4px; padding-top: 8px; border-top: 1px solid var(--hairline); }
 .week-meal .slot { font-size: var(--fs-13); text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 700; }
 .meal-chip { display: flex; align-items: flex-start; gap: 8px; text-align: left; background: var(--ground); border: 1px solid var(--hairline); border-radius: 10px; padding: 8px 10px; font: inherit; color: var(--ink); cursor: pointer; width: 100%; min-height: 44px; }
@@ -811,6 +816,8 @@ td.num, th.num { text-align: right; white-space: nowrap; }
 .welcome .brand-mark { width: 96px; height: 96px; }
 .welcome h1 { font-size: var(--fs-40); }
 .welcome .welcome-lede { font-size: var(--fs-20); color: var(--muted); }
+.welcome .welcome-sub { max-width: 520px; margin: 8px auto 0; color: var(--ink); }
+.welcome .welcome-points li strong { display: block; }
 .welcome .welcome-points { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; text-align: left; width: 100%; max-width: 420px; }
 .welcome .welcome-points li { display: flex; gap: 12px; align-items: flex-start; margin: 0; }
 .welcome .welcome-points .ico { color: var(--primary); width: 24px; height: 24px; margin-top: 2px; }

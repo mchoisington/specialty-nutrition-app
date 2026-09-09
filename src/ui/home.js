@@ -8,15 +8,21 @@ export function renderWelcomeScreen(root) {
       ${uiBrandMark({ label: 'Peace Meal' })}
       <div>
         <h1 id="welcome-h">Peace Meal</h1>
-        <p class="welcome-lede">One table, everyone's rules, every rule cited.</p>
+        <p class="welcome-lede">One table, everyone's funky dietary needs.</p>
+        <p class="welcome-sub">Celiac at one end of the table, reflux at the other, a kid who won't touch anything green, and you in the middle trying to cook one dinner. Peace Meal plans the week so everybody eats, nobody gets sick, and the science behind every choice is one tap away.</p>
       </div>
       <ul class="welcome-points">
-        <li>${uiIcon('people')}<span>One plan per person: conditions, allergies, and preferences merged into a single set of rules.</span></li>
-        <li>${uiIcon('cite')}<span>Every rule shows its source and evidence rating. Numbers come from data, never from guesswork.</span></li>
-        <li>${uiIcon('leaf')}<span>A week of meals that fits your time and kitchen, checked against every plan at the table.</span></li>
+        <li>${uiIcon('people')}<span><strong>Families who eat together.</strong> A profile for each person, and one week of meals that clears every plate at the table. Guests too.</span></li>
+        <li>${uiIcon('cite')}<span><strong>Anyone eating for a condition.</strong> 42 conditions and eating patterns, from celiac and diabetes to kidney disease and IBS, built from medical research and society guidelines. Every recommendation shows its source and how strong the evidence is.</span></li>
+        <li>${uiIcon('note')}<span><strong>People chasing a food trigger.</strong> Log meals and symptoms, then see which foods keep showing up before the bad days.</span></li>
+        <li>${uiIcon('calendar')}<span><strong>Whoever does the cooking.</strong> Meals that fit your time, skill, kitchen, and budget, with leftovers planned in. Change a day's cooking time right on the week.</span></li>
+        <li>${uiIcon('cart')}<span><strong>The grocery run.</strong> One list for the week, scaled to who is eating each day, with pantry matching and a running change log.</span></li>
+        <li>${uiIcon('check-circle')}<span><strong>The label check.</strong> Paste an ingredient list from any package and get a plain answer: fine, caution, or no, and why. Allergens are never overridden.</span></li>
+        <li>${uiIcon('leaf')}<span><strong>3,600 recipes.</strong> Peace Meal's own, the NHS, the Wikibooks Cookbook, and yours. Calorie targets, weight and exercise tracking, favorites, spice level, and cuisines you love or skip.</span></li>
+        <li>${uiIcon('breathe')}<span><strong>A minute to breathe.</strong> A short visual reset for the days when dinner is the last straw.</span></li>
       </ul>
       <a class="btn primary big" href="#/people/new">Set up the first person</a>
-      <p class="small muted">Everything stays on this device. Nothing is sent anywhere.</p>
+      <p class="small muted">Everything stays on this device. Nothing is sent anywhere. Your clinician sets any therapeutic numbers; the app never invents them.</p>
     </section>`;
 }
 

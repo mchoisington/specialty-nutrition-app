@@ -18,6 +18,7 @@
 // Usage: node tools/import-usda-recipes.mjs [--limit N] [--mirror-only] [--offline] [--keep-same-title]
 //   --keep-same-title keeps distinct recipes that share a title (USDA published e.g. two different "Potato Soup"s); by default only the first id is kept.
 import fs from 'node:fs';
+import { fixMeal } from './lib/meal-components.mjs';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -363,7 +364,7 @@ function normalize(p, { id, sourceUrl, originalUrl, category }) {
 }
 
 // ---------------------------------------------------------------- main
-function serialize(list) { return '[\n' + list.map(r => JSON.stringify(r)).join(',\n') + '\n]\n'; }
+function serialize(list) { for (const r of list) r.meal = fixMeal(r); return '[\n' + list.map(r => JSON.stringify(r)).join(',\n') + '\n]\n'; }
 
 async function main() {
   console.log(`USDA MyPlate Kitchen import (${MIRROR_ONLY ? 'mirror only' : 'Wayback preferred, mirror fallback'}${OFFLINE ? ', offline' : ''})`);

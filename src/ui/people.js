@@ -5,6 +5,8 @@ import { lbToKg, kgToLb, ftInToCm, cmToFtIn, ACTIVITY_LEVELS } from '../engine/e
 import { uiCopyText, uiState, uiEsc, uiPersist, uiActivePerson, uiSetActive, uiPlanFor, uiRatingBadge, uiSegmented, uiMultiPills, uiYesNo, uiNavigate, uiToast, uiModal, uiFindPersonById, UI_ALLERGENS, uiTagLabel, uiModuleName, uiNutrientLabel, uiEnsurePerson, uiParamUnit, uiBigChoices, uiBigToggles, uiEnsureUserDefinedSource, uiUserDefinedBadge, uiWeightHeightText, uiPageHeader, uiSection, uiChip, uiIcon, uiAvatar, uiEmptyState, uiNoticeHTML } from './common.js';
 import { learnArticleHTML } from './learn.js';
 import { CUISINES } from '../engine/cuisine.js';
+import { SPICE_LEVELS, spicePreference } from '../engine/spice.js';
+import { snackPlan } from '../engine/planner.js';
 import { listDirectory, openPerson } from '../engine/sync.js';
 import { sharingState, sharingLocalHTML, sharingPendingHTML, sharingSafe, sharingPublishIfShared, sharingPersonModal } from './sharing.js';
 
@@ -529,6 +531,9 @@ function peopleStepPreferences(container, person) {
     <div class="field" style="margin-top:1rem"><label for="pp-terms">Words to avoid in ingredient text</label>
       <input id="pp-terms" type="text" value="${uiEsc(prefs.avoid_terms.join(', '))}" placeholder="cilantro, blue cheese" autocomplete="off">
     </div>
+    <h2>Spice</h2>
+    <p class="small muted">How much heat do you want in your food? The app estimates each recipe's heat from its ingredients (chili, hot sauce, cayenne, and so on) and leaves out anything above your level. Black pepper and ginger do not count.</p>
+    ${uiBigChoices('spice', SPICE_LEVELS, spicePreference(person), { label: 'Spice level', cols: 2 })}
     <h2>Cuisines</h2>
     <p class="small muted">Tick the cuisines you want left out; those recipes disappear from the week, search, and Pantry. Ticking a cuisine you love nudges the week plan toward it. Labels come from the recipe source where it has them; otherwise the app guesses from the title and ingredients.</p>
     <div class="field"><span class="label">Cuisines to skip</span><div class="chip-grid">${CUISINES.filter(c => c.id !== 'other').map(c => `<label class="choice compact"><input type="checkbox" data-cskip="${c.id}" ${(prefs.cuisines_skip || []).includes(c.id) ? 'checked' : ''}><span class="choice-body"><span class="choice-title">${uiEsc(c.label)}</span></span></label>`).join('')}</div></div>
@@ -549,6 +554,7 @@ function peopleStepPreferences(container, person) {
     if (on && !prefs.avoid_tags.includes(v)) prefs.avoid_tags.push(v);
     if (!on) prefs.avoid_tags = prefs.avoid_tags.filter(x => x !== v);
   }, { rerender: false });
+  peopleBindSeg(container, person, 'preferences', 'spice', v => { prefs.spice = v; uiState.weekCache.clear(); }, { rerender: false });
     prefs.cuisines_skip = prefs.cuisines_skip || []; prefs.cuisines_love = prefs.cuisines_love || [];
   container.querySelectorAll('[data-cskip]').forEach(inp => inp.addEventListener('change', () => {
     const id = inp.getAttribute('data-cskip');
@@ -886,11 +892,15 @@ function peopleStepCooking(container, person, sub) {
       ${uiBigChoices('weekday_minutes', PEOPLE_TIME_OPTIONS, peopleTimeBucket(c.weekday_minutes || 20), { label: 'Weekday cooking time', cols: 2 })}
       <h3 class="big-sub">On weekends</h3>
       ${uiBigChoices('weekend_minutes', PEOPLE_TIME_OPTIONS, peopleTimeBucket(c.weekend_minutes || 40), { label: 'Weekend cooking time', cols: 2 })}
-      ${peopleTypicalHTML('30 minutes on weekdays, 45 or more on weekends')}
+      <h3 class="big-sub">Snacks each day</h3>
+      <p class="muted small">${uiEsc(peopleSnackHint(person))}</p>
+      ${uiBigChoices('snacks_per_day', [{ value: 'auto', label: 'Let the plan decide', desc: 'Follows your conditions: two for gestational diabetes, reflux, gastroparesis, or GLP-1 use; otherwise one.' }, { value: 0, label: 'None' }, { value: 1, label: 'One' }, { value: 2, label: 'Two' }, { value: 3, label: 'Three' }], typeof c.snacks_per_day === 'number' ? c.snacks_per_day : 'auto', { label: 'Snacks each day', cols: 2 })}
+      ${peopleTypicalHTML('30 minutes on weekdays, 45 or more on weekends, snacks decided by the plan')}
     </div>`;
+    peopleBindSeg(container, person, 'cooking', 'snacks_per_day', v => { if (v === 'auto') delete c.snacks_per_day; else c.snacks_per_day = Number(v); uiState.weekCache.clear(); }, { rerender: false });
     peopleBindSeg(container, person, 'cooking', 'weekday_minutes', v => { c.weekday_minutes = Number(v); }, { rerender: false });
     peopleBindSeg(container, person, 'cooking', 'weekend_minutes', v => { c.weekend_minutes = Number(v); }, { rerender: false });
-    peopleBindTypical(container, person, () => { c.weekday_minutes = 30; c.weekend_minutes = 45; }, nextHash);
+    peopleBindTypical(container, person, () => { c.weekday_minutes = 30; c.weekend_minutes = 45; delete c.snacks_per_day; }, nextHash);
   } else if (sub === 'days') {
     container.innerHTML = `<div class="cooking-screen">${progress}
       <h2 class="big-q">Which days can you cook?</h2>
@@ -938,6 +948,17 @@ function peopleStepCooking(container, person, sub) {
     peopleBindTypical(container, person, () => { c.equipment = ['stove', 'oven', 'microwave']; c.leftovers = 'ok'; c.household = Math.max(2, Number(c.household) || 0); c.grocery = 'supermarket'; }, nextHash);
   }
 }
+// "Two a day (reflux guidance: ...)" for the Cooking step and the Review.
+function peopleSnackHint(person) {
+  let plan = null;
+  try { plan = uiPlanFor(person); } catch { plan = null; }
+  const s = snackPlan(person, plan);
+  const n = s.count === 0 ? 'No snacks' : s.count === 1 ? 'One snack' : `${s.count === 2 ? 'Two' : 'Three'} snacks`;
+  const set = person.cooking && person.cooking.snacks_per_day;
+  const trimmed = !s.auto && typeof set === 'number' && set > s.count ? ' The evening snack is left out for reflux (nothing close to lying down).' : '';
+  return `${n} a day${s.auto ? ` (${s.why})` : ' (your setting)'}.${trimmed}`;
+}
+
 function peopleTypicalHTML(what) {
   return `<div class="typical"><button class="btn" type="button" id="pc-typical">Use typical answers</button><span class="small muted">Fills in: ${uiEsc(what)}. Then moves on.</span></div>`;
 }
@@ -974,9 +995,12 @@ function peopleStepReview(container, person) {
     ['Your own diets', (person.custom_modules || []).length ? person.custom_modules.map(cm => uiEsc(cm.name)).join(', ') : 'none'],
     ['Soft avoid', uiEsc((prefs.avoid_tags || []).map(uiTagLabel).join(', ') || 'none')],
     ['Avoid words', uiEsc((prefs.avoid_terms || []).join(', ') || 'none')],
+    ['Spice', uiEsc((SPICE_LEVELS.find(l => l.value === spicePreference(person)) || SPICE_LEVELS[0]).label)],
+    ['Cuisines', uiEsc(`${(prefs.cuisines_skip || []).length ? 'skip ' + prefs.cuisines_skip.join(', ') : 'nothing skipped'}${(prefs.cuisines_love || []).length ? '; love ' + prefs.cuisines_love.join(', ') : ''}`)],
     ['Medications', uiEsc(Object.entries(person.medications || {}).filter(([, v]) => v).map(([k]) => k.replace(/_/g, ' ')).join(', ') || 'none flagged')],
     ['Clinician numbers', Object.keys(person.tier2 || {}).length ? uiEsc(Object.entries(person.tier2).map(([k, v]) => `${k}: ${v}`).join(', ')) : 'none entered'],
-    ['Cooking', uiEsc(`${c.weekday_minutes || 20} min weekdays, ${c.weekend_minutes || 40} min weekends, ${(c.cook_days || []).length} cook days, ${c.interest || 'simple'}, cooking for ${c.household || 1}${c.budget ? ', reuse ingredients to save money' : ''}`)]
+    ['Cooking', uiEsc(`${c.weekday_minutes || 20} min weekdays, ${c.weekend_minutes || 40} min weekends, ${(c.cook_days || []).length} cook days, ${c.interest || 'simple'}, cooking for ${c.household || 1}${c.budget ? ', reuse ingredients to save money' : ''}`)],
+    ['Snacks', uiEsc(peopleSnackHint(person))]
   ];
   container.innerHTML = `
     <div class="card"><dl class="kv">${kv.map(([k, v]) => `<dt>${uiEsc(k)}</dt><dd>${v}</dd>`).join('')}</dl></div>

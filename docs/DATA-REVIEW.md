@@ -30,6 +30,7 @@ Items the build agents flagged for a human decision. Nothing here blocks use of 
 
 - Ingredient substitutions made because the food was not in the database: garlic-infused oil omitted; whole-wheat tortillas as flour or corn; breadcrumbs as rolled oats; Dijon as yellow mustard; rice vinegar as cider vinegar; low-sodium vegetable broth as regular broth cut with water.
 - Sodium tips exist on every recipe that uses soy sauce, fish sauce, canned goods, or rotisserie chicken.
+- Meal slots across all three recipe files were re-tagged on September 9, 2026 by `tools/fix-meal-slots.mjs`: 333 basics (sauces, dressings, stocks, doughs, spice mixes, dips) are now `component` and never scheduled; hummus-and-veg plates, snack mixes, and ice cream are `snack`; eleven desserts and party foods lost a breakfast tag the source had given them. Component and heat classifications are title and ingredient heuristics; misses can be corrected per recipe in `tools/lib/meal-components.mjs` and `src/engine/spice.js`.
 
 ## Support resources (src/engine/screen.js)
 

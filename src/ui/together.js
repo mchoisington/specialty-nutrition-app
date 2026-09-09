@@ -1,7 +1,7 @@
 // Together: cooking for more than one person. Builds the strictest combined plan, a short meal plan for the chosen days,
 // and a grocery list for it. Profiles can be shared as a file or text and added back as guests. Nothing is uploaded anywhere.
 import { buildGroupPlan, exportPersonForSharing } from '../engine/group.js';
-import { buildWeekPlan } from '../engine/planner.js';
+import { buildWeekPlan, SLOT_LABEL } from '../engine/planner.js';
 import { buildGroceryList } from '../engine/grocery.js';
 import { newPerson } from '../store.js';
 import { uiState, uiEsc, uiActivePerson, uiPersist, uiToast, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiNutrientLabel, uiVerdictWord, uiVerdictChip, uiTagLabel, uiDownload, uiCopyText, uiEnsurePerson, uiSegmented, uiNoticeHTML, uiPageHeader, uiSection, uiChip, uiIcon, uiAvatar, uiEmptyState, uiPlanFor, uiMultiPills } from './common.js';
@@ -10,7 +10,7 @@ import { groceryIcsForWeek, groceryComputeList } from './grocery.js';
 import { SHARE_PARTS, sendShare, listSharesForMe, openShare, listDevices } from '../engine/sync.js';
 import { sharingState, sharingLocalHTML, sharingPendingHTML, sharingSafe, sharingDeviceName, sharingPersonModal } from './sharing.js';
 
-const TOGETHER_SLOT_LABEL = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' };
+const TOGETHER_SLOT_LABEL = SLOT_LABEL;
 
 let togetherUi = { people: null, range: 'weekend', start: null, eaters: null, seed: 0, built: false };
 

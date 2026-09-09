@@ -3,6 +3,8 @@
 import { matchRecipes } from '../engine/pantry.js';
 import { checkRecipe } from '../engine/checker.js';
 import { cuisineSkipped } from '../engine/cuisine.js';
+import { spiceSkipped } from '../engine/spice.js';
+import { isComponent } from '../engine/planner.js';
 import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiVerdictWord, uiVerdictChip, uiPageHeader, uiSection, uiIcon, uiEmptyState } from './common.js';
 import { weekRecipeModal } from './week.js';
 import { recipesTasteHTML, recipesBindTaste, recipesIsNever } from './recipes.js';
@@ -39,7 +41,7 @@ export function renderPantryScreen(root) {
     uiPersist();
     if (!profile.pantry.length) { uiToast('List at least one item.'); return; }
     if (!uiState.data.recipes.length) { uiToast('No recipes are loaded.'); return; }
-    const matches = matchRecipes({ have: profile.pantry, recipes: uiState.data.recipes.filter(r => !cuisineSkipped(r, person)), foodsById: uiState.foodsById });
+    const matches = matchRecipes({ have: profile.pantry, recipes: uiState.data.recipes.filter(r => !isComponent(r) && !cuisineSkipped(r, person) && !spiceSkipped(r, person)), foodsById: uiState.foodsById });
     const rows = matches.map(m => ({ ...m, check: checkRecipe(m.recipe, plan, uiState.matcher, uiState.foodsById, person) }));
     pantryResults = { person: person.id, rows, have: profile.pantry.slice() };
     uiState.rerender();
