@@ -20,9 +20,10 @@ export function renderHomeScreen(root) {
         </div>
         <div class="row">
           ${people.length > 1 ? `<label class="visually-hidden" for="home-person">Active person</label><select id="home-person" style="width:auto">${people.map(p => `<option value="${uiEsc(p.id)}" ${p.id === person.id ? 'selected' : ''}>${uiEsc(p.name)}</option>`).join('')}</select>` : ''}
-          <a class="btn small" href="#/people/${uiEsc(person.id)}">Edit profile</a>
+          ${person.setup_complete ? `<a class="btn small" href="#/people/${uiEsc(person.id)}/basics">Edit profile</a>` : `<a class="btn small primary" href="#/people/${uiEsc(person.id)}/basics">Finish setup</a>`}
         </div>
       </div>
+      ${person.setup_complete ? '' : '<div class="notice warn" style="margin-top:.75rem"><div class="notice-head">Caution</div><div>Setup is not finished. The plan is built from what has been entered so far.</div></div>'}
       <div class="row" style="margin-top:.75rem">
         ${plan.modules.length ? plan.modules.map(m => `<span class="badge gray outline">${uiEsc(m.name)}</span>`).join(' ') : '<span class="muted small">No conditions or patterns selected yet.</span>'}
         ${(person.allergens || []).length ? `<span class="badge red">${person.allergens.length} allergen${person.allergens.length > 1 ? 's' : ''}</span>` : ''}
@@ -39,6 +40,7 @@ export function renderHomeScreen(root) {
 
     <h2>Go to</h2>
     <div class="quick-links">
+      <a href="#/today">Today<small>What to eat today</small></a>
       <a href="#/plan">Plan<small>Numbers, avoid list, conflicts</small></a>
       <a href="#/check">Check a food<small>Paste an ingredient list</small></a>
       <a href="#/week">This week<small>Meals that fit your time</small></a>

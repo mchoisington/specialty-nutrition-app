@@ -1,9 +1,14 @@
 // Plan: the merged plan for the active person, section by section, every rule with its sources.
-import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiRulesList, uiSourcesDisclosure, uiTagLabel, uiNutrientLabel, uiFmtNum, uiIsoDate, uiToday, uiModuleName, uiNoticeHTML, uiBindNoticeActions, uiToast } from './common.js';
+import { energyTarget } from '../engine/energy.js';
+import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiRulesList, uiSourcesDisclosure, uiTagLabel, uiNutrientLabel, uiFmtNum, uiIsoDate, uiToday, uiModuleName, uiNoticeHTML, uiBindNoticeActions, uiToast, uiEnsureUserDefinedSource, uiUserDefinedBadge } from './common.js';
 
 export function renderPlanScreen(root) {
   const person = uiActivePerson();
+  uiEnsureUserDefinedSource();
   const plan = uiPlanFor(person);
+  const customModules = plan.modules.filter(m => m.category === 'custom');
+  const customDefs = new Map((person.custom_modules || []).map(cm => [cm.id, cm]));
+  const loadNotice = plan.notices.find(n => n.code === 'restriction-load');
   const limits = Object.entries(plan.limits);
   const targets = Object.entries(plan.targets);
   const avoidHard = Object.entries(plan.avoid).filter(([, v]) => v.hard);
@@ -15,8 +20,11 @@ export function renderPlanScreen(root) {
 
   root.innerHTML = `
     <h1>Plan for ${uiEsc(person.name)}</h1>
-    <p class="muted">Modules: ${plan.modules.length ? plan.modules.map(m => `<span class="badge gray outline">${uiEsc(m.name)}</span>`).join(' ') : 'none selected'}. ${plan.disabledModules.length ? `Turned off: ${plan.disabledModules.map(d => `<span class="badge red outline">${uiEsc(uiModuleName(d.id))}</span>`).join(' ')}.` : ''}</p>
+    <p class="muted">Modules: ${plan.modules.length ? plan.modules.map(m => `<span class="badge gray outline">${uiEsc(m.name)}</span>${m.category === 'custom' ? ' ' + uiUserDefinedBadge() : ''}`).join(' ') : 'none selected'}. ${plan.disabledModules.length ? `Turned off: ${plan.disabledModules.map(d => `<span class="badge red outline">${uiEsc(uiModuleName(d.id))}</span>`).join(' ')}.` : ''}</p>
     ${plan.notices.filter(n => n.level === 'block').map(n => uiNoticeHTML(n, { person })).join('')}
+    ${!person.setup_complete ? `<div class="notice warn"><div class="notice-head">Caution</div><div>Setup for ${uiEsc(person.name)} is not finished, so this plan may be missing steps.</div><a class="btn small" href="#/people/${uiEsc(person.id)}/basics">Finish setup</a></div>` : ''}
+    ${planCalorieHTML(person, plan)}
+    ${customModules.length ? `<h2>Your own diets</h2>${customModules.map(m => planCustomCard(m, customDefs.get(m.id), plan)).join('')}` : ''}
 
     <h2 id="plan-numbers">Numbers</h2>
     <h3>Per day</h3>
@@ -68,11 +76,11 @@ export function renderPlanScreen(root) {
     ${plan.tier2.missing.length ? `<div class="card">${plan.tier2.missing.map(t => `<div class="rule"><div class="rule-text"><strong>${uiEsc(t.label)}</strong> <span class="badge amber">not applied</span></div><div class="small muted">${uiEsc(t.moduleName)}. ${t.consensus ? 'Published range: ' + uiEsc(t.consensus) + '.' : ''} ${uiEsc(t.why || '')}</div></div>`).join('')}
       <div class="btn-row"><a class="btn primary" href="#/people/${uiEsc(person.id)}/clinician">Enter clinician numbers</a></div></div>` : '<p class="muted small">None. Every Tier 2 rule either has a number or does not apply.</p>'}
 
-    <h2>Restriction load</h2>
+    <h2>Stacked restrictions</h2>
     <div class="card tight">
-      <div class="row"><strong>${plan.restrictionLoad.count} elimination-style restriction${plan.restrictionLoad.count === 1 ? '' : 's'}</strong> ${plan.restrictionLoad.warn ? '<span class="badge amber">check in</span>' : '<span class="badge green">ok</span>'}</div>
+      <div class="row"><strong>${plan.restrictionLoad.count} diet${plan.restrictionLoad.count === 1 ? '' : 's'} that cut out whole food groups</strong> ${plan.restrictionLoad.warn ? '<span class="badge amber">check in</span>' : '<span class="badge green">ok</span>'}</div>
       ${plan.restrictionLoad.modules.length ? `<div class="small muted">${plan.restrictionLoad.modules.map(m => uiEsc(uiModuleName(m))).join(', ')}</div>` : ''}
-      ${plan.restrictionLoad.warn ? '<p class="small" style="margin-top:.5rem">Three or more at once is a lot of restriction. The guidelines behind these protocols warn about it. Do one elimination at a time where you can, and consider a dietitian.</p>' : ''}
+      ${loadNotice ? `<div class="notice info" style="margin-top:.5rem"><div class="notice-head">Info</div><div>${uiEsc(loadNotice.text)}</div></div>` : `<p class="small muted" style="margin:.25rem 0 0">The plan checks in when ${plan.restrictionLoad.threshold || 3} or more run at once.</p>`}
     </div>
     <p class="small muted" style="margin-top:1.5rem">Every rule above is shown with its source. A rule marked VERIFY carries a citation that was not confirmed against a primary source and should be checked before the number is trusted.</p>
   `;
@@ -97,6 +105,35 @@ export function renderPlanScreen(root) {
     person.modes[b.dataset.module] = def.expires_days ? { mode, since: uiIsoDate(uiToday()) } : mode;
     uiPersist(); uiToast('Mode changed.'); uiState.rerender();
   }));
+}
+
+// Calorie target line, shown only when the person turned a calorie target on (person.goals.calorie_target is not 'off').
+function planCalorieHTML(person, plan) {
+  const goals = person.goals || {};
+  const mode = goals.calorie_target || 'off';
+  if (mode === 'off') return '';
+  if (plan.isDisabled && plan.isDisabled('calorie-targets')) return `<div class="notice info"><div class="notice-head">Info</div><div>A calorie target is turned on, but calorie targets are disabled for this profile, so none is shown.</div></div>`;
+  if (mode === 'manual') {
+    const k = Number(person.manual_kcal);
+    return k > 0 ? `<div class="card tight calorie-line"><div class="row"><strong>Calorie target: ${uiFmtNum(k)} kcal a day</strong> <span class="badge gray outline">entered by you</span></div></div>` : '';
+  }
+  const est = energyTarget(person, { goal: mode === 'loss' ? 'loss' : 'maintain', deficit: goals.deficit });
+  if (est.kcal == null) return `<div class="card tight calorie-line"><div class="row"><strong>Calorie target</strong> <span class="badge amber">not available</span></div><div class="small muted">${uiEsc(est.reason || 'Needs sex, age, weight, and height on the Basics step.')}</div></div>`;
+  return `<div class="card tight calorie-line">
+    <div class="row"><strong>Calorie target: about ${uiFmtNum(est.kcal)} kcal a day</strong> <span class="badge gray outline">estimate</span> <span class="small muted">${mode === 'loss' ? 'for gradual weight loss' : 'to maintain weight'}</span></div>
+    <details><summary>How this was worked out</summary><ul class="small">${(est.notes || []).map(n => `<li>${uiEsc(n)}</li>`).join('')}<li>An estimate from a published equation, not a measurement. Appetite, illness, and medications change real needs. Your clinician's number always wins.</li></ul></details>
+  </div>`;
+}
+
+// A diet the person defined. Shown with a "Defined by you" badge instead of an evidence rating.
+function planCustomCard(m, def, plan) {
+  const rules = (plan.applied || []).filter(r => r.module === m.id);
+  return `<div class="card tight custom-card">
+    <div class="row"><strong>${uiEsc(m.name)}</strong> ${uiUserDefinedBadge()}</div>
+    ${def && def.summary ? `<div class="small">${uiEsc(def.summary)}</div>` : ''}
+    <div class="small muted">Soft rules you wrote yourself. Not evidence-rated. They never loosen an allergen or a condition rule.</div>
+    ${rules.length ? `<details><summary>Rules from this diet (${rules.length})</summary>${uiRulesList(rules)}</details>` : ''}
+  </div>`;
 }
 
 function planNumberRows(limits, targets) {

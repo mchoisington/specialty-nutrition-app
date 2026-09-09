@@ -5,7 +5,11 @@ import path from 'node:path';
 const root = new URL('../', import.meta.url);
 const R = p => fs.readFileSync(new URL(p, root), 'utf8');
 
-const order = ['src/engine/dictionary.js', 'src/engine/nutrition.js', 'src/engine/plan.js', 'src/engine/checker.js', 'src/engine/planner.js', 'src/engine/grocery.js', 'src/engine/screen.js', 'src/store.js'];
+const engineOrder = ['src/engine/dictionary.js', 'src/engine/nutrition.js', 'src/engine/plan.js', 'src/engine/checker.js', 'src/engine/planner.js', 'src/engine/grocery.js', 'src/engine/screen.js'];
+// Any engine module not listed above (energy.js, group.js, pantry.js, ...) is appended after the ordered ones so the UI can import it.
+const engineDir = new URL('src/engine/', root);
+const engineExtra = fs.existsSync(engineDir) ? fs.readdirSync(engineDir).filter(f => f.endsWith('.js')).sort().map(f => 'src/engine/' + f).filter(f => !engineOrder.includes(f)) : [];
+const order = [...engineOrder, ...engineExtra, 'src/store.js'];
 const uiDir = new URL('src/ui/', root);
 const uiFiles = fs.existsSync(uiDir) ? fs.readdirSync(uiDir).filter(f => f.endsWith('.js')).sort().map(f => 'src/ui/' + f) : [];
 const appFile = 'src/app.js';

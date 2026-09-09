@@ -9,6 +9,7 @@ const conditions = read('data/conditions.json');
 const dictionaries = read('data/dictionaries.json');
 const foods = fs.existsSync(new URL('../data/foods.json', import.meta.url)) ? read('data/foods.json') : [];
 const recipes = fs.existsSync(new URL('../data/recipes.json', import.meta.url)) ? read('data/recipes.json') : [];
+const articles = fs.existsSync(new URL('../data/articles.json', import.meta.url)) ? read('data/articles.json') : {};
 
 const sourceIds = new Set(sources.map(s => s.id));
 for (const s of sources) { if (!s.id || !s.citation) err(`source missing id/citation: ${JSON.stringify(s).slice(0, 80)}`); }
@@ -75,7 +76,15 @@ for (const r of recipes) {
   if (Object.keys(r).some(k => /nutri|kcal|sodium/i.test(k))) err(`recipe ${r.id} carries nutrient numbers; nutrients are computed, not stored`);
 }
 
-console.log(`sources ${sources.length}, modules ${modList.length}, rules ${ruleIds.size}, tags ${tagIds.size}, dictionary entries ${(dictionaries.entries || []).length}, foods ${foods.length}, recipes ${recipes.length}`);
+for (const m of modList) {
+  const a = articles[m.id];
+  if (!a) { warn(`module ${m.id} has no article`); continue; }
+  if (!Array.isArray(a.summary) || a.summary.length < 3) err(`article ${m.id} summary too short`);
+  if (!Array.isArray(a.sections) || !a.sections.length) err(`article ${m.id} has no sections`);
+  for (const r of a.references || []) { if (!r.url || /\s/.test(r.url) || !/^https:\/\//.test(r.url)) err(`article ${m.id} reference ${r.id} has a bad url`); }
+  for (const sid of m.sources || []) if (!(a.references || []).some(r => r.id === sid)) warn(`article ${m.id} does not list module source ${sid}`);
+}
+console.log(`sources ${sources.length}, modules ${modList.length}, rules ${ruleIds.size}, tags ${tagIds.size}, dictionary entries ${(dictionaries.entries || []).length}, foods ${foods.length}, recipes ${recipes.length}, articles ${Object.keys(articles).length}`);
 for (const w of warnings) console.log('WARN ' + w);
 for (const e of errors) console.log('ERROR ' + e);
 if (errors.length) { console.log(`${errors.length} error(s)`); process.exit(1); }

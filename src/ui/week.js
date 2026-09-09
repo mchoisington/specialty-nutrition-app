@@ -3,8 +3,22 @@ import { buildWeekPlan, scoreRecipe } from '../engine/planner.js';
 import { checkRecipe } from '../engine/checker.js';
 import { compareToPlan, recipeTotals, emptyTotals, addTotals, round } from '../engine/nutrition.js';
 import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiWeekKey, uiToday, uiIsoDate, uiFmtDate, uiFmtNum, uiNutrientLabel, uiModal, uiToast, uiVerdictWord, uiTagLabel } from './common.js';
+import { grocerySyncChanges, grocerySetEaters } from './grocery.js';
+import { todayAddDiaryEntry, todayIsFavorite, todayToggleFavorite } from './today.js';
 
 const WEEK_SLOT_LABEL = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' };
+const WEEK_DAY_NAMES = { sun: 'Sunday', mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday' };
+const WEEK_CSS = `
+.week-heart { background:none; border:0; font:inherit; font-size:1.15rem; line-height:1; cursor:pointer; color:var(--muted); padding:.1rem .3rem; min-height:32px; vertical-align:middle; }
+.week-heart.on { color:var(--red); }
+.week-eaters { display:inline-flex; align-items:center; gap:.3rem; font-size:.85rem; color:var(--muted); margin-left:auto; }
+.week-eaters input { width:64px; min-height:36px; padding:.2rem .4rem; }
+`;
+
+function weekStyle() {
+  if (document.getElementById('week-style')) return;
+  const s = document.createElement('style'); s.id = 'week-style'; s.textContent = WEEK_CSS; document.head.appendChild(s);
+}
 
 export function weekGet(person, plan) {
   const key = uiWeekKey(person);
@@ -45,12 +59,16 @@ export function renderWeekScreen(root) {
     root.innerHTML = '<h1>Week</h1><p class="empty">No recipes are loaded (data/recipes.json is missing or empty), so a week cannot be built.</p>';
     return;
   }
+  weekStyle();
   const week = weekGet(person, plan);
+  const budget = !!(person.cooking && person.cooking.budget);
+  const household = Math.max(1, Number((person.cooking || {}).household) || 1);
   root.innerHTML = `
     <div class="row between"><h1>Week for ${uiEsc(person.name)}</h1><button class="btn" type="button" id="week-regen">Regenerate</button></div>
     <p class="muted small">Starting ${uiFmtDate(week.days[0].date)}. ${week.eligibleCount} of ${uiState.data.recipes.length} recipes are eligible. Meals are scheduled on the days you can cook; leftovers and assembly meals fill the rest. Every meal was checked against the plan.</p>
+    <div class="row" style="margin-bottom:.75rem"><span class="badge ${budget ? 'green' : 'gray'} outline">Save money: ${budget ? 'on' : 'off'}</span><label class="small" style="display:inline-flex;align-items:center;gap:.4rem;min-height:36px"><input type="checkbox" id="week-budget" ${budget ? 'checked' : ''}> Prefer recipes that reuse this week's ingredients</label><span class="small muted">Household of ${household}.</span></div>
     ${week.unmet.length ? `<div class="notice warn"><div class="notice-head">Caution</div><div>${week.unmet.length} slot${week.unmet.length === 1 ? '' : 's'} could not be filled: ${week.unmet.map(u => `${uiFmtDate(u.date)} ${u.slot}`).join(', ')}. No recipe fit the plan for that slot.</div></div>` : ''}
-    ${week.days.map((d, di) => weekDayHTML(d, di, plan)).join('')}
+    ${week.days.map((d, di) => weekDayHTML(d, di, plan, person)).join('')}
     <details class="card"><summary>Excluded recipes (${week.excluded.length})</summary>
       ${week.excluded.length ? `<ul>${week.excluded.map(x => `<li><strong>${uiEsc(x.name)}</strong>: hard exclusion${x.why.length ? ' on ' + x.why.map(uiEsc).join(', ') : ''}</li>`).join('')}</ul>` : '<p class="muted small">None.</p>'}
       <p class="small muted">Hard exclusions are allergens and any rule marked hard. They are never scheduled.</p></details>
@@ -58,8 +76,30 @@ export function renderWeekScreen(root) {
   root.querySelector('#week-regen').addEventListener('click', () => {
     person.planSeed = (person.planSeed || 0) + 1;
     if (person.mealOverrides) delete person.mealOverrides[uiWeekKey(person)];
-    uiPersist(); uiToast('New week generated.'); uiState.rerender();
+    uiPersist(); grocerySyncChanges(person, 'Regenerated week'); uiToast('New week generated.'); uiState.rerender();
   });
+  root.querySelector('#week-budget').addEventListener('change', e => {
+    person.cooking = person.cooking || {};
+    person.cooking.budget = e.target.checked;
+    uiPersist(); grocerySyncChanges(person, e.target.checked ? 'Turned on Save money' : 'Turned off Save money'); uiToast(e.target.checked ? 'Save money is on. The planner now favors recipes that share ingredients.' : 'Save money is off.'); uiState.rerender();
+  });
+  root.querySelectorAll('[data-eaters]').forEach(inp => inp.addEventListener('change', () => {
+    const reason = grocerySetEaters(person, inp.dataset.eaters, inp.value, inp.dataset.day);
+    if (reason) uiToast(reason + '. The week and grocery list were updated.');
+    uiState.rerender();
+  }));
+  root.querySelectorAll('[data-fav]').forEach(b => b.addEventListener('click', () => {
+    const on = todayToggleFavorite(person, 'recipe', b.dataset.fav);
+    uiToast(on ? 'Added to favorites.' : 'Removed from favorites.'); uiState.rerender();
+  }));
+  root.querySelectorAll('[data-today]').forEach(b => b.addEventListener('click', () => {
+    const [di, slot] = b.dataset.today.split(':');
+    const day = week.days[Number(di)];
+    const meal = day.meals.find(m => m.slot === slot);
+    if (!meal || !meal.recipe) return;
+    todayAddDiaryEntry(person, { date: day.date, meal: slot, kind: 'recipe', ref: meal.recipe, amount: 1, unit: 'serving' });
+    uiToast(`Added ${meal.name} to ${uiFmtDate(day.date)} in Today.`);
+  }));
   root.querySelectorAll('[data-recipe]').forEach(b => b.addEventListener('click', () => weekRecipeModal(b.dataset.recipe, person, plan)));
   root.querySelectorAll('[data-swap]').forEach(b => b.addEventListener('click', () => weekSwapModal(Number(b.dataset.swap), b.dataset.slot, person, plan, week)));
   root.querySelectorAll('[data-log]').forEach(b => b.addEventListener('click', () => {
@@ -73,16 +113,18 @@ export function renderWeekScreen(root) {
   }));
 }
 
-function weekDayHTML(d, di, plan) {
+function weekDayHTML(d, di, plan, person) {
   const cmp = compareToPlan(d.totals, plan);
+  const isToday = d.date === uiIsoDate(uiToday());
   return `<section class="card day" aria-labelledby="day-${di}">
     <div class="day-head"><h3 id="day-${di}">${uiFmtDate(d.date)}</h3>
       ${d.canCook ? '<span class="badge green">can cook</span>' : '<span class="badge gray">no cooking</span>'}
-      <span class="small muted">${d.minutes} min per meal</span></div>
+      <span class="small muted">${d.minutes} min per meal</span>
+      <label class="week-eaters">Cooking for <input type="number" inputmode="numeric" min="1" max="20" value="${d.eaters}" data-eaters="${uiEsc(d.date)}" data-day="${uiEsc(d.day)}" aria-label="Eaters on ${uiEsc(uiFmtDate(d.date))}"> ${isToday ? 'today' : WEEK_DAY_NAMES[d.day] || ''}</label></div>
     ${d.meals.map(m => `<div class="meal">
       <div>
         <div class="slot">${WEEK_SLOT_LABEL[m.slot] || m.slot}</div>
-        ${m.recipe ? `<div class="meal-name"><span class="dot ${m.check.verdict}" aria-hidden="true"></span><span class="visually-hidden">${uiVerdictWord(m.check.verdict)}: </span><button type="button" class="btn link" style="min-height:auto;padding:0;font-weight:600;text-align:left" data-recipe="${uiEsc(m.recipe)}">${uiEsc(m.name)}</button></div>
+        ${m.recipe ? `<div class="meal-name"><span class="dot ${m.check.verdict}" aria-hidden="true"></span><span class="visually-hidden">${uiVerdictWord(m.check.verdict)}: </span><button type="button" class="btn link" style="min-height:auto;padding:0;font-weight:600;text-align:left" data-recipe="${uiEsc(m.recipe)}">${uiEsc(m.name)}</button>${person ? `<button class="week-heart ${todayIsFavorite(person, 'recipe', m.recipe) ? 'on' : ''}" type="button" data-fav="${uiEsc(m.recipe)}" aria-pressed="${todayIsFavorite(person, 'recipe', m.recipe)}" aria-label="${todayIsFavorite(person, 'recipe', m.recipe) ? 'Remove from favorites' : 'Add to favorites'}">${todayIsFavorite(person, 'recipe', m.recipe) ? '&#9829;' : '&#9825;'}</button>` : ''}</div>
         <div class="small muted">${m.source === 'leftover' ? 'Leftovers' : m.source === 'assembly' ? 'Assembly, no cooking' : 'Cook'}${m.servingsMade && m.servingsMade > m.servings ? `, make ${m.servingsMade} servings` : ''}, ${m.servings} serving${m.servings === 1 ? '' : 's'} · <span class="badge ${m.check.verdict === 'fail' ? 'red' : m.check.verdict === 'caution' ? 'amber' : 'green'} outline">${uiVerdictWord(m.check.verdict)}</span>${m.swapped ? ' · swapped' : ''}</div>
         ${m.check.hits && m.check.hits.length ? `<div class="small">Caution: ${m.check.hits.map(h => uiEsc(h.label)).join(', ')}</div>` : ''}
         ${m.check.exceeds && m.check.exceeds.length ? `<div class="small">One serving exceeds the daily ${m.check.exceeds.map(uiNutrientLabel).map(uiEsc).join(', ')}.</div>` : ''}
@@ -90,7 +132,7 @@ function weekDayHTML(d, di, plan) {
       </div>
       <div class="meal-actions">
         <button class="btn small" type="button" data-swap="${di}" data-slot="${uiEsc(m.slot)}">Swap</button>
-        ${m.recipe ? `<button class="btn small" type="button" data-log="${di}:${uiEsc(m.slot)}">Log this meal</button>` : ''}
+        ${m.recipe ? `<button class="btn small" type="button" data-log="${di}:${uiEsc(m.slot)}">Log this meal</button><button class="btn small" type="button" data-today="${di}:${uiEsc(m.slot)}">Add to Today</button>` : ''}
       </div>
     </div>`).join('')}
     <div class="totals" aria-label="Day totals versus plan">
@@ -137,7 +179,7 @@ function weekSwapModal(di, slot, person, plan, week) {
     person.mealOverrides[key][`${di}:${slot}`] = b.dataset.pick;
     // keep only the current week's overrides
     for (const k of Object.keys(person.mealOverrides)) if (k !== key) delete person.mealOverrides[k];
-    uiPersist(); m.close(); uiToast('Meal swapped.'); uiState.rerender();
+    uiPersist(); grocerySyncChanges(person, `Swapped ${WEEK_DAY_NAMES[day.day] || uiFmtDate(day.date)} ${slot}`); m.close(); uiToast('Meal swapped.'); uiState.rerender();
   }));
   m.el.querySelectorAll('[data-detail]').forEach(b => b.addEventListener('click', () => weekRecipeModal(b.dataset.detail, person, plan)));
 }

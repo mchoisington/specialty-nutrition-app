@@ -4,14 +4,25 @@ import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiIsoDate, uiToda
 import { weekGet } from './week.js';
 
 const LOG_SYMPTOMS = [
-  { id: 'bloating', label: 'Bloating' },
-  { id: 'pain', label: 'Abdominal pain' },
-  { id: 'reflux', label: 'Reflux' },
-  { id: 'headache', label: 'Headache' },
-  { id: 'flushing', label: 'Flushing' },
-  { id: 'fatigue', label: 'Fatigue' },
-  { id: 'stool_change', label: 'Stool change' }
+  { id: 'bloating', label: 'Bloating', help: 'Belly feels swollen or tight' },
+  { id: 'gas', label: 'Gas', help: 'More wind than usual' },
+  { id: 'stomach_pain', label: 'Stomach pain', help: 'Cramps or aching in the belly' },
+  { id: 'nausea', label: 'Nausea', help: 'Feeling sick or queasy' },
+  { id: 'heartburn', label: 'Heartburn or reflux', help: 'Burning in the chest or throat, sour taste' },
+  { id: 'diarrhea', label: 'Diarrhea', help: 'Loose or urgent stools' },
+  { id: 'constipation', label: 'Constipation', help: 'Hard stools or fewer than usual' },
+  { id: 'headache', label: 'Headache', help: 'Any head pain, including migraine' },
+  { id: 'flushing', label: 'Flushing or hives', help: 'Red skin, warmth, or raised itchy welts' },
+  { id: 'itching', label: 'Itching or rash', help: 'Itchy skin or a new rash' },
+  { id: 'mouth_itch', label: 'Mouth or throat itch', help: 'Tingling or itching in the mouth, lips, or throat' },
+  { id: 'fatigue', label: 'Fatigue or brain fog', help: 'Tired, slow, or hard to concentrate' },
+  { id: 'joint_pain', label: 'Joint pain', help: 'Aching or stiff joints' },
+  { id: 'dizziness', label: 'Dizziness or racing heart', help: 'Light-headed, or heart pounding' },
+  { id: 'poor_sleep', label: 'Poor sleep', help: 'Trouble falling or staying asleep' },
+  { id: 'mood', label: 'Mood', help: 'Low, anxious, or irritable' }
 ];
+// Labels for symptom ids saved by earlier versions of this screen.
+const LOG_LEGACY_LABELS = { pain: 'Abdominal pain', reflux: 'Reflux', stool_change: 'Stool change' };
 const LOG_LEVELS = ['none', 'mild', 'moderate', 'severe'];
 
 let logDraft = null;
@@ -47,7 +58,10 @@ export function renderLogScreen(root) {
       <div class="field"><label for="log-text">Or describe what you ate</label><textarea id="log-text" style="min-height:80px" placeholder="oatmeal with banana and almond butter">${uiEsc(d.text)}</textarea>
         ${textCheck ? `<div class="small" style="margin-top:.25rem"><span class="badge ${textCheck.verdict === 'fail' ? 'red' : textCheck.verdict === 'caution' ? 'amber' : 'green'}">${uiVerdictWord(textCheck.verdict)}</span> ${textCheck.hits.length ? 'Matched: ' + textCheck.hits.map(h => uiEsc(h.label)).join(', ') + '.' : ''} ${textCheck.unrecognized.length ? 'Not recognized: ' + textCheck.unrecognized.map(uiEsc).join('; ') + '.' : ''}</div>` : ''}</div>
       <h3>Symptoms</h3>
-      ${LOG_SYMPTOMS.map(s => `<div class="field"><label for="log-sym-${s.id}">${s.label}: <span id="log-symval-${s.id}">${LOG_LEVELS[d.symptoms[s.id] || 0]}</span></label><input id="log-sym-${s.id}" type="range" min="0" max="3" step="1" value="${d.symptoms[s.id] || 0}" data-sym="${s.id}" aria-valuetext="${LOG_LEVELS[d.symptoms[s.id] || 0]}"></div>`).join('')}
+      <p class="small muted">Slide each one from 0 (none) to 3 (severe). Leave anything that did not happen at 0.</p>
+      <div class="symptom-grid">
+      ${LOG_SYMPTOMS.map(s => `<div class="field symptom"><label for="log-sym-${s.id}"><span class="symptom-name">${s.label}</span> <span class="symptom-val" id="log-symval-${s.id}">${LOG_LEVELS[d.symptoms[s.id] || 0]}</span></label><div class="hint">${s.help}</div><input id="log-sym-${s.id}" type="range" min="0" max="3" step="1" value="${d.symptoms[s.id] || 0}" data-sym="${s.id}" aria-valuetext="${LOG_LEVELS[d.symptoms[s.id] || 0]}" aria-describedby="log-symhelp-${s.id}"><span class="visually-hidden" id="log-symhelp-${s.id}">${s.help}. 0 none, 1 mild, 2 moderate, 3 severe.</span></div>`).join('')}
+      </div>
       <div class="field"><label for="log-notes">Notes</label><textarea id="log-notes" style="min-height:70px">${uiEsc(d.notes)}</textarea></div>
       <div class="btn-row"><button class="btn primary" type="button" id="log-save">Save entry</button></div>
     </div>
@@ -55,7 +69,7 @@ export function renderLogScreen(root) {
     <h2>Last 14 days</h2>
     ${Object.keys(byDate).length ? Object.entries(byDate).map(([date, list]) => `<section class="card tight"><h3>${uiFmtDate(date)}</h3>
       ${list.map(e => `<div class="rule"><div class="row between"><div><strong>${uiEsc(e.meal || '')}</strong> ${e.name ? uiEsc(e.name) : e.recipe && uiState.recipesById.get(e.recipe) ? uiEsc(uiState.recipesById.get(e.recipe).name) : ''} ${e.text ? `<span class="muted">${uiEsc(e.text)}</span>` : ''}</div><button class="btn small danger" type="button" data-del="${uiEsc(e.logged_at || '')}|${uiEsc(e.date)}|${uiEsc(e.meal || '')}">Delete</button></div>
-        <div class="small">${Object.entries(e.symptoms || {}).filter(([, v]) => v > 0).map(([k, v]) => `${uiEsc((LOG_SYMPTOMS.find(s => s.id === k) || { label: k }).label)}: ${LOG_LEVELS[v] || v}`).join(', ') || '<span class="muted">no symptoms recorded</span>'}</div>
+        <div class="small">${Object.entries(e.symptoms || {}).filter(([, v]) => v > 0).map(([k, v]) => `${uiEsc((LOG_SYMPTOMS.find(s => s.id === k) || { label: LOG_LEGACY_LABELS[k] || k }).label)}: ${LOG_LEVELS[v] || v}`).join(', ') || '<span class="muted">no symptoms recorded</span>'}</div>
         ${e.notes ? `<div class="small muted">${uiEsc(e.notes)}</div>` : ''}</div>`).join('')}
     </section>`).join('') : '<p class="empty">No entries in the last 14 days.</p>'}
     <p class="small muted">The log is a record for you and your clinician. The app does not analyze it or claim to find causes.</p>
