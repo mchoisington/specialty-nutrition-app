@@ -270,3 +270,14 @@ Barcode scanning, restaurant lookup, glucose or blood pressure device integratio
 ## 7. Open items carried from Phase 1
 
 Seven VERIFY flags remain in Phase 1. None blocks v1 because none is encoded as a numeric rule; the GLP-1 protein range is shown as a range with its flag. They are listed in docs/VERIFY-log.md and should be cleared before the numbers are trusted.
+
+
+## 8. Wave 2 (September 9, 2026)
+
+Scope changes: removed migraine, CRPS, POTS, non-celiac gluten-free, and the eating-disorder screen; added rheumatoid arthritis, chronic constipation, osteoarthritis, type 1 diabetes, diverticular disease, DASH, Portfolio diet, time-restricted eating, and a pescatarian variant.
+
+New engine modules: `energy.js` (Mifflin-St Jeor, activity factors, MET table, unit conversion), `group.js` (group plans, profile sharing), `pantry.js` (what can I make), grocery adjustments and change log in `grocery.js`, budget overlap and per-day eaters in `planner.js`, user-defined patterns in `plan.js`.
+
+New screens: Today (diary, calorie target, favorites, weight, exercise), Pantry, Together (group planning, guests, sharing). Grocery gains editing and a change log; Learn gains full articles from `data/articles.json`.
+
+Profile schema v2 (see `src/store.js`): weight and height are stored in kg and cm, entered in lb and ft/in; `diary`, `weights`, `exercise`, `pantry`, `grocery_adjustments`, `grocery_changes` live on the profile; `custom_modules`, `goals`, `favorites`, `servings_by_day`, `setup_complete` live on the person. `migrate()` fills new fields on load.
