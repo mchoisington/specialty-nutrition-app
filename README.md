@@ -40,6 +40,10 @@ npm run bundle      # write dist/nutrition-app.html
 
 Content changes go in `data/`. Run `npm run validate` after any edit. The validator fails on a rule without a source, an undeclared tag, or a recipe that stores nutrient numbers.
 
+## Sources policy
+
+Rules cite professional-society guidelines, randomized trials, systematic reviews, and consensus statements. No US federal dietary guidance (Dietary Guidelines for Americans, MyPlate, WIC materials) is cited, by the owner's decision. Nutrient values come from USDA FoodData Central, which is laboratory food-composition measurement, not dietary advice; FDA allergen and gluten-free labeling rules are cited as law, not as recommendations.
+
 ## Safety rules the code enforces
 
 1. Allergens are absolute. No preference, mode, or acknowledgment overrides them.

@@ -340,20 +340,6 @@
     "url": ""
   },
   {
-    "id": "dga-2025-2030",
-    "citation": "Dietary Guidelines for Americans 2025-2030 (released January 2026). Cited only where it agrees with professional society guidance (saturated fat under 10 percent of calories, sodium, added sugar, whole foods, pregnancy and lactation chapter).",
-    "type": "guideline",
-    "year": 2026,
-    "url": ""
-  },
-  {
-    "id": "dgac-2025-report",
-    "citation": "2025 Dietary Guidelines Advisory Committee Scientific Report.",
-    "type": "review",
-    "year": 2025,
-    "url": ""
-  },
-  {
     "id": "skodje-2018",
     "citation": "Skodje GI et al. Fructan, Rather Than Gluten, Induces Symptoms in Patients With Self-Reported Non-Celiac Gluten Sensitivity. Gastroenterology 2018;154:529-539.",
     "type": "rct",
@@ -897,13 +883,6 @@
     "id": "aap-and-infant-feeding",
     "citation": "AAP and Academy of Nutrition and Dietetics positions on infant and toddler feeding.",
     "type": "consensus",
-    "year": null,
-    "url": ""
-  },
-  {
-    "id": "usda-wic-materials",
-    "citation": "USDA WIC materials.",
-    "type": "patient-material",
     "year": null,
     "url": ""
   },

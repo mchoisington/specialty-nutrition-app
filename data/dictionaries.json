@@ -500,9 +500,8 @@
       "label": "Vegetable",
       "family": "pattern",
       "hard": false,
-      "description": "Vegetable food group (DGA). Used by prefer rules in DASH, Mediterranean, diabetes, and gut-health patterns.",
+      "description": "Vegetable food group. Used by prefer rules in DASH, Mediterranean, diabetes, and gut-health patterns.",
       "sources": [
-        "dga-2025",
         "aha-dietary-guidance-2021"
       ]
     },
@@ -510,9 +509,8 @@
       "label": "Fruit",
       "family": "pattern",
       "hard": false,
-      "description": "Whole fruit food group (DGA). Juice and juice concentrate are not tagged fruit.",
+      "description": "Whole fruit food group. Juice and juice concentrate are not tagged fruit.",
       "sources": [
-        "dga-2025",
         "aha-dietary-guidance-2021"
       ]
     },
@@ -520,9 +518,8 @@
       "label": "Whole grain",
       "family": "pattern",
       "hard": false,
-      "description": "Whole grain (DGA): oats, brown rice, quinoa, whole wheat, barley, bulgur, farro, buckwheat, millet, and so on.",
+      "description": "Whole grain: oats, brown rice, quinoa, whole wheat, barley, bulgur, farro, buckwheat, millet, and so on.",
       "sources": [
-        "dga-2025",
         "aha-dietary-guidance-2021"
       ]
     },
@@ -530,9 +527,8 @@
       "label": "Refined grain",
       "family": "pattern",
       "hard": false,
-      "description": "Refined grain (DGA): white bread, white rice, regular pasta, flour tortilla, enriched flour products.",
+      "description": "Refined grain: white bread, white rice, regular pasta, flour tortilla, enriched flour products.",
       "sources": [
-        "dga-2025",
         "aha-dietary-guidance-2021"
       ]
     },
@@ -542,18 +538,18 @@
       "hard": false,
       "description": "Beans, peas, lentils, chickpeas, soy foods, peanuts (botanically a legume; also tagged nut).",
       "sources": [
-        "dga-2025",
-        "predimed-2018"
+        "predimed-2018",
+        "aha-dietary-guidance-2021"
       ]
     },
     "nut": {
       "label": "Nut",
       "family": "pattern",
       "hard": false,
-      "description": "Tree nuts and peanuts as a food group (PREDIMED, DGA protein subgroup).",
+      "description": "Tree nuts and peanuts as a food group (PREDIMED, food group).",
       "sources": [
-        "dga-2025",
-        "predimed-2018"
+        "predimed-2018",
+        "aha-dietary-guidance-2021"
       ]
     },
     "seed": {
@@ -562,7 +558,7 @@
       "hard": false,
       "description": "Edible seeds: sesame, chia, flax, hemp, pumpkin, sunflower, poppy.",
       "sources": [
-        "dga-2025"
+        "aha-dietary-guidance-2021"
       ]
     },
     "fish": {
@@ -571,7 +567,6 @@
       "hard": false,
       "description": "Finfish and seafood as a food group (Mediterranean and AHA patterns: at least twice a week). Shellfish and mollusks are counted here too.",
       "sources": [
-        "dga-2025",
         "aha-dietary-guidance-2021",
         "predimed-2018"
       ]
@@ -582,7 +577,7 @@
       "hard": false,
       "description": "Chicken, turkey, duck, and other poultry.",
       "sources": [
-        "dga-2025"
+        "aha-dietary-guidance-2021"
       ]
     },
     "red-meat": {
@@ -611,7 +606,6 @@
       "hard": false,
       "description": "Skim and 1% milk, low-fat and nonfat yogurt, part-skim and reduced-fat cheese (DASH).",
       "sources": [
-        "dga-2025",
         "aha-dietary-guidance-2021"
       ]
     },
@@ -621,7 +615,6 @@
       "hard": false,
       "description": "Whole milk, cream, butter, ice cream, regular cheese.",
       "sources": [
-        "dga-2025",
         "aha-dietary-guidance-2021"
       ]
     },
@@ -651,8 +644,7 @@
       "hard": false,
       "description": "Deep-fried foods and fried snack foods.",
       "sources": [
-        "aha-dietary-guidance-2021",
-        "dga-2025"
+        "aha-dietary-guidance-2021"
       ]
     },
     "high-fiber-insoluble": {
@@ -20074,7 +20066,6 @@
     "aga-ibd-2024": "Hashash JG et al. AGA Clinical Practice Update on Diet and Nutritional Therapies in Patients With Inflammatory Bowel Disease: Expert Review. Gastroenterology 2024;166:521-532.",
     "aha-dietary-guidance-2021": "Lichtenstein AH et al. 2021 Dietary Guidance to Improve Cardiovascular Health: A Scientific Statement From the American Heart Association. Circulation 2021;144:e472-e487.",
     "predimed-2018": "Estruch R et al. Primary Prevention of Cardiovascular Disease with a Mediterranean Diet Supplemented with Extra-Virgin Olive Oil or Nuts. N Engl J Med 2018;378:e34.",
-    "dga-2025": "US Departments of Agriculture and Health and Human Services. Dietary Guidelines for Americans 2025-2030 (January 2026): food group definitions (vegetables, fruits, whole and refined grains, dairy, protein foods).",
     "nova-2019": "Monteiro CA et al. Ultra-processed foods: what they are and how to identify them. Public Health Nutr 2019;22:936-941. Marker ingredients for NOVA group 4.",
     "iarc-2015": "Bouvard V et al. Carcinogenicity of consumption of red and processed meat. Lancet Oncol 2015;16:1599-1600. Definitions of red meat and processed meat.",
     "wastyk-2021": "Wastyk HC et al. Gut-microbiota-targeted diets modulate human immune status. Cell 2021;184:4137-4153 (fermented foods with live cultures).",
