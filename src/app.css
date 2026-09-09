@@ -299,7 +299,8 @@ td.num, th.num { text-align: right; white-space: nowrap; }
 .stepper-btn { width: 64px; height: 64px; min-height: 64px; font-size: 1.8rem; border-radius: 16px; padding: 0; line-height: 1; }
 .stepper-value { min-width: 3rem; text-align: center; font-size: 2rem; font-weight: 700; }
 .typical { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed var(--border); }
-.big-check .choice-title { font-size: 1.05rem; }
+.big-check .choice-title { font-size: 1.05rem; display: block; }
+.big-check .choice-body > .small { display: block; margin-top: 0.15rem; }
 .people-actions { align-items: center; }
 .person-card .person-main { min-width: 0; }
 .edit-row { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
