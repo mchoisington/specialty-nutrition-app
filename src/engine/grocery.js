@@ -46,7 +46,7 @@ export function buildGroceryList(week, recipesById, foodsById) {
 // Strip quantities, units, and prep words from an ingredient line so "2 cups chopped onion" and "1 onion, diced" share a key.
 const GROCERY_NOISE = /\b(\d+[\d\/.,½¼¾⅓⅔-]*|cups?|tbsps?|tablespoons?|tsps?|teaspoons?|oz|ounces?|lbs?|pounds?|g|grams?|kg|ml|l|litres?|liters?|cans?|jars?|packages?|pkg|cloves?|slices?|pieces?|pinch|dash|handful|large|medium|small|extra|about|approx\w*|to taste|optional|fresh|frozen|canned|dried|dry|chopped|diced|minced|sliced|cubed|shredded|grated|crushed|rinsed|drained|cooked|raw|peeled|seeded|halved|quartered|trimmed|thawed|softened|melted|divided|packed|heaping|level|thinly|thickly|finely|coarsely|roughly|plus|or|of|and|for|the|a|an)\b/gi;
 export function groceryTextKey(display) {
-  return String(display || '').toLowerCase().replace(/\([^)]*\)/g, ' ').replace(/[^a-z0-9\s]/g, ' ').replace(GROCERY_NOISE, ' ').replace(/\s+/g, ' ').trim().replace(/s\b/g, '');
+  return String(display || '').toLowerCase().replace(/\([^)]*\)/g, ' ').replace(/\b\d[\d\/.,½¼¾⅓⅔-]*\s*(g|kg|ml|l|oz|lbs?|cups?|tbsps?|tsps?)\b/g, ' ').replace(/[^a-z0-9\s]/g, ' ').replace(GROCERY_NOISE, ' ').replace(/\s+/g, ' ').trim().replace(/s\b/g, '');
 }
 function groceryTextName(key) { return key ? key.charAt(0).toUpperCase() + key.slice(1) : 'Ingredient'; }
 function roundNice(n) { if (n < 1) return Math.max(0.25, Math.round(n * 4) / 4); if (n < 10) return Math.round(n * 2) / 2; return Math.round(n); }
