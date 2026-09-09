@@ -127,6 +127,7 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
   const byId = new Map(conditions.map(m => [m.id, m]));
   const notices = [];
   const selected = new Set(person.modules || []);
+  for (const cm of custom) selected.add(cm.id);
 
   // Auto-include modules driven by profile flags
   if ((person.pregnancy || person.breastfeeding) && byId.has('pregnancy-gdm-breastfeeding')) selected.add('pregnancy-gdm-breastfeeding');
