@@ -17,6 +17,7 @@ const COMPONENT_HEADS = new Set([
 const PHRASE_RULES = [
   [/\b(party|snack|trail|chex|nut|bombay|cereal|puppy chow)\s+mix(es)?$/, 'snack'],
   [/\bice\s+cream$/, 'snack'],
+  [/\b(scotch|barley)\s+broth$/, false],   // Scotch broth is a soup, not a stock
   [/\b(fried|baked|battered)\s+pickles?$/, 'snack'],
   [/\b(garam|chaat|tandoori|sambar|rasam|curry|biryani|pav bhaji|kitchen king)\s+masala$/, true],
   [/\b(spice|seasoning|baking|biscuit|pancake|soup|sauce|gravy|cocoa|chili|chilli|taco|burrito|cake|bread|master|magic|muffin|pudding|drink|mulling|curry|rub|sour|onion soup)\s+mix(es)?$/, true],
@@ -31,7 +32,7 @@ const PHRASE_RULES = [
 // Words in the first half of "X and Y <component>" that make the whole thing a dish (biscuits and gravy).
 const MEAL_NOUNS = /\b(soup|salad|biscuits?|chips|fries|pasta|spaghetti|linguine|penne|noodles?|rice|sandwich(es)?|toast|eggs?|chicken|fish|meat|meatballs?|potato(es)?|beans|bread|pancakes?|waffles?|burgers?|tacos?|pizza|wraps?|bowl|steak|salmon|tuna|shrimp|prawns?|tofu|veg|vegetables?|yam|plantain|dumplings?|tortillas?|nachos|crackers|celery|carrots?|cucumber|apple|fruit|pit+a)\b/;
 // After "<component> with ...": these make it a snack plate rather than a component (hummus with carrot sticks).
-const SERVED_WITH = /\b(carrots?|cucumber|celery|pit+a|bread|chips|crackers|crudit[eé]s|vegetables?|veg|veggies|sticks|fruit|apple|pear|toast|crisps|tortillas?|naan|flatbread|wedges)\b/;
+const SERVED_WITH = /\b(carrots?|cucumber|celery|pit+as?|bread|breadsticks?|oatcakes?|rice cakes?|chips|crackers|crudit[eé]s|vegetables?|veg|veggies|sticks|fruits?|apples?|pears?|bananas?|toast|crisps|tortillas?|naan|flatbread|wedges|dippers)\b/;
 // A title that says the component goes *on* something is a meal (cheese spread on bread).
 const SERVED_ON = /\s(on|over|atop)\s/;
 // The dish is what comes before the first "with", "in", "for", "made with", "à la"; what follows is the component.

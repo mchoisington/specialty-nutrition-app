@@ -237,16 +237,16 @@ export function appRender() {
 // The recipe pool = shipped recipes, with any ingredient links the household added to imported recipes
 // (profile.recipe_links[recipeId] = [{food, grams, display}]), plus recipes the household wrote (profile.custom_recipes).
 // Call uiState.refreshRecipes() after editing either.
-export const APP_COLLECTION_OF_SOURCE = { 'NHS website': 'nhs', 'Wikibooks Cookbook': 'wikibooks', 'USDA MyPlate Kitchen': 'usda' };
+export const APP_COLLECTION_OF_SOURCE = { 'NHS website': 'nhs', 'Parent Club Scotland': 'parentclub', 'Wikibooks Cookbook': 'wikibooks', 'USDA MyPlate Kitchen': 'usda' };
 export function appCollectionCounts() {
-  const counts = { nhs: 0, wikibooks: 0, usda: 0 };
+  const counts = { nhs: 0, parentclub: 0, wikibooks: 0, usda: 0 };
   for (const r of uiState.baseRecipes || []) { const k = APP_COLLECTION_OF_SOURCE[r.source]; if (k) counts[k]++; }
   return counts;
 }
 function appAssembleRecipes() {
   const profile = uiState.profile || {};
   const links = profile.recipe_links || {};
-  const on = Object.assign({ nhs: false, wikibooks: true, usda: false }, profile.recipe_collections || {});
+  const on = Object.assign({ nhs: true, parentclub: true, wikibooks: true, usda: false }, profile.recipe_collections || {});
   const out = [];
   for (const r of uiState.baseRecipes || []) {
     const coll = APP_COLLECTION_OF_SOURCE[r.source];
@@ -290,7 +290,9 @@ async function appBoot() {
   uiState.syncRefresh = appBootSync;
   uiState.profile = load();
   uiState.lite = APP_LITE;
-  if (APP_LITE && uiState.profile && !uiState.profile.people.length && uiState.profile.recipe_collections) { uiState.profile.recipe_collections.nhs = true; uiState.profile.recipe_collections.wikibooks = false; }
+  if (APP_LITE && uiState.profile && !uiState.profile.people.length && uiState.profile.recipe_collections) { uiState.profile.recipe_collections.nhs = true; uiState.profile.recipe_collections.parentclub = true; uiState.profile.recipe_collections.wikibooks = false; }
+  // Collections with per-serving nutrition are on by default since v2.3. Profiles saved before that carried nhs: false; switch it on once.
+  if (uiState.profile && uiState.profile.recipe_collections && !uiState.profile.recipe_collections.defaults_v3) { uiState.profile.recipe_collections.nhs = true; uiState.profile.recipe_collections.parentclub = true; uiState.profile.recipe_collections.defaults_v3 = true; }
   if (!uiState.profile.activePerson && uiState.profile.people.length) uiState.profile.activePerson = uiState.profile.people[0].id;
   if (!Array.isArray(uiState.profile.log)) uiState.profile.log = [];
   uiState.profile.people.forEach(uiEnsurePerson);

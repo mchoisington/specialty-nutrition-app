@@ -222,24 +222,25 @@ function settingsRestoreModal(text) {
 // ---- Recipe collections: each imported library is a choice. Peace Meal's own recipes and yours are always on. ----
 const SETTINGS_USDA_NOTICE = 'Please note that RFK Jr\'s racoon-dick brain may have somehow overseen or influenced these so-called nutritional "facts" from this USDA recipe directory. No raccoon dicks or bear cub meat should be included as ingredient options, but it doesn\'t hurt to double check because he is the second largest and clinically insane turd of the century. Proceed with caution - have a peaceful meal!';
 function settingsCollectionsHTML(profile) {
-  const on = Object.assign({ nhs: false, wikibooks: true, usda: false }, profile.recipe_collections || {});
+  const on = Object.assign({ nhs: true, parentclub: true, wikibooks: true, usda: false }, profile.recipe_collections || {});
   const n = appCollectionCounts();
   return `<div class="card">
     <p class="small">Tick a collection to include its recipes in search, the week plan, and Pantry. Untick it to leave all of them out. Recipes written for Peace Meal and your own are always included.</p>
-    ${uiSwitch('coll-wikibooks', `Wikibooks Cookbook (${n.wikibooks.toLocaleString()} recipes)`, 'Community recipes from around the world under a Creative Commons licence. No nutrition data until you link ingredients.', on.wikibooks)}
+    ${uiSwitch('coll-wikibooks', `Wikibooks Cookbook (${n.wikibooks.toLocaleString()} recipes)`, 'Community recipes from around the world under a Creative Commons licence. They list ingredients as plain text, so the app has no calorie or sodium numbers for them; they only go into a week when the Week screen switch "Also use recipes that have no nutrition numbers" is on.', on.wikibooks)}
     ${uiSwitch('coll-nhs', `NHS recipes, United Kingdom (${n.nhs.toLocaleString()} recipes)`, 'Dietitian-written family recipes with calories, fat, sugar, and salt per serving. British dishes and measures.', on.nhs)}
+    ${uiSwitch('coll-parentclub', `Parent Club, Scottish Government (${n.parentclub.toLocaleString()} recipes)`, 'Family recipes with full per-serving nutrition, including sodium in milligrams, and ingredient weights in grams. British dishes and measures.', on.parentclub)}
     ${uiSwitch('coll-usda', `USDA MyPlate Kitchen, United States (${n.usda.toLocaleString()} recipes)`, n.usda ? 'American home cooking with per-serving nutrition. Public domain.' : 'Not loaded in this build.', on.usda)}
   </div>`;
 }
 function settingsBindCollections(root, profile) {
   const setColl = (key, value) => {
-    profile.recipe_collections = Object.assign({ nhs: false, wikibooks: true, usda: false }, profile.recipe_collections || {}, { [key]: value });
+    profile.recipe_collections = Object.assign({ nhs: true, parentclub: true, wikibooks: true, usda: false }, profile.recipe_collections || {}, { [key]: value });
     uiPersist();
     if (typeof uiState.refreshRecipes === 'function') uiState.refreshRecipes();
     uiToast(value ? 'Collection included.' : 'Collection left out.');
     if (typeof uiState.rerender === 'function') uiState.rerender();
   };
-  for (const key of ['wikibooks', 'nhs']) {
+  for (const key of ['wikibooks', 'nhs', 'parentclub']) {
     const el = root.querySelector('#coll-' + key);
     if (el) el.addEventListener('change', () => setColl(key, el.checked));
   }

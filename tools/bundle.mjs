@@ -31,7 +31,7 @@ for (const f of ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'r
   data[f] = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : (f === 'dictionaries' ? { tags: {}, entries: [] } : f === 'articles' ? {} : []);
 }
 if (LITE && Array.isArray(data['recipes-open'])) data['recipes-open'] = data['recipes-open'].filter(r => r.source !== 'Wikibooks Cookbook');
-if (LITE) data['recipes-usda'] = [];   // the USDA collection stays a full-app opt-in; lite ships Peace Meal's own recipes plus the NHS set
+if (LITE) data['recipes-usda'] = [];   // the USDA collection stays a full-app opt-in; lite ships Peace Meal's own recipes plus the NHS and Parent Club sets
 const html = R('index.html');
 if (fs.existsSync(new URL('breathe.html', root))) data.breatheHtml = R('breathe.html');
 const iconSvg = fs.existsSync(new URL('icon.svg', root)) ? R('icon.svg') : '';

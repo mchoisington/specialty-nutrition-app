@@ -100,8 +100,8 @@ function learnRenderHow(root) {
       <p>Every food is a USDA FoodData Central record (SR Legacy or Foundation Foods), keyed by its FDC ID. The import script writes the food table; nobody edits numbers by hand. Where USDA has no value for a nutrient (added sugar, for example), the app shows "no data" rather than an estimate.</p>
       <h2>FODMAP tags are not Monash-verified</h2>
       <p>The low FODMAP module is built from published studies and USDA data. It does not use the Monash University database, and its tags carry a "not Monash-verified" notice. Portion notes matter: many foods are low FODMAP in a small serving and high in a large one.</p>
-      <h2>Time-limited protocols</h2>
-      <p>Elimination phases (low FODMAP, low histamine) have a minimum and maximum length from the protocol. Past the maximum the app prompts reintroduction and requires an acknowledgment to continue.</p>
+      <h2>Elimination phases</h2>
+      <p>Elimination phases (low FODMAP, low histamine) run until you change them. The protocol's usual length is shown on the Plan screen, and you can ask the app to check in after a set number of weeks and ask whether to move on to reintroduction or keep going. A long elimination narrows what you eat, so the check-in is worth setting.</p>
       <h2>Stacked restrictions</h2>
       <p>Running several diets that each cut out whole food groups at the same time makes it harder to get enough fiber, calcium, protein, and variety. When three or more are active at once the plan says so and suggests running one at a time where you can.</p>
       <h2>Where this comes from</h2>
@@ -122,6 +122,7 @@ function learnRenderSources(root) {
     <div class="tiles" aria-label="Recipe counts, computed from the loaded pool">
       ${uiStatTile({ value: uiFmtNum(c.total), label: 'Shipped recipes', note: `${uiFmtNum(c.peaceMeal)} Peace Meal` })}
       ${uiStatTile({ value: uiFmtNum(c.nhs), label: 'NHS website', note: `${uiFmtNum(c.nhsWithNutrition)} with nutrition` })}
+      ${uiStatTile({ value: uiFmtNum(c.parentclub), label: 'Parent Club Scotland', note: `${uiFmtNum(c.parentclubWithSodium)} with sodium` })}
       ${uiStatTile({ value: uiFmtNum(c.wikibooks), label: 'Wikibooks Cookbook', note: `${uiFmtNum(c.wikibooksFeatured)} featured` })}
     </div>
     <p class="small muted">Live from the pool on this device: ${uiFmtNum(c.pool)} recipes in all, ${uiFmtNum(c.withNutrition)} with known nutrition, ${uiFmtNum(c.mine)} written in this household, ${uiFmtNum(c.linked)} imported recipe${c.linked === 1 ? '' : 's'} with ingredients linked by you.</p>
@@ -155,10 +156,23 @@ function learnRenderSources(root) {
         <li>Counts at import: 3812 candidate pages listed, 3535 passed the filters, 1267 dropped to stay under the size budget (recipes without a stated servings value first, then the longest step text), <strong>2268 recipes imported</strong> (1202 with stated times, 1066 estimated; 1421 with a stated servings value; 2177 with a stated difficulty; 40 featured). Skipped by reason: few-ingredients 86, cocktail-or-candy 84, few-steps 64, no-procedure 25, disambiguation 12, no-ingredients 4, non-english 1, title-filter 1. Loaded now: ${uiFmtNum(c.wikibooks)} (${uiFmtNum(c.wikibooksFeatured)} featured, ${uiFmtNum(c.wikibooksTimesEstimated)} with estimated times).</li>
       </ul>
 
+      <h2>3. Parent Club (Scottish Government)</h2>
+      <p><strong>Licence status, stated plainly:</strong> parentclub.scot says it "is run by the Scottish Government" and links to gov.scot, whose content is published under the ${ext(OGL, 'Open Government Licence v3.0')} ("All content is available under the Open Government Licence v3.0, except for graphic assets and where otherwise stated"). The Parent Club site itself carries no licence statement. The recipe text is Crown copyright and is used here on the assumption that the same licence applies; that assumption is recorded on every record and on this page rather than hidden. No photographs were taken.</p>
+      <ul>
+        <li>Source: Parent Club recipes, ${ext('https://www.parentclub.scot/recipes')}, one listing page and one page per recipe.</li>
+        <li>Attribution line stored on every recipe (<code>attribution</code> field): <em>Recipe text from Parent Club (parentclub.scot), a Scottish Government website. Crown copyright. Used on the assumption that the Open Government Licence v3.0 applies as it does to gov.scot; parentclub.scot carries no licence statement of its own.</em></li>
+        <li>robots.txt: fetched first. The <code>User-agent: *</code> group disallows only site administration paths, not <code>/recipes</code> or <code>/recipe/</code>.</li>
+        <li>Recipe ids: <code>pcs-&lt;page-slug&gt;</code>; <code>source_url</code> is the page the text came from. Importer: <code>tools/import-parentclub.mjs</code>.</li>
+        <li>Nutrition data: each page publishes a "Detailed nutritional information" table per 100 g and per serving: energy, protein, total fat, saturated fat, carbohydrate, total sugars, NSP fibre, <strong>sodium in mg</strong>, and salt. The per-serving column is stored as-is in <code>nutrition_per_serving</code> with <code>nutrition_source: "parentclub-scot"</code>; the serving weight is kept as <code>serving_grams</code>. A blank cell is left out, not guessed: every page leaves total fat blank, so <code>fat_g</code> is absent for this collection and only saturated fat is known. Fibre is by the NSP method, which reads lower than the AOAC method used by USDA foods. Where a page publishes sodium and salt that disagree by more than a quarter, the importer logs it and keeps the published sodium.</li>
+        <li>Ingredient lines keep the site's gram weights in the text, for example "2 Tablespoons (30g) Tomato Puree", so the grocery list and any later food linking can use them.</li>
+        <li>Meal slots come from the site's category (breakfast, lunch, dinner, starter, snack, dessert) and the title, then pass through the same component and breakfast checks as every other collection.</li>
+        <li>Loaded now: ${uiFmtNum(c.parentclub)} recipes, ${uiFmtNum(c.parentclubWithSodium)} with published sodium.</li>
+      </ul>
+
       <h2>How the app uses these recipes</h2>
       <ul>
         <li>Ingredients are display-only (<code>{ "display": "..." }</code>, no <code>food</code> link, no grams). The dictionary tags ingredient text at run time for allergen and diet checks, and anything unrecognised is reported as such, never treated as safe.</li>
-        <li>NHS recipes show the stored per-serving nutrition (<code>recipeTotals</code> in <code>src/engine/nutrition.js</code> uses it when a recipe has <code>nutrition_source</code> and <code>nutrition_per_serving</code> and no linked foods).</li>
+        <li>NHS and Parent Club recipes show the stored per-serving nutrition (<code>recipeTotals</code> in <code>src/engine/nutrition.js</code> uses it when a recipe has <code>nutrition_source</code> and <code>nutrition_per_serving</code> and no linked foods).</li>
         <li>Wikibooks recipes show no nutrition until ingredients are linked in the editor.</li>
         <li><code>tags</code> is empty on every imported recipe because the tag vocabulary is controlled; tags are added by hand or by the dictionary at run time.</li>
         <li>Recipes you write yourself ("Mine") and ingredient links you add are stored on this device in your profile, never in the data files.</li>
