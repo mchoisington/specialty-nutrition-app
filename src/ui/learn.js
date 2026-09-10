@@ -69,7 +69,7 @@ export function learnArticleHTML(m, opts = {}) {
     ${links.length ? `<h2 class="article-h">Helpful links</h2><ul class="links">${links.map(l => { const u = learnSafeUrl(l.url); return `<li>${u ? `<a href="${uiEsc(u)}" target="_blank" rel="noopener noreferrer">${uiEsc(l.label)}</a>` : uiEsc(l.label)}${l.kind ? ` ${uiChip(l.kind, 'neutral')}` : ''}</li>`; }).join('')}</ul>` : ''}
     ${refs.length ? `<h2 class="article-h">References</h2><ol class="references">${refs.map(r => { const u = learnSafeUrl(r.url); return `<li id="ref-${uiEsc(r.id || '')}">${uiEsc(r.citation || '')}${u ? ` <a href="${uiEsc(u)}" target="_blank" rel="noopener noreferrer" class="ref-url">${uiEsc(u)}</a>` : ''}${r.verify ? ' ' + uiChip('verify', 'caution') : ''}</li>`; }).join('')}</ol>` : ''}
     ${opts.full ? `<details><summary>Rules in this module (${(m.rules || []).length})</summary>${(m.rules || []).map(r => uiRuleHTML({ ...r, moduleName: m.name }, { hideModule: true })).join('') || '<p class="muted small">No rules.</p>'}</details>` : ''}
-    ${opts.full && Array.isArray(m.tier2) && m.tier2.length ? `<h3>Clinician-set numbers (Tier 2)</h3><ul>${m.tier2.map(t => `<li><strong>${uiEsc(t.label)}</strong>${t.consensus ? `: published range ${uiEsc(t.consensus)}` : ''}${t.why ? `. ${uiEsc(t.why)}` : ''}</li>`).join('')}</ul>` : ''}
+    ${opts.full && Array.isArray(m.tier2) && m.tier2.length ? `<h3>Numbers from your doctor or dietitian (Tier 2)</h3><ul>${m.tier2.map(t => `<li><strong>${uiEsc(t.label)}</strong>${t.consensus ? `: published range ${uiEsc(t.consensus)}` : ''}${t.why ? `. ${uiEsc(t.why)}` : ''}</li>`).join('')}</ul>` : ''}
     ${opts.full && Array.isArray(m.phases) && m.phases.length ? `<h3>Phases</h3><ul>${m.phases.map(p => `<li><strong>${uiEsc(p.label || p.id)}</strong>${p.min_weeks || p.max_weeks ? `: ${p.min_weeks || 0} to ${p.max_weeks || 'open'} weeks` : ''}</li>`).join('')}</ul>` : ''}
     ${refs.length ? `<details><summary>Sources the rules cite (${(m.sources || []).length})</summary>${uiSourcesHTML(m.sources)}</details>` : `<h2 class="article-h">Sources</h2>${uiSourcesHTML(m.sources)}`}
   </article>`;
@@ -85,9 +85,9 @@ function learnRenderHow(root) {
     ${uiPageHeader('How this app decides', 'The rules the engine follows, and where they come from.', `<a class="btn small" href="#/learn">${uiIcon('book')}All topics</a>`)}
     <article class="article">
       <h2>Two tiers of rules</h2>
-      <p>Tier 1 rules come straight from published guidelines and apply to everyone with the condition: sodium under 2,300 mg a day for high blood pressure, for example. Tier 2 rules need a number that only your clinician can set: a protein target in kidney disease, a fluid limit in advanced heart failure. The app knows the published range for a Tier 2 rule, shows it, and refuses to pick a value. Until you enter your clinician's number, that module runs on its Tier 1 rules only and the plan says so.</p>
+      <p>Tier 1 rules come straight from published guidelines and apply to everyone with the condition: sodium under 2,300 mg a day for high blood pressure, for example. Tier 2 rules need a number that only your doctor or dietitian can set: a protein target in kidney disease, a fluid limit in advanced heart failure. The app knows the published range for a Tier 2 rule, shows it, and refuses to pick a value. Until you enter that number, that module runs on its Tier 1 rules only and the plan says so.</p>
       <h2>Hard conflicts stop the number, not the plan</h2>
-      <p>Some conditions give opposite advice. DASH is potassium-rich; kidney disease limits potassium. When two of your modules disagree like that, the app generates no number for that nutrient, shows the conflict, and asks for a clinician number. Everything else in the plan still builds.</p>
+      <p>Some conditions give opposite advice. DASH is potassium-rich; kidney disease limits potassium. When two of your modules disagree like that, the app generates no number for that nutrient, shows the conflict, and asks for a number from your doctor or dietitian. Everything else in the plan still builds.</p>
       <h2>Allergens are absolute</h2>
       <p>A confirmed food allergy is a hard exclusion. No preference, mode, phase, or acknowledgment overrides it. A recipe with a matching ingredient is never scheduled, and a checked food fails.</p>
       <h2>Unknown is not safe</h2>
@@ -106,7 +106,7 @@ function learnRenderHow(root) {
       <p>Running several diets that each cut out whole food groups at the same time makes it harder to get enough fiber, calcium, protein, and variety. When three or more are active at once the plan says so and suggests running one at a time where you can.</p>
       <h2>Where this comes from</h2>
       <p>The evidence review behind every module is <strong>docs/PHASE-1-evidence-and-regulatory-foundation.md</strong> (Phase 1: Evidence and Regulatory Foundation), and the build decisions are in <strong>docs/PHASE-2-prd-and-architecture.md</strong>. Items marked VERIFY in Phase 1 are shown with that flag in the app until they are cleared in docs/VERIFY-log.md.</p>
-      <p class="small muted">This app is for general wellness and education. It does not diagnose or treat any condition. Your clinician sets any therapeutic numbers.</p>
+      <p class="small muted">This app is for general wellness and education. It does not diagnose or treat any condition. Any medical targets, like a sodium or protein limit, come from your doctor or dietitian, never from the app.</p>
     </article>`;
 }
 
@@ -166,6 +166,6 @@ function learnRenderSources(root) {
 
       <h2>Peace Meal recipes</h2>
       <p>The ${uiFmtNum(c.peaceMeal)} recipes written for Peace Meal link every ingredient to a USDA FoodData Central record, so their nutrients are summed from <code>foods.json</code> by grams. They carry no outside licence.</p>
-      <p class="small muted">This app is for general wellness and education. It does not diagnose or treat any condition. Your clinician sets any therapeutic numbers.</p>
+      <p class="small muted">This app is for general wellness and education. It does not diagnose or treat any condition. Any medical targets, like a sodium or protein limit, come from your doctor or dietitian, never from the app.</p>
     </article>`;
 }

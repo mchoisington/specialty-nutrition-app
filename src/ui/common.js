@@ -133,10 +133,10 @@ export function uiRuleHTML(rule, opts = {}) {
   if (rule.moduleName && !opts.hideModule) meta.push(`<span class="chip neutral">${uiEsc(rule.moduleName)}</span>`);
   if (rule.strength) meta.push(`<span class="chip ${rule.strength === 'must' ? 'stop' : rule.strength === 'should' ? 'info' : 'neutral'} outline">${uiEsc(rule.strength)}</span>`);
   meta.push(`<span class="chip neutral">tier ${uiEsc(rule.tier || 1)}</span>`);
-  if (rule.clinician) meta.push('<span class="chip plum">clinician-set</span>');
+  if (rule.clinician) meta.push('<span class="chip plum">doctor or dietitian</span>');
   if (rule.userAllergen) meta.push('<span class="chip stop">allergen</span>');
   if (rule.preference) meta.push('<span class="chip neutral">preference</span>');
-  if (rule.tier2Pending) meta.push('<span class="chip caution">waiting for clinician number</span>');
+  if (rule.tier2Pending) meta.push('<span class="chip caution">waiting for a number from your doctor or dietitian</span>');
   if (rule.needsWeight) meta.push('<span class="chip caution">needs weight</span>');
   if (rule.note) meta.push(`<span class="muted">${uiEsc(rule.note)}</span>`);
   const verify = !!rule.verify;
@@ -519,7 +519,7 @@ export function uiRing({ value, max, kind = 'limit', unit = '', label = '', size
   return href ? `<a class="ring ${t.tone}" href="${uiEsc(href)}" style="${style}">${svg}${foot}</a>` : `<div class="ring ${t.tone}" style="${style}">${svg}${foot}</div>`;
 }
 
-// Horizontal bar meter: label, value of max, a bar, and a word. Extra chips (for example clinician-set) go in labelExtra.
+// Horizontal bar meter: label, value of max, a bar, and a word. Extra chips (for example doctor or dietitian) go in labelExtra.
 export function uiMeter({ label, value, max, kind = 'limit', unit = '', labelExtra = '', wordExtra = '', digits = 0 }) {
   const t = uiMeterTone(value, max, kind);
   const pct = max > 0 ? Math.max(0, Math.min(100, value / max * 100)) : 0;

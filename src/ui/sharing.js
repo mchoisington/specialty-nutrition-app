@@ -54,7 +54,7 @@ export function sharingAddGuest(obj, sourceKey) {
   return guest;
 }
 
-// Read-only view of a person from the store or a share: plan summary, allergens, modules, clinician numbers, and optional week/grocery parts.
+// Read-only view of a person from the store or a share: plan summary, allergens, modules, doctor or dietitian numbers, and optional week/grocery parts.
 export function sharingPersonModal(obj, opts = {}) {
   const person = obj || {};
   const hasRules = Array.isArray(person.modules) || Array.isArray(person.allergens);
@@ -75,11 +75,11 @@ export function sharingPersonModal(obj, opts = {}) {
         <dl class="kv">
           <dt>Rules applied</dt><dd>${uiFmtNum((plan.applied || []).length)}</dd>
           <dt>Hard exclusions</dt><dd>${hard.length ? hard.map(([t]) => uiEsc(uiTagLabel(t))).join(', ') : 'none'}</dd>
-          <dt>Limits</dt><dd>${Object.keys(plan.limits).length ? Object.entries(plan.limits).map(([n, l]) => `${uiEsc(uiNutrientLabel(n))} at most ${uiFmtNum(l.value, 1)}${l.clinician ? ' (clinician-set)' : ''}`).join('; ') : 'none'}</dd>
+          <dt>Limits</dt><dd>${Object.keys(plan.limits).length ? Object.entries(plan.limits).map(([n, l]) => `${uiEsc(uiNutrientLabel(n))} at most ${uiFmtNum(l.value, 1)}${l.clinician ? ' (from your doctor or dietitian)' : ''}`).join('; ') : 'none'}</dd>
           <dt>Targets</dt><dd>${Object.keys(plan.targets).length ? Object.entries(plan.targets).map(([n, t]) => `${uiEsc(uiNutrientLabel(n))} at least ${uiFmtNum(t.min, 1)}`).join('; ') : 'none'}</dd>
         </dl>
         ${plan.notices.filter(n => n.level !== 'info').length ? `<div class="stack">${plan.notices.filter(n => n.level !== 'info').map(n => uiNoticeHTML(n)).join('')}</div>` : ''}` : ''}
-      <h3>Clinician numbers</h3>${person.tier2 && Object.keys(person.tier2).length ? `<ul class="small">${Object.entries(person.tier2).map(([k, v]) => `<li>${uiEsc(k)}: <strong>${uiEsc(v)}</strong> ${uiChip('clinician-set', 'plum')}</li>`).join('')}</ul>` : '<p class="small muted">None entered.</p>'}
+      <h3>Numbers from a doctor or dietitian</h3>${person.tier2 && Object.keys(person.tier2).length ? `<ul class="small">${Object.entries(person.tier2).map(([k, v]) => `<li>${uiEsc(k)}: <strong>${uiEsc(v)}</strong> ${uiChip('doctor or dietitian', 'plum')}</li>`).join('')}</ul>` : '<p class="small muted">None entered.</p>'}
       ${person.cooking ? `<h3>Cooking</h3><p class="small">${uiEsc(`${person.cooking.weekday_minutes || 20} min weekdays, ${person.cooking.weekend_minutes || 40} min weekends, ${(person.cooking.cook_days || []).length} cook days, ${person.cooking.skill || 'comfortable'}, ${(person.cooking.equipment || []).join(', ') || 'no equipment listed'}`)}</p>` : ''}` : ''}
     ${week ? `<h3>Meal plan</h3><div class="stack">${week.days.map(d => `<div><strong>${uiEsc(uiFmtDate(d.date))}</strong><ul class="small">${(d.meals || []).filter(m => m.recipe).map(m => `<li>${uiEsc(m.slot)}: ${uiEsc(m.name)}${m.source === 'leftover' ? ' (leftovers)' : ''}</li>`).join('') || '<li class="muted">No meals</li>'}</ul></div>`).join('')}</div>` : ''}
     ${grocery ? `<h3>Grocery list</h3><ul class="small">${grocery.items.filter(i => !i.removed).map(i => `<li>${uiEsc(i.name)}: ${uiEsc(i.quantity)}</li>`).join('') || '<li class="muted">Empty</li>'}</ul>` : ''}

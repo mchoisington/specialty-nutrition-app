@@ -41,7 +41,7 @@ export function renderSettingsScreen(root) {
         <dt>Recipes</dt><dd>Peace Meal, the NHS website (Open Government Licence v3.0), the Wikibooks Cookbook (CC BY-SA 4.0), and your own. <a href="#/learn/sources">Where the recipes come from</a>.</dd>
         <dt>Language model</dt><dd>None. Every decision comes from readable data files.</dd>
       </dl>
-      <p><strong>This app is for general wellness and education. It does not diagnose or treat any condition. Your clinician sets any therapeutic numbers.</strong></p>
+      <p><strong>This app is for general wellness and education. It does not diagnose or treat any condition. Any medical targets, like a sodium or protein limit, come from your doctor or dietitian, never from the app.</strong></p>
       ${uiState.dataProblems.length ? uiNoticeHTML({ level: 'warn', text: uiState.dataProblems.join(' ') }) : ''}`, { id: 'set-about-h' })}
   `;
   root.querySelectorAll('[data-seg="set-theme"]').forEach(r => r.addEventListener('change', () => {

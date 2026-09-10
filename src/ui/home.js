@@ -22,7 +22,7 @@ export function renderWelcomeScreen(root) {
         <li>${uiIcon('breathe')}<span><strong>A minute to breathe.</strong> A short visual reset for the days when dinner is the last straw.</span></li>
       </ul>
       <a class="btn primary big" href="#/people/new">Set up the first person</a>
-      <p class="small muted">Everything stays on this device. Nothing is sent anywhere. Your clinician sets any therapeutic numbers; the app never invents them.</p>
+      <p class="small muted">Everything stays on this device. Nothing is sent anywhere. Any medical targets, like a sodium or protein limit, come from your doctor or dietitian. The app never makes those numbers up.</p>
     </section>`;
 }
 
@@ -42,7 +42,7 @@ function homeTodayRing(person, plan) {
   } else if (plan.limits.sodium_mg) {
     const lim = plan.limits.sodium_mg.value;
     ring = uiRing({ value: sodium, max: lim, kind: 'limit', unit: 'mg', label: `sodium of ${uiFmtNum(lim)} mg limit`, href: '#/today', size: 120 });
-    text = `<p><strong>${uiFmtNum(sodium)} mg sodium</strong> logged so far against a limit of ${uiFmtNum(lim)} mg.</p><p class="small muted">${entries.length ? `${entries.length} entr${entries.length === 1 ? 'y' : 'ies'} today, ${uiFmtNum(kcal)} kcal.` : 'Nothing logged yet today.'}${plan.limits.sodium_mg.clinician ? ' Limit set by your clinician.' : ''}</p>`;
+    text = `<p><strong>${uiFmtNum(sodium)} mg sodium</strong> logged so far against a limit of ${uiFmtNum(lim)} mg.</p><p class="small muted">${entries.length ? `${entries.length} entr${entries.length === 1 ? 'y' : 'ies'} today, ${uiFmtNum(kcal)} kcal.` : 'Nothing logged yet today.'}${plan.limits.sodium_mg.clinician ? ' Limit set by your doctor or dietitian.' : ''}</p>`;
   } else {
     ring = '';
     text = `<p><strong>${uiFmtNum(kcal)} kcal</strong> logged so far.</p><p class="small muted">No calorie target or sodium limit is active, so there is no ring to fill. ${info.state === 'off' ? '<a href="#/today">Set a calorie target</a> if you want one.' : ''}</p>`;
@@ -72,7 +72,7 @@ export function renderHomeScreen(root) {
     <div class="tiles" aria-label="Plan summary">
       ${uiStatTile({ value: uiFmtNum((plan.applied || []).length), label: 'Rules applied', note: `${plan.modules.length} module${plan.modules.length === 1 ? '' : 's'}`, href: '#/plan' })}
       ${uiStatTile({ value: uiFmtNum(hard), label: 'Hard exclusions', note: hard ? 'never overridden' : 'none', tone: hard ? 'stop' : '', href: '#/plan' })}
-      ${missing ? uiStatTile({ value: uiFmtNum(missing), label: 'Clinician numbers missing', note: 'not applied yet', tone: 'caution', href: `#/people/${uiEsc(person.id)}/clinician` }) : uiStatTile({ value: uiFmtNum(numbers), label: 'Numbers set', note: numbers ? 'limits and targets' : 'none active', href: '#/plan' })}
+      ${missing ? uiStatTile({ value: uiFmtNum(missing), label: 'Doctor or dietitian numbers missing', note: 'not applied yet', tone: 'caution', href: `#/people/${uiEsc(person.id)}/clinician` }) : uiStatTile({ value: uiFmtNum(numbers), label: 'Numbers set', note: numbers ? 'limits and targets' : 'none active', href: '#/plan' })}
     </div>
     ${uiSection('Notices', notices.length ? `<div class="stack" id="home-notices">${blocks.map(n => uiNoticeHTML(n, { person })).join('')}${warns.map(n => uiNoticeHTML(n, { person })).join('')}${infos.map(n => uiNoticeHTML(n, { person })).join('')}</div>` : '<p class="muted">No notices. The plan built without conflicts or missing numbers.</p>', { id: 'home-notices-h' })}
     ${uiSection('Today so far', homeTodayRing(person, plan), { id: 'home-today-h' })}
@@ -82,7 +82,7 @@ export function renderHomeScreen(root) {
       <a class="quick-action" href="#/grocery">${uiIcon('cart')}<span>Grocery list</span><small>From this week's meals</small></a>
       <a class="quick-action" href="#/breathe">${uiIcon('breathe')}<span>Breathe</span><small>A short visual reset</small></a>
     </div>`, { id: 'home-actions-h' })}
-    <p class="small muted">This app is for general wellness and education. It does not diagnose or treat any condition. Your clinician sets any therapeutic numbers.</p>
+    <p class="small muted">This app is for general wellness and education. It does not diagnose or treat any condition. Any medical targets, like a sodium or protein limit, come from your doctor or dietitian, never from the app.</p>
   `;
 
   const sel = root.querySelector('#home-person');

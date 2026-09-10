@@ -22,7 +22,7 @@ const PEOPLE_STEPS = [
   { id: 'allergens', label: 'Allergens' },
   { id: 'preferences', label: 'Preferences' },
   { id: 'medications', label: 'Medications' },
-  { id: 'clinician', label: 'Clinician numbers' },
+  { id: 'clinician', label: 'Doctor or dietitian numbers' },
   { id: 'cooking', label: 'Cooking' },
   { id: 'review', label: 'Review' }
 ];
@@ -664,7 +664,7 @@ function peopleCustomDietHTML(person) {
       <div class="field"><label for="cd-terms">Other words to avoid in ingredient text</label><input id="cd-terms" type="text" value="${uiEsc(d.avoid_terms)}" placeholder="pork, corn syrup" autocomplete="off"><div class="hint">Comma separated. Matched as plain text.</div></div>
       ${preferOptions.length ? `<div class="field"><span class="label">Foods it favors (optional)</span>${uiMultiPills('cd-prefer', preferOptions, d.prefer_tags, { label: 'Prefer tags' })}</div>` : ''}
       <h4>Daily limits (optional)</h4>
-      <p class="small muted">Only if the diet is defined by a number. Leave blank otherwise. These are soft and never replace a clinician number.</p>
+      <p class="small muted">Only if the diet is defined by a number. Leave blank otherwise. These are soft and never replace a number from your doctor or dietitian.</p>
       <div class="limits-grid">${PEOPLE_CUSTOM_LIMITS.map(l => `<div class="field"><label for="cd-limit-${l.key}">${l.label}</label><div class="row"><input id="cd-limit-${l.key}" type="number" inputmode="decimal" min="0" step="any" data-limit="${l.key}" value="${typeof d.limits[l.key] === 'number' ? d.limits[l.key] : ''}" style="max-width:140px"><span class="small muted">${l.unit}</span></div></div>`).join('')}</div>
       <div class="field"><label for="cd-notes">Notes (optional)</label><textarea id="cd-notes" style="min-height:60px">${uiEsc(d.notes)}</textarea></div>
       <div class="btn-row"><button class="btn primary" type="button" id="cd-save">${d.editingId ? 'Save changes' : 'Save this diet'}</button><button class="btn" type="button" id="cd-clear">${d.editingId ? 'Cancel' : 'Clear'}</button></div>
@@ -830,7 +830,7 @@ function peopleStepMedications(container, person) {
   for (const q of qs) peopleBindSeg(container, person, 'medications', 'med-' + q.id, v => { person.medications[q.id] = v === 'yes'; }, { rerender: false });
 }
 
-// f) Clinician numbers (Tier 2)
+// f) Doctor or dietitian numbers (Tier 2; the source document calls these clinician-set)
 function peopleStepClinician(container, person) {
   const plan = uiPlanFor(person);
   person.tier2 = person.tier2 || {};
@@ -866,10 +866,10 @@ function peopleStepClinician(container, person) {
       <div class="row" style="margin-top:.5rem">
         <input id="pt-${uiEsc(t.param)}" type="number" inputmode="decimal" step="any" style="max-width:220px" data-tier2="${uiEsc(t.param)}" value="${typeof person.tier2[t.param] === 'number' ? person.tier2[t.param] : ''}" aria-describedby="pt-help-${uiEsc(t.param)}">
         <span class="muted small">${uiEsc(uiParamUnit(t.param))}</span>
-        ${applied.has(t.param) ? uiChip('clinician-set, applied', 'plum') : typeof person.tier2[t.param] === 'number' ? uiChip('saved, not currently used', 'neutral') : t.declaredOnly ? uiChip('not needed right now', 'neutral') : uiChip('not applied', 'caution')}
+        ${applied.has(t.param) ? uiChip('from your doctor or dietitian, applied', 'plum') : typeof person.tier2[t.param] === 'number' ? uiChip('saved, not currently used', 'neutral') : t.declaredOnly ? uiChip('not needed right now', 'neutral') : uiChip('not applied', 'caution')}
       </div>
-      <p id="pt-help-${uiEsc(t.param)}" class="small" style="margin:.5rem 0 0"><strong>Enter the number your clinician gave you. The app does not set this.</strong></p>
-    </div>`).join('') : uiEmptyState('No clinician-set numbers are needed for the modules you selected.')}`;
+      <p id="pt-help-${uiEsc(t.param)}" class="small" style="margin:.5rem 0 0"><strong>Enter the number your doctor or dietitian gave you. The app does not set this.</strong></p>
+    </div>`).join('') : uiEmptyState('None of the conditions you selected need a number from your doctor or dietitian.')}`;
   container.querySelectorAll('[data-tier2]').forEach(inp => inp.addEventListener('change', () => {
     const v = inp.value.trim();
     if (v === '') delete person.tier2[inp.dataset.tier2]; else person.tier2[inp.dataset.tier2] = Number(v);
@@ -998,7 +998,7 @@ function peopleStepReview(container, person) {
     ['Spice', uiEsc((SPICE_LEVELS.find(l => l.value === spicePreference(person)) || SPICE_LEVELS[0]).label)],
     ['Cuisines', uiEsc(`${(prefs.cuisines_skip || []).length ? 'skip ' + prefs.cuisines_skip.join(', ') : 'nothing skipped'}${(prefs.cuisines_love || []).length ? '; love ' + prefs.cuisines_love.join(', ') : ''}`)],
     ['Medications', uiEsc(Object.entries(person.medications || {}).filter(([, v]) => v).map(([k]) => k.replace(/_/g, ' ')).join(', ') || 'none flagged')],
-    ['Clinician numbers', Object.keys(person.tier2 || {}).length ? uiEsc(Object.entries(person.tier2).map(([k, v]) => `${k}: ${v}`).join(', ')) : 'none entered'],
+    ['Doctor or dietitian numbers', Object.keys(person.tier2 || {}).length ? uiEsc(Object.entries(person.tier2).map(([k, v]) => `${k}: ${v}`).join(', ')) : 'none entered'],
     ['Cooking', uiEsc(`${c.weekday_minutes || 20} min weekdays, ${c.weekend_minutes || 40} min weekends, ${(c.cook_days || []).length} cook days, ${c.interest || 'simple'}, cooking for ${c.household || 1}${c.budget ? ', reuse ingredients to save money' : ''}`)],
     ['Snacks', uiEsc(peopleSnackHint(person))]
   ];

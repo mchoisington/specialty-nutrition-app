@@ -75,7 +75,7 @@ export function renderTogetherScreen(root) {
     </div>`, { id: 'tg-who-h' })}
     <div id="tg-result" class="stack-2">${togetherUi.built && selected.length ? togetherResultHTML(selected, eaters, start, count) : ''}</div>
     ${uiSection('Share and add guests', `<div class="card">
-      <p class="small">Share <strong>${uiEsc(me.name)}</strong>'s conditions, allergens, preferences, and clinician numbers as a small file or text, so another household can cook for them. No log, weights, or diary is included.</p>
+      <p class="small">Share <strong>${uiEsc(me.name)}</strong>'s conditions, allergens, preferences, and any doctor or dietitian numbers as a small file or text, so another household can cook for them. No log, weights, or diary is included.</p>
       <div class="btn-row"><button class="btn primary" type="button" id="tg-share-file">${uiIcon('share')}Share my profile (file)</button><button class="btn" type="button" id="tg-share-copy">${uiIcon('copy')}Copy as text</button></div>
       <h3>Add a guest</h3>
       <p class="small muted">Paste the text someone sent you, or choose their file. Guests get a "Guest" chip, can be picked above, and can be removed at any time here or on the Settings screen.</p>

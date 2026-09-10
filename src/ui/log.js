@@ -72,7 +72,7 @@ export function renderLogScreen(root) {
         ${e.notes ? `<div class="small">${uiEsc(e.notes)}</div>` : ''}</div>
         <div class="list-actions"><button class="btn small danger" type="button" data-del="${uiEsc(e.logged_at || '')}|${uiEsc(e.date)}|${uiEsc(e.meal || '')}">Delete</button></div></div>`).join('')}</div>
     </section>`).join('')}</div>` : uiEmptyState('No entries in the last 14 days.', '', 'list'), { id: 'log-recent-h' })}
-    <p class="small muted">The log is a record for you and your clinician. The app does not analyze it or claim to find causes.</p>
+    <p class="small muted">The log is a record for you and your doctor or dietitian. The app does not analyze it or claim to find causes.</p>
   `;
 
   root.querySelector('#log-date').addEventListener('change', e => { d.date = e.target.value || today; d.recipe = ''; uiState.rerender(); });

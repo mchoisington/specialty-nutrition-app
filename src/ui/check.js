@@ -114,7 +114,7 @@ function checkFoodNutrientsHTML(food, plan) {
     const pct = vPortion != null && daily && !isPct ? round(vPortion / daily * 100) : null;
     const cls = pct == null ? '' : lim ? (pct > 100 ? 'over' : '') : (pct >= 100 ? 'ok' : '');
     const word = pct == null ? '' : lim ? (pct > 100 ? ' over' : '') : (pct >= 100 ? ' met' : '');
-    return `<tr><td>${uiEsc(uiNutrientLabel(k))}</td><td class="num">${missing ? '<span class="muted">no data</span>' : uiFmtNum(v100, 1)}</td><td class="num">${perPortion ? (missing ? '<span class="muted">no data</span>' : uiFmtNum(vPortion, 1)) : ''}</td><td class="num">${daily != null ? uiFmtNum(daily, 1) : ''}${lim && lim.clinician || tg && tg.clinician ? ' ' + uiChip('clinician-set', 'plum') : ''}</td><td class="num ${cls}">${pct != null ? pct + '%' + word : ''}</td></tr>`;
+    return `<tr><td>${uiEsc(uiNutrientLabel(k))}</td><td class="num">${missing ? '<span class="muted">no data</span>' : uiFmtNum(v100, 1)}</td><td class="num">${perPortion ? (missing ? '<span class="muted">no data</span>' : uiFmtNum(vPortion, 1)) : ''}</td><td class="num">${daily != null ? uiFmtNum(daily, 1) : ''}${lim && lim.clinician || tg && tg.clinician ? ' ' + uiChip('doctor or dietitian', 'plum') : ''}</td><td class="num ${cls}">${pct != null ? pct + '%' + word : ''}</td></tr>`;
   }).join('');
   return uiSection('Nutrients that matter for this plan', `<div class="table-wrap"><table>
     <thead><tr><th>Nutrient</th><th class="num">Per 100 g</th><th class="num">${portion ? 'Per ' + uiEsc(portion.label) + ' (' + portion.grams + ' g)' : 'Per portion'}</th><th class="num">Daily number</th><th class="num">% of daily (portion)</th></tr></thead>

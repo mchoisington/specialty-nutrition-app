@@ -143,9 +143,9 @@ function todayTargetCardHTML(person, plan, totals, exerciseKcal) {
     const m = /^(.*?)\s*\((.*)\)\s*$/.exec(full);
     const name = m ? m[1] : full, unit = m ? m[2] : '';
     const digits = n === 'sodium_mg' ? 0 : 1;
-    if (over) return uiMeter({ label: uiEsc(name), value: totals[n], max: over.limit, kind: 'limit', unit, digits, labelExtra: plan.limits[n] && plan.limits[n].clinician ? uiChip('clinician-set', 'plum') : '' });
+    if (over) return uiMeter({ label: uiEsc(name), value: totals[n], max: over.limit, kind: 'limit', unit, digits, labelExtra: plan.limits[n] && plan.limits[n].clinician ? uiChip('doctor or dietitian', 'plum') : '' });
     if (under) return uiMeter({ label: uiEsc(name), value: totals[n], max: under.min, kind: 'target', unit, digits });
-    if (ok && ok.limit != null) return uiMeter({ label: uiEsc(name), value: totals[n], max: ok.limit, kind: 'limit', unit, digits, labelExtra: plan.limits[n] && plan.limits[n].clinician ? uiChip('clinician-set', 'plum') : '' });
+    if (ok && ok.limit != null) return uiMeter({ label: uiEsc(name), value: totals[n], max: ok.limit, kind: 'limit', unit, digits, labelExtra: plan.limits[n] && plan.limits[n].clinician ? uiChip('doctor or dietitian', 'plum') : '' });
     if (ok && ok.min != null) return uiMeter({ label: uiEsc(name), value: totals[n], max: ok.min, kind: 'target', unit, digits });
     return `<div class="meter neutral"><div class="meter-label">${uiEsc(name)}</div><div class="meter-value"><strong>${uiFmtNum(totals[n], digits)}</strong> <span class="meter-of">${uiEsc(unit)}</span></div><div class="meter-word"><span>no number in plan</span></div></div>`;
   });
@@ -339,7 +339,7 @@ function todayTargetModal(person, plan) {
     <p class="small muted">A calorie target is an estimate from a published equation (Mifflin-St Jeor), not a prescription. It needs sex, age, weight, and height from the People screen.</p>
     <div class="field"><span class="label">Goal</span>${uiSegmented('today-goal', [{ value: 'maintain', label: 'Maintain' }, { value: 'loss', label: 'Lose weight' }, { value: 'manual', label: 'Enter my own number' }], draft.goal)}</div>
     <div class="field" id="today-goal-loss" ${draft.goal === 'loss' ? '' : 'hidden'}><label for="today-deficit">Daily deficit: <span id="today-deficit-val">${draft.deficit}</span> kcal</label><input id="today-deficit" type="range" min="500" max="750" step="50" value="${draft.deficit}"><div class="hint">Guidelines use 500 to 750 kcal a day below maintenance. The estimate never goes below 1,200 kcal.</div></div>
-    <div class="field" id="today-goal-manual" ${draft.goal === 'manual' ? '' : 'hidden'}><label for="today-manual">Calories per day</label><input id="today-manual" type="number" inputmode="numeric" min="800" max="6000" value="${uiEsc(draft.manual)}"><div class="hint">Use the number your clinician or dietitian gave you.</div></div>
+    <div class="field" id="today-goal-manual" ${draft.goal === 'manual' ? '' : 'hidden'}><label for="today-manual">Calories per day</label><input id="today-manual" type="number" inputmode="numeric" min="800" max="6000" value="${uiEsc(draft.manual)}"><div class="hint">Use the number your doctor or dietitian gave you.</div></div>
     <div class="field" id="today-goal-activity" ${draft.goal === 'manual' ? 'hidden' : ''}><label for="today-activity">Usual activity</label><select id="today-activity">${ACTIVITY_LEVELS.map(l => `<option value="${l.id}" ${l.id === draft.activity ? 'selected' : ''}>${uiEsc(l.label)}</option>`).join('')}</select></div>
     <div id="today-target-preview" class="notice info plain"></div>
     <div class="btn-row"><button class="btn primary" type="button" id="today-target-save">Save</button>${g.calorie_target !== 'off' ? '<button class="btn" type="button" id="today-target-off">Turn off the target</button>' : ''}</div>
