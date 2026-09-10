@@ -285,7 +285,7 @@ function householdSwapModal(h, people, week, di, slot) {
   const current = day.meals.find(m => m.slot === slot);
   const { eaters, rows } = householdCandidates({ week, di, slot, people, household: h, recipes: uiState.data.recipes, foodsById: uiState.foodsById, n: 6, exclude: current && current.recipe });
   const m = uiModal(`
-    <p class="small muted">Top alternatives for ${SLOT_LABEL[slot] || slot} on ${HH_DAY_NAMES[day.day]} for ${uiEsc(eaters.map(p => p.name).join(', ') || 'nobody')}, scored the way the planner scores them. Nothing here breaks anyone's hard rules.</p>
+    <p class="small muted">Top alternatives for ${SLOT_LABEL[slot] || slot} on ${HH_DAY_NAMES[day.day]} for ${uiEsc(eaters.map(p => p.name).join(', ') || 'nobody')}, scored the way the planner scores them. Only recipes that pass every eater's checks are listed.</p>
     ${rows.length ? `<div class="list">${rows.map(x => `<div class="list-row"><div class="list-main">
       <div class="list-title"><span class="dot ${x.check.verdict}" aria-hidden="true"></span>${uiEsc(x.r.name)} ${uiVerdictChip(x.check.verdict)}</div>
       <div class="list-sub">${x.r.active_min} min active, ${x.r.total_min} total, ${uiEsc(x.r.skill)}${x.r.assembly_only ? ', assembly only' : ''} · score ${Math.round(x.score)}</div>

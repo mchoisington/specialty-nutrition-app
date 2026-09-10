@@ -87,7 +87,7 @@ export function makeSeatingCache({ conditions, dictionaries, matcher, foodsById,
         if (!(hasNutrition(r) || favorites.includes(r.id) || sp.cooking.include_unknown_nutrition)) continue;
         if (disliked.includes(r.id) || cuisineSkipped(r, sp) || spiceSkipped(r, sp)) continue;
         const c = checkRecipe(r, plan, matcher, foodsById, sp);
-        if (c.verdict === 'fail') continue;
+        if (c.verdict !== 'pass') continue;   // only recipes that pass every eater's checks are ever seated
         checks.set(r.id, c);
         pool.push(r);
       }

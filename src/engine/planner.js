@@ -94,6 +94,7 @@ export function mealFits(recipe, meal, { canCook, minutes, slot }) {
 
 export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, minutes, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked, person, slot }) {
   if (check.verdict === 'fail') return { score: -Infinity, reasons: ['hard exclusion'] };
+  if (check.verdict !== 'pass') return { score: -Infinity, reasons: ['not fully safe: ' + cautionWhy(check)] };
   if (disliked && disliked.includes(recipe.id)) return { score: -Infinity, reasons: ['marked never again'] };
   if (person && cuisineSkipped(recipe, person)) return { score: -Infinity, reasons: ['cuisine skipped'] };
   if (person && spiceSkipped(recipe, person)) return { score: -Infinity, reasons: ['too spicy for your setting'] };
@@ -158,6 +159,20 @@ export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, minutes, 
 }
 
 // A component (sauce, dressing, stock, dough, spice mix) is never a meal on its own.
+// Why a recipe is caution rather than pass, in plain words. Only recipes that pass every check are ever planned.
+export function cautionWhy(check) {
+  const parts = [];
+  const soft = (check.hits || []).filter(h => !h.hard).map(h => h.label);
+  if (soft.length) parts.push('avoid: ' + soft.join(', '));
+  const terms = (check.termHits || []).filter(t => !t.hard).map(t => t.term || t.label).filter(Boolean);
+  if (terms.length) parts.push('avoid word: ' + [...new Set(terms)].join(', '));
+  if (check.verifyLabel && check.verifyLabel.length) parts.push('label must be checked for ' + check.verifyLabel.map(v => v.label).join(', '));
+  if (check.exceeds && check.exceeds.length) parts.push('one serving is over the daily ' + check.exceeds.map(e => String(e.nutrient).replace(/_(mg|mcg|g|kcal)$/, '').replace(/_/g, ' ')).join(', '));
+  if (check.unknownRisk && check.unknownRisk.length) parts.push('unknown-risk ingredient');
+  if (check.unrecognized && check.unrecognized.length) parts.push('ingredient not recognized: ' + check.unrecognized.slice(0, 3).join(', '));
+  return parts.join('; ') || 'needs a look';
+}
+
 export function isComponent(r) { return Array.isArray(r.meal) && r.meal.length === 1 && r.meal[0] === 'component'; }
 
 // dayOverrides: { 'YYYY-MM-DD': { can_cook, minutes } } for this week only; snacksPerDay: this week's snack count, if set.
@@ -174,8 +189,15 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
   const meals = recipes.filter(r => !isComponent(r));
   const pool = meals.filter(r => (hasNutrition(r) || favorites.includes(r.id) || cooking.include_unknown_nutrition) && !cuisineSkipped(r, person) && !spiceSkipped(r, person));
   const checks = new Map(pool.map(r => [r.id, checkRecipe(r, plan, matcher, foodsById, person)]));
-  const eligible = pool.filter(r => checks.get(r.id).verdict !== 'fail' && !disliked.includes(r.id));
-  const excluded = pool.filter(r => checks.get(r.id).verdict === 'fail').map(r => ({ id: r.id, name: r.name, why: checks.get(r.id).hits.filter(h => h.hard).map(h => h.label) }));
+  // Only recipes that pass every check are planned. Caution recipes (a soft avoid, a label to verify, an unrecognized
+  // ingredient, a serving over a daily limit) stay in the library but never land on the table by default.
+  const eligible = pool.filter(r => checks.get(r.id).verdict === 'pass' && !disliked.includes(r.id));
+  const excluded = pool.filter(r => checks.get(r.id).verdict !== 'pass').map(r => {
+    const c = checks.get(r.id);
+    return c.verdict === 'fail'
+      ? { id: r.id, name: r.name, verdict: 'fail', why: c.hits.filter(h => h.hard).map(h => h.label) }
+      : { id: r.id, name: r.name, verdict: 'caution', why: [cautionWhy(c)] };
+  });
   const skippedNoNutrition = meals.length - pool.length;
   const days = [];
   const recentIds = [];
@@ -257,7 +279,7 @@ export function repickSlots({ week, di, slots, person, plan, recipes, foodsById,
     for (const r of pool) {
       if (!recipeMeal(r, slot)) continue;
       const check = checkRecipe(r, plan, matcher, foodsById, person);
-      if (check.verdict === 'fail') continue;
+      if (check.verdict !== 'pass') continue;
       const s = scoreRecipe({ recipe: r, check, cooking, dayIdx, canCook: cc, minutes: mins, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked, person, slot });
       if (s.score === -Infinity) continue;
       scored.push({ r, check, score: s.score + rnd() * 4, reasons: s.reasons });

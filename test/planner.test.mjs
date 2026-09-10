@@ -75,3 +75,22 @@ test('text-only ingredients from imported recipes appear on the grocery list by 
   assert.equal(onion.group, 'From recipe text (check amounts)');
   assert.ok(/1 onion, chopped \(Lentil soup\)/.test(onion.quantity));
 });
+
+test('only recipes that pass every check are planned: a soft avoid, an avoid word, or a serving over a limit is left out', () => {
+  // soft avoid on poultry: chicken recipes become caution, so oatmeal is the only recipe left and dinners go unfilled
+  const softPlan = { ...plan, avoid: { ...plan.avoid, poultry: { hard: false, rules: [] } } };
+  const week = buildWeekPlan({ person, plan: softPlan, recipes, foodsById: foods, matcher, startDate: new Date('2026-09-06'), seed: 1 });
+  for (const d of week.days) for (const m of d.meals) if (m.recipe) assert.equal(m.check.verdict, 'pass', `${m.name} was planned with verdict ${m.check.verdict}`);
+  const cb = week.excluded.find(e => e.id === 'chicken-broccoli');
+  assert.ok(cb && cb.verdict === 'caution' && /avoid: Poultry|avoid: poultry/i.test(cb.why.join(' ')), JSON.stringify(cb));
+  assert.ok(week.excluded.find(e => e.id === 'pb-toast').verdict === 'fail');
+  // an avoid word from preferences is caution too
+  const p2 = { ...person, preferences: { avoid_tags: [], avoid_terms: ['broccoli'] } };
+  const w2 = buildWeekPlan({ person: p2, plan, recipes, foodsById: foods, matcher, startDate: new Date('2026-09-06'), seed: 1 });
+  for (const d of w2.days) for (const m of d.meals) assert.notEqual(m.recipe, 'chicken-broccoli');
+  // a serving over the daily sodium limit is caution: with a 1000 mg limit the salt bomb (3100 mg) is never planned
+  const lowSodium = { ...plan, limits: { sodium_mg: { value: 1000 } } };
+  const w3 = buildWeekPlan({ person, plan: lowSodium, recipes, foodsById: foods, matcher, startDate: new Date('2026-09-06'), seed: 1 });
+  for (const d of w3.days) for (const m of d.meals) assert.notEqual(m.recipe, 'salt-bomb');
+  assert.ok(/daily sodium/.test(w3.excluded.find(e => e.id === 'salt-bomb').why.join(' ')));
+});
