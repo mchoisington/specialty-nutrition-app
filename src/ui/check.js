@@ -11,15 +11,19 @@ export function renderCheckScreen(root) {
   const plan = uiPlanFor(person);
   const foods = uiState.data.foods;
   root.innerHTML = `
-    ${uiPageHeader('Check a food', `Checked against ${uiEsc(person.name)}'s plan. The dictionary matches exact terms; it does not guess. Anything it does not recognize is reported, not assumed safe.`)}
+    ${uiPageHeader('Check a food', `Two questions, both answered against ${uiEsc(person.name)}'s plan. Anything the app does not recognize is reported, never assumed safe.`)}
     <div class="card">
-      <label for="check-text">Paste an ingredient list or type a food</label>
+      <h2>Is this product okay?</h2>
+      <p class="small muted">Copy the ingredient list off a package (or type a dish) and get a plain answer: fine, caution, or no, and why.</p>
+      <label for="check-text" class="visually-hidden">Ingredient list</label>
       <textarea id="check-text" placeholder="Ingredients: water, roasted peanuts, salt, natural flavors">${uiEsc(checkLastText)}</textarea>
-      <div class="btn-row"><button class="btn primary" type="button" id="check-run">${uiIcon('check')}Check</button><button class="btn" type="button" id="check-clear">Clear</button></div>
+      <div class="btn-row"><button class="btn primary" type="button" id="check-run">${uiIcon('check')}Check this list</button><button class="btn" type="button" id="check-clear">Clear</button></div>
     </div>
     <div class="card">
-      <label for="check-search">Search foods (${foods.length} in the database)</label>
-      <input id="check-search" type="search" placeholder="Start typing: peanut, yogurt, salmon" autocomplete="off" ${foods.length ? '' : 'disabled'}>
+      <h2>What is in one food?</h2>
+      <p class="small muted">Look up a single food to see its numbers (sodium, potassium, sugar, fiber, and whatever else ${uiEsc(person.name)}'s plan watches) and whether it fits. Same ${uiFmtNum(foods.length)} foods Today uses when you log a meal.</p>
+      <label for="check-search" class="visually-hidden">Look up a food</label>
+      <input id="check-search" type="search" placeholder="Type a food: banana, Greek yogurt, canned tuna" autocomplete="off" ${foods.length ? '' : 'disabled'}>
       <ul class="search-results" id="check-results" hidden></ul>
       ${foods.length ? '' : '<p class="small muted">The food database (data/foods.json) is not loaded.</p>'}
     </div>

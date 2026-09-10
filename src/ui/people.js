@@ -336,9 +336,9 @@ function peopleStepBasics(container, person) {
         ${uiBigChoices('activity', ACTIVITY_LEVELS.map(l => ({ value: l.id, label: l.label })), person.activity || 'light', { label: 'Activity level' })}
         <div class="hint">Used only for the calorie estimate, and only when you turn that on.</div></div>
       ${person.adult === false ? '' : `
-      <div class="field"><span class="label">Pregnant?</span>${uiYesNo('pregnancy', !!person.pregnancy)}</div>
+      <div id="pb-repro" ${person.sex === 'male' ? 'hidden' : ''}><div class="field"><span class="label">Pregnant?</span>${uiYesNo('pregnancy', !!person.pregnancy)}</div>
       <div class="field"><span class="label">Breastfeeding?</span>${uiYesNo('breastfeeding', !!person.breastfeeding)}
-        <div class="hint">Either answer turns on the pregnancy and breastfeeding rules and turns off weight-loss, ketogenic, low-carbohydrate, fasting, and elimination protocols other than allergen and celiac.</div></div>`}
+        <div class="hint">Either answer turns on the pregnancy and breastfeeding rules and turns off weight-loss, ketogenic, low-carbohydrate, fasting, and elimination protocols other than allergen and celiac.</div></div></div>`}
     </div>
     ${peopleGlobalFlagsHTML(person)}`;
   const bindText = (sel, fn) => container.querySelector(sel).addEventListener('change', e => { fn(e.target.value); peoplePersist(person); });
@@ -360,7 +360,12 @@ function peopleStepBasics(container, person) {
     peoplePersist(person);
     uiState.rerender(); // the step list changes with this answer
   }));
-  peopleBindSeg(container, person, 'basics', 'sex', v => { person.sex = v; }, { rerender: false });
+  peopleBindSeg(container, person, 'basics', 'sex', v => {
+    person.sex = v;
+    const repro = container.querySelector('#pb-repro');
+    if (repro) repro.hidden = v === 'male';
+    if (v === 'male') { person.pregnancy = false; person.breastfeeding = false; container.querySelectorAll('input[data-seg="pregnancy"], input[data-seg="breastfeeding"]').forEach(i => { i.checked = i.value === 'no'; i.closest('label').classList.toggle('on', i.checked); }); }
+  }, { rerender: false });
   peopleBindSeg(container, person, 'basics', 'activity', v => { person.activity = v; }, { rerender: false });
   peopleBindSeg(container, person, 'basics', 'pregnancy', v => { person.pregnancy = v === 'yes'; }, { rerender: false });
   peopleBindSeg(container, person, 'basics', 'breastfeeding', v => { person.breastfeeding = v === 'yes'; }, { rerender: false });
