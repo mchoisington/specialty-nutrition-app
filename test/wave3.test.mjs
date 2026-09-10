@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { classifyComponent, fixMeal, fixBreakfast } from '../tools/lib/meal-components.mjs';
 import { recipeHeat, spiceSkipped, spiceBonus } from '../src/engine/spice.js';
-import { buildWeekPlan, minutesAvailable, canCookOn, snackPlan, daySlots, recipeMeal, isComponent, scoreRecipe } from '../src/engine/planner.js';
+import { buildWeekPlan, minutesAvailable, canCookOn, snackPlan, daySlots, recipeMeal, isComponent, scoreRecipe, mealFits, repickSlots } from '../src/engine/planner.js';
 import { buildPlan } from '../src/engine/plan.js';
 import { buildMatcher } from '../src/engine/dictionary.js';
 
@@ -92,16 +92,58 @@ test('spice preference excludes above the level and nudges within it', () => {
   assert.equal(scoreRecipe({ recipe: medium, check, cooking: p('none').cooking, dayIdx: 1, canCook: true, recentIds: [], person: p('none'), favorites: [], disliked: [] }).score, -Infinity);
 });
 
-test('per-day cooking minutes override the weekday and weekend answers; cook days can be toggled', () => {
+test('a per-date override changes that date only and never the standing weekday answer', () => {
   const c = { weekday_minutes: 20, weekend_minutes: 45, cook_days: ['mon', 'wed'] };
   assert.equal(minutesAvailable(c, 1), 20);
   assert.equal(minutesAvailable(c, 6), 45);
-  c.day_minutes = { mon: 60 };
-  assert.equal(minutesAvailable(c, 1), 60);
-  assert.equal(minutesAvailable(c, 2), 20);
+  assert.equal(minutesAvailable(c, 1, { minutes: 60 }), 60);
+  assert.equal(minutesAvailable(c, 1), 20, 'the override is not stored on cooking');
   assert.equal(canCookOn(c, 1), true);
   assert.equal(canCookOn(c, 2), false);
+  assert.equal(canCookOn(c, 2, { can_cook: true }), true);
+  assert.equal(canCookOn(c, 1, { can_cook: false }), false);
   assert.equal(canCookOn({ cook_days: [] }, 2), true, 'no cook days listed means every day');
+  assert.equal(c.day_minutes, undefined);
+});
+
+test('mealFits: leftovers and assembly always fit; cooked meals need the time', () => {
+  const cooked = { id: 'c', active_min: 30, assembly_only: false };
+  const quick = { id: 'q', active_min: 5, assembly_only: true };
+  assert.equal(mealFits(cooked, { recipe: 'c', slot: 'dinner', source: 'cook' }, { canCook: true, minutes: 45, slot: 'dinner' }).fits, true);
+  assert.equal(mealFits(cooked, { recipe: 'c', slot: 'dinner', source: 'cook' }, { canCook: true, minutes: 15, slot: 'dinner' }).fits, false);
+  assert.equal(mealFits(cooked, { recipe: 'c', slot: 'dinner', source: 'cook' }, { canCook: false, minutes: 45, slot: 'dinner' }).fits, false);
+  assert.equal(mealFits(cooked, { recipe: 'c', slot: 'dinner', source: 'leftover' }, { canCook: false, minutes: 10, slot: 'dinner' }).fits, true);
+  assert.equal(mealFits(quick, { recipe: 'q', slot: 'lunch', source: 'assembly' }, { canCook: false, minutes: 10, slot: 'lunch' }).fits, true);
+});
+
+test('repickSlots replaces only the named slots of one day; every other meal in the week is untouched', () => {
+  const p = person();
+  const plan = buildPlan({ person: p, conditions, dictionaries });
+  const all = [...recipes, ...open, ...usda];
+  const week = buildWeekPlan({ person: p, plan, recipes: all, foodsById, matcher, startDate: new Date('2026-09-07T00:00:00Z'), seed: 2 });
+  const before = JSON.stringify(week.days.map(d => d.meals.map(m => m.recipe)));
+  const di = 2;
+  const { meals } = repickSlots({ week, di, slots: ['dinner'], person: p, plan, recipes: all, foodsById, matcher, canCook: true, minutes: 10 });
+  assert.equal(meals.length, 1);
+  assert.equal(meals[0].slot, 'dinner');
+  assert.ok(meals[0].repicked);
+  const r = all.find(x => x.id === meals[0].recipe);
+  assert.ok(r, 'picked a recipe');
+  assert.ok((r.active_min || 0) <= 10 || r.assembly_only, `picked ${r.name} with ${r.active_min} active minutes for a 10 minute day`);
+  assert.equal(JSON.stringify(week.days.map(d => d.meals.map(m => m.recipe))), before, 'repickSlots does not mutate the week');
+});
+
+test('buildWeekPlan honours a per-date override on that date only', () => {
+  const p = person();
+  const plan = buildPlan({ person: p, conditions, dictionaries });
+  const all = [...recipes, ...open, ...usda];
+  const start = new Date('2026-09-07T00:00:00Z');
+  const week = buildWeekPlan({ person: p, plan, recipes: all, foodsById, matcher, startDate: start, seed: 3, dayOverrides: { '2026-09-09': { can_cook: false, minutes: 10 } }, snacksPerDay: 0 });
+  const d = week.days.find(x => x.date === '2026-09-09');
+  assert.equal(d.canCook, false); assert.equal(d.minutes, 10); assert.equal(d.overridden, true);
+  assert.equal(week.days.find(x => x.date === '2026-09-08').canCook, true);
+  assert.equal(week.days.find(x => x.date === '2026-09-08').overridden, false);
+  assert.deepEqual(week.slots, ['breakfast', 'lunch', 'dinner'], 'this-week snack override of 0 removes the snack slot');
 });
 
 test('snack slots: one by default, two for reflux without an evening snack, two with a bedtime snack for GDM, and the person can override', () => {

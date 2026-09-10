@@ -23,8 +23,8 @@ export function isSnackSlot(slot) { return typeof slot === 'string' && slot.star
 const FREQUENT_MODULES = { 'pregnancy-gdm-breastfeeding': 'gdm', gerd: 'gerd', gastroparesis: 'frequent', 'weight-management-glp1': 'frequent', 'cancer-nutrition': 'frequent' };
 
 // How many snacks a day the plan should carry and why. The person's own setting wins; otherwise the conditions decide.
-export function snackPlan(person, plan) {
-  const set = person && person.cooking && person.cooking.snacks_per_day;
+export function snackPlan(person, plan, weekOverride) {
+  const set = typeof weekOverride === 'number' ? weekOverride : person && person.cooking && person.cooking.snacks_per_day;
   const mods = new Set(((plan && plan.modules) || []).map(m => m.id));
   let kind = null;
   for (const [id, k] of Object.entries(FREQUENT_MODULES)) if (mods.has(id)) { kind = kind === 'gdm' ? kind : k; }
@@ -41,12 +41,12 @@ export function snackPlan(person, plan) {
   else if (count === 2) slots = kind === 'gdm' ? ['snack-pm', 'snack-eve'] : ['snack-am', 'snack-pm'];
   else slots = ['snack-am', 'snack-pm', 'snack-eve'];
   if (kind === 'gerd') slots = slots.filter(s => s !== 'snack-eve');   // no evening snack with reflux
-  return { count: slots.length, slots, why, auto: why !== 'your setting' };
+  return { count: slots.length, slots, why: typeof weekOverride === 'number' ? 'your setting for this week' : why, auto: why !== 'your setting' && typeof weekOverride !== 'number' };
 }
 
 // The day's slots in order: breakfast, morning snack, lunch, afternoon snack, dinner, evening snack.
-export function daySlots(person, plan) {
-  const snacks = new Set(snackPlan(person, plan).slots);
+export function daySlots(person, plan, weekOverride) {
+  const snacks = new Set(snackPlan(person, plan, weekOverride).slots);
   const order = ['breakfast', 'snack-am', 'lunch', 'snack-pm', 'dinner', 'snack-eve'];
   return order.filter(s => !isSnackSlot(s) || snacks.has(s));
 }
@@ -61,24 +61,37 @@ function mulberry32(a) {
 }
 function hashStr(s) { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
 
-// Minutes the person can cook on a given weekday. A per-day override (set from the Week screen) wins over the weekday/weekend answer.
-export function minutesAvailable(cooking, dayIdx) {
-  const day = DAYS[dayIdx];
-  const per = cooking && cooking.day_minutes;
-  if (per && typeof per[day] === 'number' && per[day] > 0) return per[day];
+// Minutes the person can cook on a given weekday. `override` is this week's change for that one date ({ minutes }),
+// made on the Week screen; it never touches the standing weekday/weekend answer from the Cooking step.
+export function minutesAvailable(cooking, dayIdx, override) {
+  if (override && typeof override.minutes === 'number' && override.minutes > 0) return override.minutes;
   const weekend = dayIdx === 0 || dayIdx === 6;
   const m = weekend ? cooking.weekend_minutes : cooking.weekday_minutes;
   return Number(m) || 20;
 }
 
-// Whether the person can cook on a given weekday. An empty cook_days list means every day.
-export function canCookOn(cooking, dayIdx) {
+// Whether the person can cook on a given weekday. An empty cook_days list means every day. `override` as above ({ can_cook }).
+export function canCookOn(cooking, dayIdx, override) {
+  if (override && typeof override.can_cook === 'boolean') return override.can_cook;
   const days = cooking && cooking.cook_days;
   if (!days || !days.length) return true;
   return days.includes(DAYS[dayIdx]);
 }
 
-export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked, person, slot }) {
+// Does a scheduled meal still fit a day's cooking time? Leftovers and assembly meals always fit; a cooked meal needs the
+// day to allow cooking and its active minutes to fit. Returns { fits, why }.
+export function mealFits(recipe, meal, { canCook, minutes, slot }) {
+  if (!recipe || !meal || !meal.recipe) return { fits: true, why: '' };
+  if (meal.source === 'leftover') return { fits: true, why: 'leftovers, no cooking' };
+  const snack = isSnackSlot(slot || meal.slot);
+  const active = Number(recipe.active_min) || 0;
+  if (!canCook && !snack && !recipe.assembly_only && active > 10) return { fits: false, why: `needs ${active} minutes of cooking on a no-cooking day` };
+  const avail = snack ? Math.min(15, minutes) : minutes;
+  if (active > avail) return { fits: false, why: `needs ${active} active minutes, the day now has ${avail}` };
+  return { fits: true, why: '' };
+}
+
+export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, minutes, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked, person, slot }) {
   if (check.verdict === 'fail') return { score: -Infinity, reasons: ['hard exclusion'] };
   if (disliked && disliked.includes(recipe.id)) return { score: -Infinity, reasons: ['marked never again'] };
   if (person && cuisineSkipped(recipe, person)) return { score: -Infinity, reasons: ['cuisine skipped'] };
@@ -97,7 +110,8 @@ export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, recentIds
   score += Math.min(30, check.preferHits.length * 6);
   // time. Snacks are held to a short assembly window whatever the day allows.
   const snack = isSnackSlot(slot);
-  const avail = snack ? Math.min(15, minutesAvailable(cooking, dayIdx)) : minutesAvailable(cooking, dayIdx);
+  const dayMinutes = typeof minutes === 'number' ? minutes : minutesAvailable(cooking, dayIdx);
+  const avail = snack ? Math.min(15, dayMinutes) : dayMinutes;
   if (!canCook && !snack) {
     if (!recipe.assembly_only && (recipe.active_min || 0) > 10) { score -= 60; reasons.push('no time to cook that day'); }
   } else if ((recipe.active_min || 0) > avail) { score -= 40 + ((recipe.active_min - avail) * 1.5); reasons.push(`needs ${recipe.active_min} active minutes, you have ${avail}`); }
@@ -139,12 +153,14 @@ export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, recentIds
 // A component (sauce, dressing, stock, dough, spice mix) is never a meal on its own.
 export function isComponent(r) { return Array.isArray(r.meal) && r.meal.length === 1 && r.meal[0] === 'component'; }
 
-export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, startDate = new Date(), seed = 0, slots }) {
+// dayOverrides: { 'YYYY-MM-DD': { can_cook, minutes } } for this week only; snacksPerDay: this week's snack count, if set.
+export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, startDate = new Date(), seed = 0, slots, dayOverrides, snacksPerDay }) {
   const cooking = person.cooking || {};
+  const overrides = dayOverrides || {};
   const favorites = (person.favorites && person.favorites.recipes) || [];
   const disliked = (person.disliked && person.disliked.recipes) || [];
   const rnd = mulberry32(hashStr(person.id + '|' + startDate.toISOString().slice(0, 10) + '|' + seed));
-  const daySlotList = slots || daySlots(person, plan);
+  const daySlotList = slots || daySlots(person, plan, snacksPerDay);
   // Only recipes with known nutrition can be held to daily limits. Recipes without it (community imports whose
   // ingredients are not yet linked to foods) are scheduled only when the person has favorited them, and are flagged.
   const hasNutrition = r => !!(r.nutrition_per_serving && r.nutrition_source) || (r.ingredients || []).some(i => i.food);
@@ -165,8 +181,10 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
   for (let i = 0; i < 7; i++) {
     const date = new Date(startDate.getTime() + i * 86400000);
     const dayIdx = date.getDay();
-    const canCook = canCookOn(cooking, dayIdx);
     const dateKey = date.toISOString().slice(0, 10);
+    const ov = overrides[dateKey];
+    const canCook = canCookOn(cooking, dayIdx, ov);
+    const minutes = minutesAvailable(cooking, dayIdx, ov);
     const eaters = Math.max(1, Number(perDay[dateKey] || perDay[DAYS[dayIdx]] || household));
     let dayTotals = emptyTotals();
     const dayMeals = [];
@@ -185,7 +203,7 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
       const candidates = eligible.filter(r => recipeMeal(r, slot));
       const scored = candidates.map(r => {
         const check = checks.get(r.id);
-        const s = scoreRecipe({ recipe: r, check, cooking, dayIdx, canCook, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked, person, slot });
+        const s = scoreRecipe({ recipe: r, check, cooking, dayIdx, canCook, minutes, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked, person, slot });
         return { r, check, score: s.score + rnd() * 4, reasons: s.reasons };
       }).filter(x => x.score > -Infinity).sort((a, b) => b.score - a.score);
       if (!scored.length) { unmet.push({ date: dateKey, slot, why: 'no recipe fits' }); dayMeals.push({ slot, recipe: null, source: 'none' }); continue; }
@@ -199,9 +217,52 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
       dayMeals.push({ slot, recipe: pick.r.id, name: pick.r.name, source: pick.r.assembly_only ? 'assembly' : 'cook', servings: eaters, servingsMade, score: Math.round(pick.score), reasons: pick.reasons, check: summarize(pick.check) });
       recentIds.push(pick.r.id);
     }
-    days.push({ date: dateKey, day: DAYS[dayIdx], canCook, eaters, minutes: minutesAvailable(cooking, dayIdx), meals: dayMeals, totals: dayTotals });
+    days.push({ date: dateKey, day: DAYS[dayIdx], canCook, eaters, minutes, overridden: !!ov, meals: dayMeals, totals: dayTotals });
   }
-  return { days, excluded, unmet, eligibleCount: eligible.length, skippedNoNutrition, seed, slots: daySlotList, snacks: snackPlan(person, plan) };
+  return { days, excluded, unmet, eligibleCount: eligible.length, skippedNoNutrition, seed, slots: daySlotList, snacks: snackPlan(person, plan, snacksPerDay) };
+}
+
+// Picks new meals for the named slots of one day, leaving every other meal in the week exactly as it is.
+// Used when a day's cooking time changes and only the meals that no longer fit are replaced. Returns
+// { meals: [{slot, recipe, name, source, servings, servingsMade, score, reasons, check, repicked: true}], unmet: [slot] }.
+export function repickSlots({ week, di, slots, person, plan, recipes, foodsById, matcher, canCook, minutes }) {
+  const cooking = person.cooking || {};
+  const favorites = (person.favorites && person.favorites.recipes) || [];
+  const disliked = (person.disliked && person.disliked.recipes) || [];
+  const day = week.days[di];
+  const dayIdx = new Date(day.date + 'T00:00:00').getDay();
+  const cc = typeof canCook === 'boolean' ? canCook : day.canCook;
+  const mins = typeof minutes === 'number' ? minutes : day.minutes;
+  const want = new Set(slots);
+  const recentIds = week.days.flatMap(d => d.meals.filter(m => m.recipe && !(d === day && want.has(m.slot))).map(m => m.recipe));
+  let dayTotals = emptyTotals();
+  const byId = new Map(recipes.map(r => [r.id, r]));
+  for (const m of day.meals) { if (want.has(m.slot) || !m.recipe) continue; const r = byId.get(m.recipe); if (r) dayTotals = addTotals(dayTotals, recipeTotals(r, foodsById).perServing); }
+  const weekFoods = new Set();
+  for (const d of week.days) for (const m of d.meals) { if (!m.recipe || (d === day && want.has(m.slot))) continue; const r = byId.get(m.recipe); for (const ing of (r && r.ingredients) || []) if (ing.food) weekFoods.add(ing.food); }
+  const hasNutrition = r => !!(r.nutrition_per_serving && r.nutrition_source) || (r.ingredients || []).some(i => i.food);
+  const pool = recipes.filter(r => !isComponent(r) && (hasNutrition(r) || favorites.includes(r.id) || cooking.include_unknown_nutrition) && !cuisineSkipped(r, person) && !spiceSkipped(r, person) && !disliked.includes(r.id));
+  const rnd = mulberry32(hashStr(person.id + '|' + day.date + '|repick'));
+  const meals = [];
+  const unmet = [];
+  for (const slot of slots) {
+    const scored = [];
+    for (const r of pool) {
+      if (!recipeMeal(r, slot)) continue;
+      const check = checkRecipe(r, plan, matcher, foodsById, person);
+      if (check.verdict === 'fail') continue;
+      const s = scoreRecipe({ recipe: r, check, cooking, dayIdx, canCook: cc, minutes: mins, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked, person, slot });
+      if (s.score === -Infinity) continue;
+      scored.push({ r, check, score: s.score + rnd() * 4, reasons: s.reasons });
+    }
+    scored.sort((a, b) => b.score - a.score);
+    if (!scored.length) { unmet.push(slot); meals.push({ slot, recipe: null, source: 'none', repicked: true }); continue; }
+    const pick = scored[0];
+    dayTotals = addTotals(dayTotals, recipeTotals(pick.r, foodsById).perServing);
+    recentIds.push(pick.r.id);
+    meals.push({ slot, recipe: pick.r.id, name: pick.r.name, source: pick.r.assembly_only ? 'assembly' : 'cook', servings: day.eaters, servingsMade: day.eaters, score: Math.round(pick.score), reasons: pick.reasons, check: summarize(pick.check), repicked: true });
+  }
+  return { meals, unmet };
 }
 
 // Does a recipe fit a slot? Snack slots take recipes tagged "snack"; components fit nothing.

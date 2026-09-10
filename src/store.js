@@ -45,6 +45,7 @@ export function migrate(p) {
     for (const k of Object.keys(np)) if (person[k] === undefined && k !== 'id' && k !== 'name') person[k] = JSON.parse(JSON.stringify(np[k]));
     if (person.cooking && person.cooking.budget === undefined) person.cooking.budget = false;
     if (person.setup_complete === undefined) person.setup_complete = !!(person.modules && person.modules.length);
+    if (person.cooking && person.cooking.day_minutes) delete person.cooking.day_minutes;   // v1.6 stored Week-screen minutes per weekday; now per date, this week only
   }
   p.version = 2;
   return p;
