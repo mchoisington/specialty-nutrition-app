@@ -198,7 +198,7 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
       ? { id: r.id, name: r.name, verdict: 'fail', why: c.hits.filter(h => h.hard).map(h => h.label) }
       : { id: r.id, name: r.name, verdict: 'caution', why: [cautionWhy(c)] };
   });
-  const skippedNoNutrition = meals.length - pool.length;
+  const skippedNoNutrition = meals.filter(r => !(hasNutrition(r) || favorites.includes(r.id) || cooking.include_unknown_nutrition)).length;   // only the no-numbers recipes, not those skipped for spice or cuisine
   const days = [];
   const recentIds = [];
   const leftovers = []; // {recipeId, servings, madeOn}
