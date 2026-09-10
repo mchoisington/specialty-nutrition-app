@@ -12,7 +12,7 @@ const TODAY_MEALS = [{ id: 'breakfast', label: 'Breakfast' }, { id: 'lunch', lab
 const TODAY_TRACKED = ['protein_g', 'carb_g', 'fiber_g', 'sodium_mg', 'satfat_g'];
 let todayUi = { date: null, personId: null };
 
-function todayShiftDate(iso, n) {
+export function todayShiftDate(iso, n) {
   const [y, m, d] = iso.split('-').map(Number);
   return uiIsoDate(new Date(y, m - 1, d + n));
 }
@@ -83,7 +83,7 @@ export function todayToggleFavorite(person, kind, id) {
 
 function todayEntries(person, date) { return (uiState.profile.diary || []).filter(e => e.person === person.id && e.date === date); }
 function todaySum(entries) { let t = emptyTotals(); for (const e of entries) { const x = emptyTotals(); for (const k of NUTRIENT_KEYS) x[k] = (e.nutrients && e.nutrients[k]) || 0; t = addTotals(t, x); } return t; }
-function todayLatestWeightKg(person) {
+export function todayLatestWeightKg(person) {
   const ws = (uiState.profile.weights || []).filter(w => w.person === person.id).sort((a, b) => b.date.localeCompare(a.date));
   return ws.length ? ws[0].kg : person.weight_kg;
 }
@@ -209,7 +209,7 @@ function todayWeightHTML(person) {
   </section>`;
 }
 
-function todayChartSVG(points) {
+export function todayChartSVG(points) {
   const W = 360, H = 170, L = 48, R = 12, T = 14, B = 30;
   const lbs = points.map(p => kgToLb(p.kg));
   let lo = Math.min(...lbs), hi = Math.max(...lbs);
@@ -406,7 +406,7 @@ function todaySearchItems(person, plan, query, favOnly) {
   return { out, total: items.length };
 }
 
-function todayAddModal(person, plan, date, meal) {
+export function todayAddModal(person, plan, date, meal) {
   const state = { q: '', fav: false };
   const m = uiModal(`
     <div class="row"><input type="search" id="today-q" placeholder="Search recipes and foods" aria-label="Search recipes and foods" style="flex:1;min-width:0"><button class="today-chip" type="button" id="today-fav-chip" aria-pressed="false">${uiIcon('heart')}Favorites</button></div>

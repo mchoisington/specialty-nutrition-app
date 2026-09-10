@@ -4,6 +4,10 @@ A personal, evidence-based nutrition planner for a household where people have d
 
 This is a personal tool for one family. It is not a medical device and does not diagnose or treat anything. See `docs/PHASE-1-evidence-and-regulatory-foundation.md` for the evidence behind every module and `docs/PHASE-2-prd-and-architecture.md` for how the app is built.
 
+## Two builds
+
+`node tools/bundle.mjs` builds the full app (`dist/nutrition-app.html`). `node tools/bundle.mjs --lite` builds Peace Meal for one (`dist/peace-meal-lite.html`): one person, four tabs (Today, Meals, Recipes, Report), same engine and conditions, smaller recipe set.
+
 ## Run it
 
 No install, no build, no server, no account.

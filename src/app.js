@@ -15,6 +15,7 @@ import { renderSettingsScreen } from './ui/settings.js';
 import { renderTodayScreen } from './ui/today.js';
 import { renderPantryScreen } from './ui/pantry.js';
 import { renderTogetherScreen } from './ui/together.js';
+import { renderLiteTodayScreen, renderLiteReportScreen } from './ui/lite.js';
 import { renderBreatheScreen } from './ui/breathe.js';
 import { renderRecipesScreen } from './ui/recipes.js';
 import { renderOwnerScreen } from './ui/owner.js';
@@ -71,7 +72,9 @@ function appNormalizeData(data) {
   return data;
 }
 
-const APP_SCREENS = [
+// Lite build ("Peace Meal for one"): set by the bundler. One person, four tabs, the same engine and data.
+export const APP_LITE = typeof window !== 'undefined' && !!window.__PEACE_MEAL_LITE__;
+const APP_SCREENS_FULL = [
   { id: 'home', label: 'Home', icon: 'home' },
   { id: 'people', label: 'People', icon: 'person' },
   { id: 'plan', label: 'Plan', icon: 'list' },
@@ -87,14 +90,31 @@ const APP_SCREENS = [
   { id: 'learn', label: 'Learn', icon: 'book' },
   { id: 'settings', label: 'Settings', icon: 'gear' }
 ];
-const APP_TAB_PRIMARY = ['home', 'today', 'check', 'week'];
+const APP_SCREENS_LITE = [
+  { id: 'today', label: 'Today', icon: 'clock' },
+  { id: 'week', label: 'Meals', icon: 'calendar' },
+  { id: 'recipes', label: 'Recipes', icon: 'leaf' },
+  { id: 'report', label: 'Report', icon: 'cite' },
+  { id: 'check', label: 'Check a label', icon: 'check-circle' },
+  { id: 'plan', label: 'My plan', icon: 'list' },
+  { id: 'grocery', label: 'Grocery', icon: 'cart' },
+  { id: 'people', label: 'My profile', icon: 'person' },
+  { id: 'log', label: 'Symptom log', icon: 'note' },
+  { id: 'breathe', label: 'Breathe', icon: 'breathe' },
+  { id: 'learn', label: 'Learn', icon: 'book' },
+  { id: 'settings', label: 'Settings', icon: 'gear' }
+];
+const APP_SCREENS = APP_LITE ? APP_SCREENS_LITE : APP_SCREENS_FULL;
+const APP_TAB_PRIMARY = APP_LITE ? ['today', 'week', 'recipes', 'report'] : ['home', 'today', 'check', 'week'];
+const APP_HOME = APP_LITE ? 'today' : 'home';
+const APP_BRAND = APP_LITE ? 'Peace Meal for one' : 'Peace Meal';
 
 function appParseRoute() {
-  const h = (location.hash || '#/home').replace(/^#\/?/, '');
+  const h = (location.hash || '#/' + APP_HOME).replace(/^#\/?/, '');
   const parts = h.split('/').filter(Boolean);
-  const screen = parts.shift() || 'home';
+  const screen = parts.shift() || APP_HOME;
   if (screen === 'welcome' || screen === 'owner') return { screen, parts };
-  return { screen: APP_SCREENS.some(s => s.id === screen) ? screen : 'home', parts };
+  return { screen: APP_SCREENS.some(s => s.id === screen) ? screen : APP_HOME, parts };
 }
 
 let appMoreOpen = false;
@@ -115,10 +135,10 @@ function appRenderNav() {
   const who = person ? `<a class="who" href="#/people" aria-label="Active person: ${uiEsc(person.name)}. Open People.">${uiAvatar(person.name)}<span class="who-name">${uiEsc(person.name)}</span></a>` : '';
 
   // Phone top bar: Back (when there is somewhere to go), brand, active person.
-  top.innerHTML = `${canBack ? uiBackButtonHTML('back-phone') : ''}<a class="brand" href="#/home">${uiBrandMark({ label: 'Peace Meal' })}<span class="brand-name">Peace Meal</span></a><div class="spacer"></div>${who}`;
+  top.innerHTML = `${canBack ? uiBackButtonHTML('back-phone') : ''}<a class="brand" href="#/${APP_HOME}">${uiBrandMark({ label: APP_BRAND })}<span class="brand-name">${APP_BRAND}</span></a><div class="spacer"></div>${who}`;
 
   // Desktop rail: brand at top, nav, active person at the bottom.
-  side.innerHTML = `<a class="rail-brand" href="#/home">${uiBrandMark({ label: 'Peace Meal' })}<span class="brand-name">Peace Meal</span></a>
+  side.innerHTML = `<a class="rail-brand" href="#/${APP_HOME}">${uiBrandMark({ label: APP_BRAND })}<span class="brand-name">${APP_BRAND}</span></a>
     <div class="rail-nav">${APP_SCREENS.map(s => appNavLink(s, cur)).join('')}</div>
     ${person ? `<a class="rail-person" href="#/people" aria-label="Active person: ${uiEsc(person.name)}. Open People.">${uiAvatar(person.name)}<span class="rail-person-text"><span class="eyebrow">Active person</span><span class="rail-person-name">${uiEsc(person.name)}</span></span></a>` : ''}`;
 
@@ -134,7 +154,7 @@ function appRenderNav() {
   if (!sheet) { sheet = document.createElement('div'); sheet.id = 'more-sheet'; sheet.className = 'more-sheet'; sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-label', 'More screens'); document.getElementById('app').appendChild(sheet); }
   sheet.hidden = !appMoreOpen;
   scrim.hidden = !appMoreOpen;
-  const MORE_GROUPS = [['Plan and cook', ['plan', 'week', 'recipes', 'grocery', 'pantry', 'together']], ['Track', ['today', 'log', 'check', 'people']], ['Learn and settings', ['learn', 'breathe', 'settings']]];
+  const MORE_GROUPS = APP_LITE ? [['Every day', ['check', 'plan', 'grocery', 'log']], ['You', ['people', 'learn', 'breathe', 'settings']]] : [['Plan and cook', ['plan', 'week', 'recipes', 'grocery', 'pantry', 'together']], ['Track', ['today', 'log', 'check', 'people']], ['Learn and settings', ['learn', 'breathe', 'settings']]];
   const grouped = MORE_GROUPS.map(([title, ids]) => { const items = more.filter(s => ids.includes(s.id)); return items.length ? `<div class="sheet-group"><span class="eyebrow">${title}</span></div>` + items.map(s => appNavLink(s, cur)).join('') : ''; }).join('');
   const rest = more.filter(s => !MORE_GROUPS.some(([, ids]) => ids.includes(s.id))).map(s => appNavLink(s, cur)).join('');
   sheet.innerHTML = `<div class="sheet-title"><span class="eyebrow">More</span><button type="button" class="btn small icon" id="more-close" aria-label="Close the More menu">${uiIcon('close')}</button></div>` + grouped + rest;
@@ -150,7 +170,7 @@ function appRenderNav() {
 
 export function appRender() {
   uiState.route = appParseRoute();
-  uiNavRecord(location.hash || '#/home', !!uiState.navReplaceNext);
+  uiNavRecord(location.hash || '#/' + APP_HOME, !!uiState.navReplaceNext);
   uiState.navReplaceNext = false;
   const main = document.getElementById('main');
   const profile = uiState.profile;
@@ -160,7 +180,7 @@ export function appRender() {
     location.replace('#/welcome');
     return;
   }
-  if (profile.people.length && uiState.route.screen === 'welcome') { uiState.navReplaceNext = true; location.replace('#/home'); return; }
+  if (profile.people.length && uiState.route.screen === 'welcome') { uiState.navReplaceNext = true; location.replace('#/' + APP_HOME); return; }
   // The owner dashboard exists only for the device that holds the owner key of a shared store.
   if (uiState.route.screen === 'owner' && uiState.sync.ready && !uiState.sync.isOwner) { uiState.navReplaceNext = true; uiToast('The owner dashboard is only for the owner device.'); location.replace('#/home'); return; }
   if (uiState.modalClose) uiState.modalClose({ silent: true });
@@ -175,7 +195,8 @@ export function appRender() {
       case 'people': renderPeopleScreen(main, ctx); break;
       case 'plan': renderPlanScreen(main, ctx); break;
       case 'check': renderCheckScreen(main, ctx); break;
-      case 'today': renderTodayScreen(main, ctx); break;
+      case 'today': if (APP_LITE) renderLiteTodayScreen(main, ctx); else renderTodayScreen(main, ctx); break;
+      case 'report': renderLiteReportScreen(main, ctx); break;
       case 'week': renderWeekScreen(main, ctx); break;
       case 'pantry': renderPantryScreen(main, ctx); break;
       case 'together': renderTogetherScreen(main, ctx); break;
@@ -268,6 +289,8 @@ async function appBoot() {
   uiState.sync = { db: null, identity: null, owner: null, isOwner: false, ready: false };
   uiState.syncRefresh = appBootSync;
   uiState.profile = load();
+  uiState.lite = APP_LITE;
+  if (APP_LITE && uiState.profile && !uiState.profile.people.length && uiState.profile.recipe_collections) { uiState.profile.recipe_collections.nhs = true; uiState.profile.recipe_collections.wikibooks = false; }
   if (!uiState.profile.activePerson && uiState.profile.people.length) uiState.profile.activePerson = uiState.profile.people[0].id;
   if (!Array.isArray(uiState.profile.log)) uiState.profile.log = [];
   uiState.profile.people.forEach(uiEnsurePerson);
@@ -283,7 +306,7 @@ async function appBoot() {
   appAssembleRecipes();
   uiState.rerender = appRender;
   window.addEventListener('hashchange', appRender);
-  if (!location.hash) location.hash = '#/home';
+  if (!location.hash) location.hash = '#/' + APP_HOME;
   appRender();
   if (problems.length) uiToast('Some data files did not load.');
   appBootSync();

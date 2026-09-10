@@ -122,6 +122,7 @@ export function fixMeal(recipe) {
   if (cur.includes('component')) meal = /\bsoup\b/i.test(recipe.name || '') ? ['lunch'] : ['lunch', 'dinner'];
   if (kind === 'snack') meal = ['snack'];
   let fixed = fixBreakfast(recipe.name, meal);
+  if (/\b(popcorn|crisps|nibbles|trail mix)\b/i.test(String(recipe.name || '')) && fixed.some(s => s === 'lunch' || s === 'dinner' || s === 'breakfast')) fixed = ['snack'];
   if (fixed.length === 1 && fixed[0] === 'snack' && MAIN_DISH.test(String(recipe.name || '').toLowerCase())) fixed = ['lunch', 'dinner'];
   const same = fixed.length === (recipe.meal || []).length && fixed.every((s, i) => s === recipe.meal[i]);
   return same ? recipe.meal : fixed;

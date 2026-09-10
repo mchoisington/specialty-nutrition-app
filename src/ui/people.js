@@ -173,7 +173,7 @@ function peopleRenderList(root) {
   const people = uiState.profile.people;
   const active = uiActivePerson();
   root.innerHTML = `
-    ${uiPageHeader('People', "Each person has their own conditions, allergens, numbers, and week. Only the active person's plan is shown on the other screens.", `<a class="btn primary" href="#/people/new">${uiIcon('plus')}Add a person</a>`)}
+    ${uiPageHeader(uiState.lite ? 'My profile' : 'People', uiState.lite ? 'Your conditions, allergies, likes, and cooking answers. Tap a step to change it.' : "Each person has their own conditions, allergens, numbers, and week. Only the active person's plan is shown on the other screens.", uiState.lite && people.length ? '' : `<a class="btn primary" href="#/people/new">${uiIcon('plus')}Add a person</a>`)}
     ${people.length ? `<div class="stack-2">${people.map(p => {
       const isActive = active && active.id === p.id;
       const mods = (p.modules || []).length + (p.custom_modules || []).length;
@@ -193,7 +193,7 @@ function peopleRenderList(root) {
         ${p.setup_complete ? `<div class="edit-row" role="group" aria-label="Edit ${uiEsc(p.name)}"><span class="small muted edit-label">${uiIcon('edit')}Edit</span>${peopleStepsFor(p).map(s => `<a class="chip neutral" href="#/people/${uiEsc(p.id)}/${s.id}${s.id === 'cooking' ? '/time' : ''}">${s.label}</a>`).join('')}</div>` : ''}
       </div>`;
     }).join('')}</div>` : uiEmptyState('No people yet. Add the first person to build a plan.', `<a class="btn primary" href="#/people/new">Add a person</a>`)}
-    ${uiSection('Invite someone', peopleInviteHTML(), { id: 'people-invite-h' })}
+    ${uiState.lite ? '' : uiSection('Invite someone', peopleInviteHTML(), { id: 'people-invite-h' })}
     ${uiSection('Other people using Peace Meal', `<div class="card" id="people-directory">${peopleDirectoryShellHTML()}</div>`, { id: 'people-dir-h' })}
   `;
   peopleLoadDirectory(root.querySelector('#people-directory'));

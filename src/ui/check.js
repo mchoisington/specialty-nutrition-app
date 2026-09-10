@@ -6,6 +6,26 @@ import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiRulesList, uiVerdictWord, 
 let checkLastText = '';
 let checkLastRules = [];
 
+// Runs Tesseract (open-source OCR) in the browser. Loaded on first use from a CDN; nothing about the photo leaves the device.
+let checkOcrLoading = null;
+function checkLoadOcr() {
+  if (window.Tesseract) return Promise.resolve(window.Tesseract);
+  if (checkOcrLoading) return checkOcrLoading;
+  checkOcrLoading = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/tesseract.min.js';
+    s.onload = () => window.Tesseract ? resolve(window.Tesseract) : reject(new Error('reader did not load'));
+    s.onerror = () => reject(new Error('reader blocked'));
+    document.head.appendChild(s);
+  });
+  return checkOcrLoading;
+}
+async function checkReadImage(file, onProgress) {
+  const T = await checkLoadOcr();
+  const worker = await T.createWorker('eng', 1, { logger: m => { if (m.status === 'recognizing text' && onProgress) onProgress(Math.round((m.progress || 0) * 100)); } });
+  try { const { data } = await worker.recognize(file); return data.text || ''; } finally { await worker.terminate(); }
+}
+
 export function renderCheckScreen(root) {
   const person = uiActivePerson();
   const plan = uiPlanFor(person);
@@ -17,7 +37,8 @@ export function renderCheckScreen(root) {
       <p class="small muted">Copy the ingredient list off a package (or type a dish) and get a plain answer: fine, caution, or no, and why.</p>
       <label for="check-text" class="visually-hidden">Ingredient list</label>
       <textarea id="check-text" placeholder="Ingredients: water, roasted peanuts, salt, natural flavors">${uiEsc(checkLastText)}</textarea>
-      <div class="btn-row"><button class="btn primary" type="button" id="check-run">${uiIcon('check')}Check this list</button><button class="btn" type="button" id="check-clear">Clear</button></div>
+      <div class="btn-row"><button class="btn primary" type="button" id="check-run">${uiIcon('check')}Check this list</button><label class="btn" for="check-photo">${uiIcon('search')}Photo of the label</label><input id="check-photo" type="file" accept="image/*" capture="environment" class="visually-hidden"><button class="btn" type="button" id="check-clear">Clear</button></div>
+      <p class="small muted" id="check-ocr-status">Photo of the label reads the ingredient text off a picture and puts it in the box for you to check. Needs the internet the first time (it fetches a small reader), and works in the downloaded app, not the claude.ai link. Your phone's camera can do the same: point it at the label, tap the text, Copy, then paste here.</p>
     </div>
     <div class="card">
       <h2>What is in one food?</h2>
@@ -40,6 +61,23 @@ export function renderCheckScreen(root) {
   });
   ta.addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') root.querySelector('#check-run').click(); });
   root.querySelector('#check-clear').addEventListener('click', () => { ta.value = ''; checkLastText = ''; out.innerHTML = ''; ta.focus(); });
+  root.querySelector('#check-photo').addEventListener('change', async e => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const status = root.querySelector('#check-ocr-status');
+    status.textContent = 'Reading the label...';
+    try {
+      const text = await checkReadImage(file, pct => { status.textContent = `Reading the label... ${pct}%`; });
+      const cleaned = text.replace(/\s+/g, ' ').trim();
+      if (!cleaned) { status.textContent = 'Could not read any text. Try a closer, flatter, better-lit photo, or copy the text with your phone camera.'; return; }
+      ta.value = (ta.value.trim() ? ta.value.trim() + ' ' : '') + cleaned;
+      checkLastText = ta.value;
+      status.textContent = 'Text added. Look it over, fix anything the camera misread, then tap Check this list.';
+      ta.focus();
+    } catch (err) {
+      status.textContent = 'The label reader could not load here (' + (err && err.message ? err.message : 'no internet or blocked') + '). Use your phone camera to copy the text, then paste it above.';
+    } finally { e.target.value = ''; }
+  });
 
   const search = root.querySelector('#check-search');
   const results = root.querySelector('#check-results');

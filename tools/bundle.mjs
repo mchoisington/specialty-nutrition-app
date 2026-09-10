@@ -23,11 +23,15 @@ function stripModuleSyntax(code) {
     .replace(/^\s*export\s*\{[^}]*\};?\s*$/gm, '');
 }
 
+// --lite builds dist/peace-meal-lite.html: one person, four tabs, and without the Wikibooks recipes (no nutrition data, 4 MB).
+const LITE = process.argv.includes('--lite');
 const data = {};
 for (const f of ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'recipes-open', 'recipes-usda', 'articles']) {
   const p = new URL('data/' + f + '.json', root);
   data[f] = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : (f === 'dictionaries' ? { tags: {}, entries: [] } : f === 'articles' ? {} : []);
 }
+if (LITE && Array.isArray(data['recipes-open'])) data['recipes-open'] = data['recipes-open'].filter(r => r.source !== 'Wikibooks Cookbook');
+if (LITE) data['recipes-usda'] = [];   // the USDA collection stays a full-app opt-in; lite ships Peace Meal's own recipes plus the NHS set
 const html = R('index.html');
 if (fs.existsSync(new URL('breathe.html', root))) data.breatheHtml = R('breathe.html');
 const iconSvg = fs.existsSync(new URL('icon.svg', root)) ? R('icon.svg') : '';
@@ -38,7 +42,7 @@ for (const f of [...order, ...uiFiles, appFile]) {
   if (!fs.existsSync(new URL(f, root))) continue;
   js += `\n/* ---- ${f} ---- */\n` + stripModuleSyntax(R(f)) + '\n';
 }
-const dataScript = `<script>window.__APP_DATA__ = ${JSON.stringify(data).replace(/<\/script/gi, '<\\/script')};</script>`;
+const dataScript = `<script>${LITE ? 'window.__PEACE_MEAL_LITE__ = true;' : ''}window.__APP_DATA__ = ${JSON.stringify(data).replace(/<\/script/gi, '<\\/script')};</script>`;
 let out = html
   .replace(/<link[^>]+href="src\/app\.css"[^>]*>/, () => `<style>\n${css}\n</style>`)
   .replace(/<script[^>]+type="module"[^>]+src="src\/app\.js"[^>]*><\/script>/, () => `${dataScript}\n<script>\n(function(){\n${js}\n})();\n</script>`)
@@ -46,5 +50,7 @@ let out = html
   .replace(/(<link[^>]+rel="(?:icon|apple-touch-icon)"[^>]+href=")[^"]+(")/g, (m, a, b) => iconData ? a + iconData + b : '')
   .replace(/<script>[^<]*serviceWorker[^<]*<\/script>\s*/, '');
 fs.mkdirSync(new URL('dist/', root), { recursive: true });
-fs.writeFileSync(new URL('dist/nutrition-app.html', root), out);
-console.log('dist/nutrition-app.html', (out.length / 1024).toFixed(0) + ' KB');
+if (LITE) out = out.replace(/<title>Peace Meal<\/title>/, '<title>Peace Meal for one</title>').replace(/one table, everyone's funky dietary needs, every recommendation cited/, 'your meals, your symptoms, your doctor report, every recommendation cited');
+const outName = LITE ? 'dist/peace-meal-lite.html' : 'dist/nutrition-app.html';
+fs.writeFileSync(new URL(outName, root), out);
+console.log(outName, (out.length / 1024).toFixed(0) + ' KB');

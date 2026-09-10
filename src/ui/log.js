@@ -3,7 +3,7 @@ import { checkText } from '../engine/checker.js';
 import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiIsoDate, uiToday, uiFmtDate, uiToast, uiPageHeader, uiSection, uiVerdictChip, uiNoticeHTML, uiEmptyState, uiIcon } from './common.js';
 import { weekGet } from './week.js';
 
-const LOG_SYMPTOMS = [
+export const LOG_SYMPTOMS = [
   { id: 'bloating', label: 'Bloating', help: 'Belly feels swollen or tight' },
   { id: 'gas', label: 'Gas', help: 'More wind than usual' },
   { id: 'stomach_pain', label: 'Stomach pain', help: 'Cramps or aching in the belly' },

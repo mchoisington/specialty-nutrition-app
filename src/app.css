@@ -917,3 +917,28 @@ td.num, th.num { text-align: right; white-space: nowrap; }
 .chip-grid .choice.compact input { width: 18px; height: 18px; margin: 0; }
 .chip-grid .choice.compact .choice-title { font-weight: 700; font-size: var(--fs-15); }
 .pref-more > summary { min-height: 48px; }
+
+/* ---------- Lite shell ---------- */
+.lite-big { min-height: 56px; font-size: var(--fs-17); padding: 12px 20px; }
+.lite-slots { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 720px) { .lite-slots { grid-template-columns: 1fr 1fr; } }
+.lite-slot .lite-slot-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.lite-slot .slot { font-size: var(--fs-15); text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 700; }
+.lite-slot .lite-planned { font-size: var(--fs-17); }
+.lite-logged { padding-left: 1.1rem; margin: 4px 0; }
+.lite-symptoms { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.lite-sym { min-height: 48px; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--hairline); background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; }
+.lite-sym.on { background: var(--tint-plum); border-color: var(--accent); color: var(--accent); }
+.report-sheet { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); padding: var(--s3); }
+.report-sheet .report-title { font-size: var(--fs-24); }
+.report-sheet .report-meta { color: var(--muted); font-size: var(--fs-15); margin-bottom: var(--s2); }
+.report-sheet h2 { margin-top: var(--s3); border-bottom: 2px solid var(--hairline); padding-bottom: 4px; }
+.report-list { padding-left: 1.2rem; font-size: var(--fs-15); }
+.report-day { padding: 10px 0; border-top: 1px solid var(--hairline); }
+.report-day h3 { margin-bottom: 4px; }
+.report-table { min-width: 0; }
+@media print {
+  .main.print-report > :not(.report-sheet) { display: none !important; }
+  .report-sheet { border: 0; padding: 0; }
+  .page-head, .card.tight { display: none !important; }
+}
