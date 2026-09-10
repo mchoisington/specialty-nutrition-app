@@ -89,6 +89,7 @@ const APP_SCREENS_FULL = [
   { id: 'pantry', label: 'Pantry', icon: 'jar' },
   { id: 'together', label: 'Together', icon: 'people' },
   { id: 'log', label: 'Log', icon: 'note' },
+  { id: 'report', label: 'Report', icon: 'cite' },
   { id: 'breathe', label: 'Breathe', icon: 'breathe' },
   { id: 'learn', label: 'Learn', icon: 'book' },
   { id: 'settings', label: 'Settings', icon: 'gear' }
@@ -101,6 +102,7 @@ const APP_SCREENS_LITE = [
   { id: 'check', label: 'Check a label', icon: 'check-circle' },
   { id: 'plan', label: 'My plan', icon: 'list' },
   { id: 'grocery', label: 'Grocery', icon: 'cart' },
+  { id: 'pantry', label: 'Pantry', icon: 'jar' },
   { id: 'people', label: 'My profile', icon: 'person' },
   { id: 'log', label: 'Symptom log', icon: 'note' },
   { id: 'breathe', label: 'Breathe', icon: 'breathe' },
@@ -157,7 +159,7 @@ function appRenderNav() {
   if (!sheet) { sheet = document.createElement('div'); sheet.id = 'more-sheet'; sheet.className = 'more-sheet'; sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-label', 'More screens'); document.getElementById('app').appendChild(sheet); }
   sheet.hidden = !appMoreOpen;
   scrim.hidden = !appMoreOpen;
-  const MORE_GROUPS = APP_LITE ? [['Every day', ['check', 'plan', 'grocery', 'log']], ['You', ['people', 'learn', 'breathe', 'settings']]] : [['Plan and cook', ['plan', 'week', 'recipes', 'grocery', 'pantry', 'together']], ['Track', ['today', 'log', 'check', 'people']], ['Learn and settings', ['learn', 'breathe', 'settings']]];
+  const MORE_GROUPS = APP_LITE ? [['Every day', ['check', 'plan', 'grocery', 'pantry', 'log']], ['You', ['people', 'learn', 'breathe', 'settings']]] : [['Plan and cook', ['plan', 'week', 'recipes', 'grocery', 'pantry', 'together']], ['Track', ['today', 'log', 'report', 'check', 'people']], ['Learn and settings', ['learn', 'breathe', 'settings']]];
   const grouped = MORE_GROUPS.map(([title, ids]) => { const items = more.filter(s => ids.includes(s.id)); return items.length ? `<div class="sheet-group"><span class="eyebrow">${title}</span></div>` + items.map(s => appNavLink(s, cur)).join('') : ''; }).join('');
   const rest = more.filter(s => !MORE_GROUPS.some(([, ids]) => ids.includes(s.id))).map(s => appNavLink(s, cur)).join('');
   sheet.innerHTML = `<div class="sheet-title"><span class="eyebrow">More</span><button type="button" class="btn small icon" id="more-close" aria-label="Close the More menu">${uiIcon('close')}</button></div>` + grouped + rest;
