@@ -6847,6 +6847,99 @@
           "Fasting windows have unique metabolic effects beyond eating less."
         ]
       }
+    },
+    {
+      "id": "medication-food-interactions",
+      "name": "Medicines that interact with food",
+      "category": "medication",
+      "phase1_ref": "Added 2026-09-10 after the dietitian review; not covered in the Phase 1 document",
+      "evidence": {
+        "rating": "strong",
+        "summary": "Rating: STRONG for warfarin and vitamin K consistency (systematic review of interaction studies); STRONG for grapefruit with medicines cleared by CYP3A4 (pharmacokinetic evidence); STRONG for levothyroxine timing (ATA guideline)."
+      },
+      "sources": [
+        "holbrook-2005",
+        "bailey-2013",
+        "ata-hypothyroidism-2014"
+      ],
+      "tier2": [],
+      "conflicts": [],
+      "phases": null,
+      "modes": null,
+      "disables": [],
+      "auto_by_medication": true,
+      "medication_questions": [
+        {
+          "id": "warfarin",
+          "text": "Do you take warfarin (Coumadin, Jantoven)?",
+          "effect": "enable:med-warfarin-vitamin-k",
+          "global": true
+        },
+        {
+          "id": "grapefruit_interacting",
+          "text": "Has a pharmacist or doctor told you to avoid grapefruit with one of your medicines? (Common with simvastatin, lovastatin, atorvastatin, some blood pressure and heart rhythm medicines, and some transplant medicines.)",
+          "effect": "enable:med-grapefruit",
+          "global": true
+        },
+        {
+          "id": "levothyroxine",
+          "text": "Do you take levothyroxine?",
+          "effect": "enable:med-levothyroxine-timing",
+          "global": true
+        }
+      ],
+      "rules": [
+        {
+          "id": "med-warfarin-vitamin-k",
+          "kind": "info",
+          "tier": 1,
+          "strength": "must",
+          "applies_when": "medication.warfarin",
+          "text": "Warfarin: keep vitamin K steady rather than low. Eat about the same amount of leafy greens and other vitamin K foods from week to week, and tell the clinic that manages your INR before a big change in diet, a new supplement, or regular cranberry or grapefruit juice. Do not cut greens out; a sudden drop swings the INR as much as a sudden rise.",
+          "sources": [
+            "holbrook-2005"
+          ]
+        },
+        {
+          "id": "med-grapefruit",
+          "kind": "avoid",
+          "tags": [
+            "grapefruit"
+          ],
+          "hard": false,
+          "tier": 1,
+          "strength": "should",
+          "applies_when": "medication.grapefruit_interacting",
+          "text": "Avoid grapefruit, grapefruit juice, Seville orange, and pomelo while on the medicine your pharmacist flagged. They block the gut enzyme that clears the drug, so blood levels rise, and the effect lasts about a day, so taking them hours apart does not fix it. Other citrus is fine.",
+          "sources": [
+            "bailey-2013"
+          ]
+        },
+        {
+          "id": "med-levothyroxine-timing",
+          "kind": "timing",
+          "tags": [
+            "iron-supplement",
+            "calcium-rich",
+            "soy",
+            "high-fiber",
+            "coffee"
+          ],
+          "applies_when": "medication.levothyroxine",
+          "unless_module": "thyroid",
+          "empty_stomach_minutes_before_food_min": 30,
+          "empty_stomach_minutes_before_food_max": 60,
+          "bedtime_hours_after_eating_min": 3,
+          "bedtime_hours_after_eating_max": 4,
+          "separate_hours": 4,
+          "tier": 1,
+          "strength": "must",
+          "text": "Levothyroxine: take on an empty stomach, 30 to 60 minutes before food or at bedtime 3 to 4 hours after eating; separate from calcium, iron, soy, high-fiber meals, and coffee by about 4 hours.",
+          "sources": [
+            "ata-hypothyroidism-2014"
+          ]
+        }
+      ]
     }
   ],
   "proposed_tags": [

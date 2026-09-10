@@ -1,6 +1,9 @@
 // Merges the modules a person selected into one plan.
 // Every applied rule carries its source ids. Conflicts are surfaced, never silently resolved.
 
+// Elimination phases ask how it is going after this many weeks unless the person set a different number or turned the reminder off.
+export const PHASE_DEFAULT_CHECK_IN_WEEKS = 4;
+
 export const FEATURE_MODULES = {
   // feature id -> module ids that the feature gates
   'weight-loss': ['weight-management-glp1'],
@@ -133,6 +136,8 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
   if ((person.pregnancy || person.breastfeeding) && byId.has('pregnancy-gdm-breastfeeding')) selected.add('pregnancy-gdm-breastfeeding');
   if ((person.allergens || []).length && byId.has('food-allergies')) selected.add('food-allergies');
   if (person.flags && person.flags.glp1 && byId.has('weight-management-glp1')) selected.add('weight-management-glp1');
+  // Medicines that interact with food: the module switches itself on when any of its questions is answered yes.
+  for (const m of byId.values()) if (m.auto_by_medication && (m.medication_questions || []).some(q => q.global && person.medications && person.medications[q.id])) selected.add(m.id);
   const screenPositive = !!(person.screen && person.screen.positive);
   if (screenPositive && byId.has('eating-disorder-screen')) selected.add('eating-disorder-screen');
   if (person.adult === false) notices.push({ level: 'block', code: 'adults-only', text: 'This app is for adults. A caregiver may manage a child\'s confirmed celiac disease or diagnosed food allergies only.' });
@@ -169,6 +174,19 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
   }
   const active = [...selected].filter(id => byId.has(id) && !disabledModules.has(id)).map(id => byId.get(id));
   const activeIds = new Set(active.map(m => m.id));
+  // Older adults and people on a GLP-1 medicine need more protein to hold muscle (ESPEN 2022). Suggest the module; never add it silently.
+  {
+    const ageNum = Number(person.age) || null;
+    const glp1On = !!((person.flags && person.flags.glp1) || ((person.variants || {})['weight-management-glp1'] === 'glp1'));
+    const dismissed = (person.dismissed_suggestions || []).includes('higher-protein-older-adult');
+    if (byId.has('higher-protein-older-adult') && !activeIds.has('higher-protein-older-adult') && !dismissed && person.adult !== false && ((ageNum && ageNum >= 65) || glp1On)) {
+      notices.push({ level: 'info', code: 'suggest-module', module: 'higher-protein-older-adult', sources: ['espen-geriatrics-2022'],
+        text: ageNum && ageNum >= 65
+          ? `At ${ageNum}, dietitians recommend more protein than the standard adult amount, about 1.0 to 1.2 g per kg of body weight a day, to hold on to muscle. The higher-protein module sets that target and spreads it across meals.`
+          : 'On a GLP-1 medicine, appetite drops and muscle goes with the fat unless protein stays up. The higher-protein module sets a protein target of about 1.0 to 1.2 g per kg a day and spreads it across meals.',
+        action: 'add-module:higher-protein-older-adult', actionLabel: 'Add it', dismiss: 'higher-protein-older-adult' });
+    }
+  }
   const variantsFor = m => {
     if (!Array.isArray(m.variants) || !m.variants.length) return [];
     const stored = person.variants && person.variants[m.id];
@@ -266,7 +284,9 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
     const weeks = Math.max(0, daysBetween(started, today) / 7);
     // A phase never ends on its own. It stays until the person moves it. An optional check-in reminder (every N weeks
     // from when it was set) asks whether to keep going or move on; the protocol's suggested length is shown as information.
-    const checkWeeks = state && Number(state.check_in_weeks) > 0 ? Number(state.check_in_weeks) : null;
+    // Default: ask after 4 weeks on any phase with a usual maximum length (an elimination). An explicit 0 means no reminder.
+    const hasCheckKey = !!(state && Object.prototype.hasOwnProperty.call(state, 'check_in_weeks'));
+    const checkWeeks = hasCheckKey ? (Number(state.check_in_weeks) > 0 ? Number(state.check_in_weeks) : null) : (phase.max_weeks ? PHASE_DEFAULT_CHECK_IN_WEEKS : null);
     const checkFrom = state && state.check_in_from ? new Date(state.check_in_from) : started;
     const sinceCheck = Math.max(0, daysBetween(checkFrom, today) / 7);
     const status = checkWeeks && sinceCheck >= checkWeeks ? 'check-in' : 'active';
@@ -324,6 +344,7 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
       // phase gating
       if (phaseInfo && phaseInfo.phaseRuleIds.has(rule.id) && !phaseInfo.allowed.has(rule.id)) continue;
       if (modeInfo && modeInfo.modeRuleIds.has(rule.id) && !modeInfo.allowed.has(rule.id)) continue;
+      if (rule.unless_module && activeIds.has(rule.unless_module)) continue;   // another active module already carries this rule
       // medication suppression and gating
       if (suppressedRules.has(rule.id)) { suppressed.push(ruleRef(m, rule, { reason: suppressedRules.get(rule.id) })); continue; }
       if (gatedRules.has(rule.id) && !enabledRules.has(rule.id)) continue;

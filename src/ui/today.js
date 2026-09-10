@@ -3,6 +3,7 @@
 import { energyTarget, ACTIVITIES, ACTIVITY_LEVELS, activityCalories, kgToLb, lbToKg } from '../engine/energy.js';
 import { nutrientsForGrams, recipeTotals, scaleTotals, addTotals, emptyTotals, compareToPlan, round, NUTRIENT_KEYS } from '../engine/nutrition.js';
 import { checkRecipe, checkFood } from '../engine/checker.js';
+import { unintendedWeightLoss } from '../engine/report.js';
 import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiModal, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiNutrientLabel, uiVerdictWord, uiVerdictChip, uiSegmented, uiPageHeader, uiSection, uiChip, uiIcon, uiRing, uiMeter, uiStatTile, uiNoticeHTML, uiEmptyState, uiSwitch } from './common.js';
 import { weekGet } from './week.js';
 import { householdWeekGet } from './household.js';
@@ -83,6 +84,13 @@ export function todayToggleFavorite(person, kind, id) {
 
 function todayEntries(person, date) { return (uiState.profile.diary || []).filter(e => e.person === person.id && e.date === date); }
 function todaySum(entries) { let t = emptyTotals(); for (const e of entries) { const x = emptyTotals(); for (const k of NUTRIENT_KEYS) x[k] = (e.nutrients && e.nutrients[k]) || 0; t = addTotals(t, x); } return t; }
+// Unintended weight loss, GLIM screen (more than 5% in 6 months, more than 10% over longer). Off when losing weight is the goal.
+export function todayWeightLossNoticeHTML(person, dateIso) {
+  const intended = !!(person.goals && person.goals.calorie_target === 'loss');
+  const w = unintendedWeightLoss(uiState.profile.weights, person.id, dateIso, { intended });
+  if (!w) return '';
+  return uiNoticeHTML({ level: 'warn', text: `Weight is down ${w.pct}% since ${uiFmtDate(w.fromDate)} (${w.weeks} weeks): ${kgToLb(w.fromKg)} lb to ${kgToLb(w.toKg)} lb. For an adult who is not trying to lose weight, more than ${w.threshold}% over this span is the level doctors use to screen for undernutrition. Tell your doctor, and say whether appetite has changed.` });
+}
 export function todayLatestWeightKg(person) {
   const ws = (uiState.profile.weights || []).filter(w => w.person === person.id).sort((a, b) => b.date.localeCompare(a.date));
   return ws.length ? ws[0].kg : person.weight_kg;
@@ -127,6 +135,7 @@ export function renderTodayScreen(root) {
       <input type="date" id="today-date" value="${uiEsc(date)}" aria-label="Date">
       <button class="btn small icon" type="button" id="today-next" aria-label="Next day">${uiIcon('arrow-right')}</button>
     </div>
+    ${todayWeightLossNoticeHTML(person, today)}
     ${todayTargetCardHTML(person, plan, totals, exerciseKcal)}
     ${todayMealsHTML(person, plan, entries)}
     ${todayWeightHTML(person)}

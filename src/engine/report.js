@@ -64,3 +64,44 @@ export function reportDays({ diary, log, weights, personId, from, to, onlySympto
   }
   return days;
 }
+
+// Average daily intake over the days in range that have at least one diary entry. Uses the nutrients stored on each
+// entry when it was logged (USDA values by grams, or the recipe's published per-serving numbers).
+export function intakeAverages(diary, personId, from, to) {
+  const days = new Map();
+  for (const e of diary || []) {
+    if (e.person !== personId || !e.date || e.date < from || e.date > to || !e.nutrients) continue;
+    const d = days.get(e.date) || {};
+    for (const [k, v] of Object.entries(e.nutrients)) if (k[0] !== '_') d[k] = (d[k] || 0) + (Number(v) || 0);
+    days.set(e.date, d);
+  }
+  const n = days.size;
+  const avg = {};
+  if (!n) return { days: 0, avg };
+  for (const d of days.values()) for (const [k, v] of Object.entries(d)) avg[k] = (avg[k] || 0) + v / n;
+  for (const k of Object.keys(avg)) avg[k] = Math.round(avg[k] * 10) / 10;
+  return { days: n, avg };
+}
+
+// Unintended weight loss, screened with the GLIM phenotypic criterion (Cederholm 2019): more than 5% within the past
+// 6 months, or more than 10% over a longer span. Returns the worst qualifying span, or null. Only meaningful when losing
+// weight is not the goal, so pass intended: true to switch it off. Needs a weight logged in the last 45 days.
+export function unintendedWeightLoss(weights, personId, today, { intended = false } = {}) {
+  if (intended) return null;
+  const day = d => new Date(String(d).slice(0, 10) + 'T00:00:00');
+  const pts = (weights || []).filter(w => w.person === personId && w.date && Number(w.kg) > 0).sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  if (pts.length < 2) return null;
+  const last = pts[pts.length - 1];
+  const t = typeof today === 'string' ? day(today) : day(today.toISOString());
+  const dayMs = 86400000;
+  if ((t - day(last.date)) / dayMs > 45) return null;
+  let worst = null;
+  for (const p of pts.slice(0, -1)) {
+    const days = Math.round((day(last.date) - day(p.date)) / dayMs);
+    if (days < 7) continue;
+    const pct = (p.kg - last.kg) / p.kg * 100;
+    const threshold = days <= 183 ? 5 : 10;
+    if (pct >= threshold && (!worst || pct > worst.pct)) worst = { pct: Math.round(pct * 10) / 10, days, weeks: Math.round(days / 7), fromDate: p.date, fromKg: p.kg, toDate: last.date, toKg: last.kg, threshold };
+  }
+  return worst;
+}

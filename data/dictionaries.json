@@ -883,6 +883,15 @@
       "sources": [
         "phase1-partc"
       ]
+    },
+    "grapefruit": {
+      "label": "Grapefruit",
+      "family": "medication-interaction",
+      "hard": false,
+      "description": "Grapefruit, grapefruit juice, Seville orange, and pomelo. Their furanocoumarins block the gut enzyme (CYP3A4) that clears many medicines, so blood levels rise. Applies only when a medicine on the interaction list is taken.",
+      "sources": [
+        "bailey-2013"
+      ]
     }
   },
   "entries": [
@@ -7867,14 +7876,16 @@
         "fruit",
         "histamine-high",
         "citrus",
-        "vitamin-c-rich"
+        "vitamin-c-rich",
+        "grapefruit"
       ],
       "match": "word",
-      "note": "citrus; also interacts with many medications (not a food rule here)",
+      "note": "citrus; blocks CYP3A4, so it interacts with many medicines (the grapefruit tag applies only when such a medicine is taken)",
       "sources": [
         "comas-baste-2020",
         "reese-2017",
-        "sighi-list"
+        "sighi-list",
+        "bailey-2013"
       ]
     },
     {
@@ -19686,6 +19697,71 @@
       ],
       "match": "word",
       "note": ""
+    },
+    {
+      "term": "grapefruit juice",
+      "tags": [
+        "fruit",
+        "citrus",
+        "grapefruit"
+      ],
+      "match": "phrase",
+      "note": "grapefruit-type citrus for the medication interaction tag",
+      "sources": [
+        "bailey-2013"
+      ]
+    },
+    {
+      "term": "pomelo",
+      "tags": [
+        "fruit",
+        "citrus",
+        "grapefruit"
+      ],
+      "match": "word",
+      "note": "grapefruit-type citrus for the medication interaction tag",
+      "sources": [
+        "bailey-2013"
+      ]
+    },
+    {
+      "term": "pummelo",
+      "tags": [
+        "fruit",
+        "citrus",
+        "grapefruit"
+      ],
+      "match": "word",
+      "note": "grapefruit-type citrus for the medication interaction tag",
+      "sources": [
+        "bailey-2013"
+      ]
+    },
+    {
+      "term": "seville orange",
+      "tags": [
+        "fruit",
+        "citrus",
+        "grapefruit"
+      ],
+      "match": "phrase",
+      "note": "grapefruit-type citrus for the medication interaction tag",
+      "sources": [
+        "bailey-2013"
+      ]
+    },
+    {
+      "term": "bitter orange",
+      "tags": [
+        "fruit",
+        "citrus",
+        "grapefruit"
+      ],
+      "match": "phrase",
+      "note": "grapefruit-type citrus for the medication interaction tag",
+      "sources": [
+        "bailey-2013"
+      ]
     }
   ],
   "unsure": [
@@ -20075,6 +20151,7 @@
     "acg-gerd-2022": "Katz PO et al. ACG Clinical Guideline for the Diagnosis and Management of GERD. Am J Gastroenterol 2022;117:27-56. Trigger-food avoidance is individual, not blanket.",
     "bsg-ida-2021": "Snook J et al. British Society of Gastroenterology guidelines for the management of iron deficiency anaemia in adults. Gut 2021;70:2030-2051.",
     "aga-ibd-diet-2024": "Hashash JG et al. AGA Clinical Practice Update on Diet and Nutritional Therapies in Patients With IBD. Gastroenterology 2024;166:521-532.",
-    "phase1-partc": "Phase 1 Part C: may contain and shared-facility labels are user-configurable; the evidence on actual risk is mixed."
+    "phase1-partc": "Phase 1 Part C: may contain and shared-facility labels are user-configurable; the evidence on actual risk is mixed.",
+    "bailey-2013": "Bailey DG, Dresser G, Arnold JMO. Grapefruit-medication interactions: forbidden fruit or avoidable consequences? CMAJ 2013;185(4):309-316. https://doi.org/10.1503/cmaj.120951"
   }
 }

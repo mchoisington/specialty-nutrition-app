@@ -61,3 +61,36 @@ test('weight trend and the day list, with the symptom-only option', () => {
   assert.equal(sym[1].episodes.length, 1);
   assert.equal(sym[1].weight.kg, 51.2);
 });
+
+import { intakeAverages, unintendedWeightLoss } from '../src/engine/report.js';
+
+test('average daily intake counts only days with food logged and only this person', () => {
+  const d = [
+    { person: P, date: '2026-09-01', meal: 'breakfast', nutrients: { kcal: 400, sodium_mg: 300, protein_g: 20 } },
+    { person: P, date: '2026-09-01', meal: 'dinner', nutrients: { kcal: 600, sodium_mg: 900, protein_g: 30 } },
+    { person: P, date: '2026-09-02', meal: 'lunch', nutrients: { kcal: 500, sodium_mg: 400 } },
+    { person: 'other', date: '2026-09-02', meal: 'lunch', nutrients: { kcal: 5000, sodium_mg: 4000 } },
+    { person: P, date: '2026-09-03', meal: 'lunch', name: 'custom without numbers' }
+  ];
+  const a = intakeAverages(d, P, '2026-09-01', '2026-09-30');
+  assert.equal(a.days, 2);
+  assert.equal(a.avg.kcal, 750);
+  assert.equal(a.avg.sodium_mg, 800);
+  assert.equal(a.avg.protein_g, 25);
+  assert.equal(intakeAverages(d, P, '2026-10-01', '2026-10-31').days, 0);
+});
+
+test('unintended weight loss: GLIM 5% within six months or 10% beyond; off when losing weight is the goal; needs a recent weight', () => {
+  const w = [{ person: P, date: '2026-03-15', kg: 60 }, { person: P, date: '2026-08-01', kg: 58 }, { person: P, date: '2026-09-05', kg: 56.5 }];
+  const r = unintendedWeightLoss(w, P, '2026-09-10');
+  assert.ok(r, 'a 5.8% loss over about six months qualifies');
+  assert.equal(r.fromDate, '2026-03-15');
+  assert.equal(r.threshold, 5);
+  assert.equal(unintendedWeightLoss(w, P, '2026-09-10', { intended: true }), null);
+  assert.equal(unintendedWeightLoss(w, P, '2026-12-01'), null, 'no weight logged in the last 45 days: nothing to say');
+  const small = [{ person: P, date: '2026-06-01', kg: 60 }, { person: P, date: '2026-09-05', kg: 58.5 }];
+  assert.equal(unintendedWeightLoss(small, P, '2026-09-10'), null, '2.5% is under the threshold');
+  const slow = [{ person: P, date: '2025-06-01', kg: 70 }, { person: P, date: '2026-09-05', kg: 62 }];
+  const s = unintendedWeightLoss(slow, P, '2026-09-10');
+  assert.ok(s && s.threshold === 10, 'over more than six months the threshold is 10%');
+});

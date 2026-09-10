@@ -163,7 +163,11 @@ export function uiNoticeHTML(n, opts = {}) {
     ? `<label class="choice"><input type="checkbox" data-confirm="${uiEsc(n.confirmId)}"><span class="choice-body">I confirm this.</span></label>` : '';
   const icon = level === 'block' ? 'stop' : level === 'warn' ? 'alert' : 'info';
   const link = n.link ? `<a class="btn small" href="${uiEsc(n.link)}">${uiEsc(n.linkLabel || 'Open')}</a>` : '';
-  return `<div class="notice ${level}" role="${level === 'block' ? 'alert' : 'status'}">${uiIcon(icon, { cls: 'notice-icon' })}<div class="notice-head">${head}</div><div class="notice-body"><div>${uiEsc(n.text)}</div>${ack}${confirm}${link}</div></div>`;
+  // Suggestions carry an action (handled once, app-wide, in app.js) and a "Not now" that remembers the dismissal on the person.
+  const action = n.action ? `<button class="btn small primary" type="button" data-notice-action="${uiEsc(n.action)}">${uiEsc(n.actionLabel || 'Do it')}</button>` : '';
+  const dismiss = n.dismiss ? `<button class="btn small" type="button" data-notice-dismiss="${uiEsc(n.dismiss)}">Not now</button>` : '';
+  const acts = action || dismiss ? `<div class="btn-row">${action}${dismiss}</div>` : '';
+  return `<div class="notice ${level}" role="${level === 'block' ? 'alert' : 'status'}">${uiIcon(icon, { cls: 'notice-icon' })}<div class="notice-head">${head}</div><div class="notice-body"><div>${uiEsc(n.text)}</div>${ack}${confirm}${link}${acts}</div></div>`;
 }
 
 // Wires the "I understand" buttons and confirmation checkboxes that uiNoticeHTML renders.

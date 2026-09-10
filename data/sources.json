@@ -1024,5 +1024,26 @@
     "type": "other",
     "year": null,
     "url": ""
+  },
+  {
+    "id": "holbrook-2005",
+    "citation": "Holbrook AM, Pereira JA, Labiris R, et al. Systematic overview of warfarin and its drug and food interactions. Arch Intern Med 2005;165(10):1095-1106.",
+    "type": "systematic-review",
+    "year": 2005,
+    "url": "https://doi.org/10.1001/archinte.165.10.1095"
+  },
+  {
+    "id": "bailey-2013",
+    "citation": "Bailey DG, Dresser G, Arnold JMO. Grapefruit-medication interactions: forbidden fruit or avoidable consequences? CMAJ 2013;185(4):309-316.",
+    "type": "review",
+    "year": 2013,
+    "url": "https://doi.org/10.1503/cmaj.120951"
+  },
+  {
+    "id": "glim-2019",
+    "citation": "Cederholm T, Jensen GL, Correia MITD, et al. GLIM criteria for the diagnosis of malnutrition: a consensus report from the global clinical nutrition community. Clin Nutr 2019;38(1):1-9.",
+    "type": "consensus",
+    "year": 2019,
+    "url": "https://doi.org/10.1016/j.clnu.2018.08.002"
   }
 ]

@@ -123,6 +123,7 @@ function learnRenderSources(root) {
       ${uiStatTile({ value: uiFmtNum(c.total), label: 'Shipped recipes', note: `${uiFmtNum(c.peaceMeal)} Peace Meal` })}
       ${uiStatTile({ value: uiFmtNum(c.nhs), label: 'NHS website', note: `${uiFmtNum(c.nhsWithNutrition)} with nutrition` })}
       ${uiStatTile({ value: uiFmtNum(c.parentclub), label: 'Parent Club Scotland', note: `${uiFmtNum(c.parentclubWithSodium)} with sodium` })}
+      ${uiStatTile({ value: uiFmtNum(c.nhlbi), label: 'NHLBI (NIH)', note: `${uiFmtNum(c.nhlbiWithPotassium)} with potassium` })}
       ${uiStatTile({ value: uiFmtNum(c.wikibooks), label: 'Wikibooks Cookbook', note: `${uiFmtNum(c.wikibooksFeatured)} featured` })}
     </div>
     <p class="small muted">Live from the pool on this device: ${uiFmtNum(c.pool)} recipes in all, ${uiFmtNum(c.withNutrition)} with known nutrition, ${uiFmtNum(c.mine)} written in this household, ${uiFmtNum(c.linked)} imported recipe${c.linked === 1 ? '' : 's'} with ingredients linked by you.</p>
@@ -169,10 +170,21 @@ function learnRenderSources(root) {
         <li>Loaded now: ${uiFmtNum(c.parentclub)} recipes, ${uiFmtNum(c.parentclubWithSodium)} with published sodium.</li>
       </ul>
 
+      <h2>4. NHLBI Healthy Eating Recipes (National Institutes of Health, United States)</h2>
+      <p><strong>Public domain.</strong> Works of the United States Government are not subject to copyright (17 U.S.C. section 105); the National Heart, Lung, and Blood Institute is a federal institute, so its recipe text is public domain. The NIH web-policies page could not be reached from the build environment, so the statute is cited rather than the page. Included at the household's request; it is a collection switch in Settings like every other outside source.</p>
+      <ul>
+        <li>Source: ${ext('https://www.nhlbi.nih.gov/health/heart-healthy-living/healthy-foods/healthy-eating-recipes')}, seven listing pages of ten and one page per recipe. Importer: <code>tools/import-nhlbi.mjs</code>.</li>
+        <li>Attribution line stored on every recipe: <em>Recipe from the National Heart, Lung, and Blood Institute (NHLBI), National Institutes of Health, nhlbi.nih.gov. Public domain as a work of the United States Government.</em></li>
+        <li>robots.txt: fetched first; the recipe pages are not disallowed for <code>User-agent: *</code>.</li>
+        <li>Recipe ids: <code>nhlbi-&lt;page-slug&gt;</code>; <code>source_url</code> is the page the text came from.</li>
+        <li>Nutrition data: each page publishes a per-serving "Nutritional Facts" table: calories, total fat, saturated fat, cholesterol, <strong>sodium</strong>, fiber, protein, carbohydrates, and <strong>potassium</strong>. Stored as-is with <code>nutrition_source: "nhlbi"</code>; the stated serving size is kept as <code>serving_size_text</code>. A fiber value printed as "0 (less than 1g)" is stored as 0. Ten of the pages publish only calories, fat, saturated fat, cholesterol, and sodium; those recipes carry no protein, carbohydrate, fiber, or potassium value, and the app leaves the field blank rather than guessing.</li>
+        <li>Ingredient lines use American measures (cups, tablespoons, ounces). Two pages had no ingredient list and were skipped. Loaded now: ${uiFmtNum(c.nhlbi)} recipes.</li>
+      </ul>
+
       <h2>How the app uses these recipes</h2>
       <ul>
         <li>Ingredients are display-only (<code>{ "display": "..." }</code>, no <code>food</code> link, no grams). The dictionary tags ingredient text at run time for allergen and diet checks, and anything unrecognised is reported as such, never treated as safe.</li>
-        <li>NHS and Parent Club recipes show the stored per-serving nutrition (<code>recipeTotals</code> in <code>src/engine/nutrition.js</code> uses it when a recipe has <code>nutrition_source</code> and <code>nutrition_per_serving</code> and no linked foods).</li>
+        <li>NHS, Parent Club, and NHLBI recipes show the stored per-serving nutrition (<code>recipeTotals</code> in <code>src/engine/nutrition.js</code> uses it when a recipe has <code>nutrition_source</code> and <code>nutrition_per_serving</code> and no linked foods).</li>
         <li>Wikibooks recipes show no nutrition until ingredients are linked in the editor.</li>
         <li><code>tags</code> is empty on every imported recipe because the tag vocabulary is controlled; tags are added by hand or by the dictionary at run time.</li>
         <li>Recipes you write yourself ("Mine") and ingredient links you add are stored on this device in your profile, never in the data files.</li>

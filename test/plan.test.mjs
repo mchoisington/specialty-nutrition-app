@@ -96,9 +96,9 @@ test('phase gating: elimination rules apply in elimination, not in reintroductio
   const p2 = buildPlan({ person: person({ modules: ['ibs-low-fodmap'], phases: { 'ibs-low-fodmap': { phase: 'reintroduction', started: '2026-08-20' } } }), conditions, today });
   assert.equal(p2.avoid['fodmap-fructan'], undefined);
   assert.ok(p2.behavior.some(b => b.rule === 'fm-always'));
-  // months past the protocol's suggested length: still active, still restricting, no block, no expiry notice
+  // months past the protocol's suggested length: still restricting, no block, no expiry notice; the default 4-week reminder is due
   const p3 = buildPlan({ person: person({ modules: ['ibs-low-fodmap'], phases: { 'ibs-low-fodmap': { phase: 'elimination', started: '2026-01-01' } } }), conditions, today });
-  assert.equal(p3.phases[0].status, 'active');
+  assert.equal(p3.phases[0].status, 'check-in');
   assert.ok(p3.avoid['fodmap-fructan'], 'elimination rules keep applying indefinitely');
   assert.ok(!p3.notices.some(n => /expired/.test(n.code)));
   // a check-in reminder set 4 weeks ago at "every 4 weeks" is due; at "every 8 weeks" it is not
@@ -154,4 +154,59 @@ test('allergy module applies only the person\'s own allergens (real content shap
   assert.equal(plan.avoid['allergen-peanut'].hard, true);
   assert.equal(plan.avoid['soy'], undefined);
   assert.equal(plan.avoid['allergen-soy'], undefined);
+});
+
+// ---- Dietitian-review additions: default check-in, medicines that interact with food, protein suggestion
+const medModule = { id: 'medication-food-interactions', name: 'Medicines', category: 'medication', evidence: { rating: 'strong' }, sources: ['s9'], auto_by_medication: true,
+  medication_questions: [ { id: 'warfarin', text: 'Warfarin?', effect: 'enable:med-warfarin', global: true }, { id: 'levothyroxine', text: 'Levothyroxine?', effect: 'enable:med-levo', global: true } ],
+  rules: [ { id: 'med-warfarin', kind: 'info', tier: 1, strength: 'must', text: 'Keep vitamin K steady', sources: ['s9'] }, { id: 'med-levo', kind: 'timing', tags: ['coffee'], unless_module: 'thyroid', tier: 1, strength: 'must', text: 'Levothyroxine timing', sources: ['s9'] } ] };
+const thyroidModule = { id: 'thyroid', name: 'Thyroid', category: 'condition', evidence: { rating: 'strong' }, sources: ['s10'],
+  medication_questions: [ { id: 'levothyroxine', text: 'Levothyroxine?', effect: 'enable:thy-levo' } ],
+  rules: [ { id: 'thy-levo', kind: 'timing', tags: ['coffee'], tier: 1, strength: 'must', text: 'Levothyroxine timing (thyroid)', sources: ['s10'] } ] };
+const hpModule = { id: 'higher-protein-older-adult', name: 'Higher protein', category: 'condition', evidence: { rating: 'strong' }, sources: ['s11'], rules: [ { id: 'hp-1', kind: 'info', tier: 1, strength: 'should', text: '1.0 to 1.2 g/kg', sources: ['s11'] } ] };
+const conds2 = conditions.concat([medModule, thyroidModule, hpModule]);
+const ruleIds = plan => ['applied', 'behavior', 'info', 'timing'].flatMap(k => plan[k] || []).map(r => r.id || r.rule);
+
+test('elimination phases default to a 4-week check-in; an explicit 0 turns it off; a set number is kept', () => {
+  const today = new Date('2026-09-10');
+  const d = buildPlan({ person: person({ modules: ['ibs-low-fodmap'], phases: { 'ibs-low-fodmap': { phase: 'elimination', started: '2026-08-20' } } }), conditions, today });
+  assert.equal(d.phases[0].check_in_weeks, 4);
+  assert.equal(d.phases[0].status, 'active');
+  const due = buildPlan({ person: person({ modules: ['ibs-low-fodmap'], phases: { 'ibs-low-fodmap': { phase: 'elimination', started: '2026-08-01' } } }), conditions, today });
+  assert.equal(due.phases[0].status, 'check-in', 'nearly six weeks in with the default reminder: a check-in is due');
+  const off = buildPlan({ person: person({ modules: ['ibs-low-fodmap'], phases: { 'ibs-low-fodmap': { phase: 'elimination', started: '2026-08-01', check_in_weeks: 0 } } }), conditions, today });
+  assert.equal(off.phases[0].check_in_weeks, null);
+  assert.equal(off.phases[0].status, 'active');
+  const six = buildPlan({ person: person({ modules: ['ibs-low-fodmap'], phases: { 'ibs-low-fodmap': { phase: 'elimination', started: '2026-08-01', check_in_weeks: 6, check_in_from: '2026-08-01' } } }), conditions, today });
+  assert.equal(six.phases[0].check_in_weeks, 6);
+  assert.equal(six.phases[0].status, 'active');
+});
+
+test('a medicine answered yes switches the interaction module on by itself; its levothyroxine rule yields to the thyroid module', () => {
+  const none = buildPlan({ person: person({ modules: ['hypertension'] }), conditions: conds2 });
+  assert.ok(!none.modules.some(m => m.id === 'medication-food-interactions'));
+  const w = buildPlan({ person: person({ modules: ['hypertension'], medications: { warfarin: true } }), conditions: conds2 });
+  assert.ok(w.modules.some(m => m.id === 'medication-food-interactions'));
+  assert.ok(ruleIds(w).includes('med-warfarin'));
+  assert.ok(!ruleIds(w).includes('med-levo'), 'levothyroxine not answered: its rule stays gated');
+  const l = buildPlan({ person: person({ modules: [], medications: { levothyroxine: true } }), conditions: conds2 });
+  assert.ok(ruleIds(l).includes('med-levo'), 'no thyroid module: the interaction module carries the timing rule');
+  const both = buildPlan({ person: person({ modules: ['thyroid'], medications: { levothyroxine: true } }), conditions: conds2 });
+  assert.ok(ruleIds(both).includes('thy-levo'));
+  assert.ok(!ruleIds(both).includes('med-levo'), 'thyroid active: only one levothyroxine rule');
+});
+
+test('higher protein is suggested at 65 and on a GLP-1 medicine, never added silently, and stays quiet once dismissed or added', () => {
+  const young = buildPlan({ person: person({ age: 50 }), conditions: conds2 });
+  assert.ok(!young.notices.some(n => n.code === 'suggest-module'));
+  const older = buildPlan({ person: person({ age: 72 }), conditions: conds2 });
+  const n = older.notices.find(n => n.code === 'suggest-module');
+  assert.ok(n && n.module === 'higher-protein-older-adult' && n.action === 'add-module:higher-protein-older-adult');
+  assert.ok(!older.modules.some(m => m.id === 'higher-protein-older-adult'), 'suggested, not applied');
+  const glp = buildPlan({ person: person({ age: 40, flags: { glp1: true } }), conditions: conds2 });
+  assert.ok(glp.notices.some(n => n.code === 'suggest-module'));
+  const dismissed = buildPlan({ person: person({ age: 72, dismissed_suggestions: ['higher-protein-older-adult'] }), conditions: conds2 });
+  assert.ok(!dismissed.notices.some(n => n.code === 'suggest-module'));
+  const added = buildPlan({ person: person({ age: 72, modules: ['higher-protein-older-adult'] }), conditions: conds2 });
+  assert.ok(!added.notices.some(n => n.code === 'suggest-module'));
 });

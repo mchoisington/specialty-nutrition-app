@@ -114,7 +114,7 @@ export function renderPlanScreen(root) {
     person.phases = person.phases || {};
     const cur = person.phases[sel.dataset.phaseCheck] || { phase: (uiState.conditionsById.get(sel.dataset.phaseCheck).phases[0] || {}).id, started: uiIsoDate(uiToday()) };
     const n = Number(sel.value);
-    if (n > 0) { cur.check_in_weeks = n; cur.check_in_from = uiIsoDate(uiToday()); } else { delete cur.check_in_weeks; delete cur.check_in_from; }
+    if (n > 0) { cur.check_in_weeks = n; cur.check_in_from = uiIsoDate(uiToday()); } else { cur.check_in_weeks = 0; delete cur.check_in_from; }   // 0 is an explicit "no reminder"; a missing key means the 4-week default
     person.phases[sel.dataset.phaseCheck] = cur;
     uiPersist(); uiToast(n > 0 ? `The app will ask how it is going in ${n} weeks.` : 'No reminder. The phase stays until you change it.'); uiState.rerender();
   }));
@@ -128,7 +128,7 @@ export function renderPlanScreen(root) {
   root.querySelectorAll('[data-phase-next]').forEach(b => b.addEventListener('click', () => {
     person.phases = person.phases || {};
     const prev = person.phases[b.dataset.phaseNext] || {};
-    person.phases[b.dataset.phaseNext] = { phase: b.dataset.next, started: uiIsoDate(uiToday()), ...(prev.check_in_weeks ? { check_in_weeks: prev.check_in_weeks, check_in_from: uiIsoDate(uiToday()) } : {}) };
+    person.phases[b.dataset.phaseNext] = { phase: b.dataset.next, started: uiIsoDate(uiToday()), ...(Object.prototype.hasOwnProperty.call(prev, 'check_in_weeks') ? { check_in_weeks: prev.check_in_weeks, ...(prev.check_in_weeks ? { check_in_from: uiIsoDate(uiToday()) } : {}) } : {}) };
     uiPersist(); uiToast('Phase updated.'); uiState.rerender();
   }));
   root.querySelectorAll('[data-phase-restart]').forEach(b => b.addEventListener('click', () => {

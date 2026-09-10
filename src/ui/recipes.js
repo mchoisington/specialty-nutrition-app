@@ -25,12 +25,13 @@ export function recipesSourceKey(r) {
   if (r.custom) return 'mine';
   if (/nhs/i.test(r.source || '')) return 'nhs';
   if (/parent club/i.test(r.source || '')) return 'parentclub';
+  if (/nhlbi/i.test(r.source || '')) return 'nhlbi';
   if (/wikibooks/i.test(r.source || '')) return 'wikibooks';
   if (/usda/i.test(r.source || '')) return 'usda';
   return 'peace-meal';
 }
-const RECIPES_SOURCE_LABEL = { mine: 'Mine', nhs: 'NHS', parentclub: 'Parent Club', wikibooks: 'Wikibooks', usda: 'USDA', 'peace-meal': 'Peace Meal' };
-const RECIPES_SOURCE_TONE = { mine: 'plum', nhs: 'info', parentclub: 'info', wikibooks: 'neutral', usda: 'caution', 'peace-meal': 'olive' };
+const RECIPES_SOURCE_LABEL = { mine: 'Mine', nhs: 'NHS', parentclub: 'Parent Club', nhlbi: 'NHLBI', wikibooks: 'Wikibooks', usda: 'USDA', 'peace-meal': 'Peace Meal' };
+const RECIPES_SOURCE_TONE = { mine: 'plum', nhs: 'info', parentclub: 'info', nhlbi: 'info', wikibooks: 'neutral', usda: 'caution', 'peace-meal': 'olive' };
 export function recipesSourceChip(r) { const k = recipesSourceKey(r); return uiChip(RECIPES_SOURCE_LABEL[k], RECIPES_SOURCE_TONE[k]); }
 
 let recipesIndexCache = null;
@@ -314,7 +315,7 @@ export function renderRecipesScreen(root) {
         ${chip('fits', 'Fits my plan', recipesUi.fits)}
         ${chip('quick', 'Under 20 minutes', recipesUi.quick)}
         <span class="filter-sep" aria-hidden="true"></span>
-        ${['peace-meal', 'nhs', 'parentclub', 'wikibooks', 'usda', 'mine'].filter(s => s !== 'usda' || uiState.data.recipes.some(r => r.source === 'USDA MyPlate Kitchen')).map(s => chip('source:' + s, RECIPES_SOURCE_LABEL[s], recipesUi.source === s)).join('')}
+        ${['peace-meal', 'nhs', 'parentclub', 'nhlbi', 'wikibooks', 'usda', 'mine'].filter(s => s !== 'usda' || uiState.data.recipes.some(r => r.source === 'USDA MyPlate Kitchen')).map(s => chip('source:' + s, RECIPES_SOURCE_LABEL[s], recipesUi.source === s)).join('')}
         <span class="filter-sep" aria-hidden="true"></span>
         ${chip('veg:vegetarian', 'Vegetarian', recipesUi.veg === 'vegetarian')}
         ${chip('veg:vegan', 'Vegan', recipesUi.veg === 'vegan')}
@@ -377,10 +378,11 @@ export function renderRecipesScreen(root) {
 export function recipesSourceCounts() {
   const base = uiState.baseRecipes || [];
   const by = key => base.filter(r => recipesSourceKey(r) === key);
-  const nhs = by('nhs'), pcs = by('parentclub'), wb = by('wikibooks'), pm = by('peace-meal');
+  const nhs = by('nhs'), pcs = by('parentclub'), nhlbi = by('nhlbi'), wb = by('wikibooks'), pm = by('peace-meal');
   const links = uiState.profile && uiState.profile.recipe_links ? Object.keys(uiState.profile.recipe_links).filter(id => Array.isArray(uiState.profile.recipe_links[id]) && uiState.profile.recipe_links[id].some(l => l.food)).length : 0;
   return {
     total: base.length, peaceMeal: pm.length, nhs: nhs.length, nhsWithNutrition: nhs.filter(r => r.nutrition_per_serving).length,
+    nhlbi: nhlbi.length, nhlbiWithPotassium: nhlbi.filter(r => r.nutrition_per_serving && typeof r.nutrition_per_serving.potassium_mg === 'number').length,
     parentclub: pcs.length, parentclubWithSodium: pcs.filter(r => r.nutrition_per_serving && typeof r.nutrition_per_serving.sodium_mg === 'number').length,
     wikibooks: wb.length, wikibooksFeatured: wb.filter(r => r.featured).length, wikibooksTimesEstimated: wb.filter(r => r.times_estimated).length,
     mine: (uiState.profile && uiState.profile.custom_recipes || []).length, linked: links,

@@ -21,7 +21,7 @@ const PEOPLE_STEPS = [
   { id: 'allergens', label: 'Allergies', why: 'Hard stops. Anything ticked here is never served, suggested, or overridden.' },
   { id: 'conditions', label: 'Conditions and diets', why: 'Where the plan comes from. Each one you tick brings its published guidelines; the app merges them and shows conflicts.' },
   { id: 'preferences', label: 'Likes and dislikes', why: 'Soft choices: foods to steer away from, spice level, cuisines you love or skip. Never overrides an allergy or a condition.' },
-  { id: 'medications', label: 'Medications', why: 'Only asked when a condition you ticked has a medication that changes its advice.' },
+  { id: 'medications', label: 'Medications', why: 'Medicines that change what you should eat, like warfarin, levothyroxine, or insulin.' },
   { id: 'clinician', label: 'Numbers from your doctor', why: 'Only asked when a condition needs a number the app must not choose for you, like a protein or potassium limit.' },
   { id: 'cooking', label: 'Cooking', why: 'Your real week: time, days, kitchen, and how you feel about cooking. Meals are chosen to fit.' },
   { id: 'review', label: 'Review', why: 'Everything on one page. Save to build the plan.' }
@@ -121,7 +121,7 @@ function peopleStepApplies(person, stepId) {
   if (stepId !== 'medications' && stepId !== 'clinician') return true;
   let plan = null;
   try { plan = uiPlanFor(person); } catch { return true; }
-  if (stepId === 'medications') return plan.modules.some(m => { const mod = uiState.conditionsById.get(m.id); return mod && Array.isArray(mod.medication_questions) && mod.medication_questions.length; });
+  if (stepId === 'medications') return [...uiState.conditionsById.values()].some(m => m.auto_by_medication) || plan.modules.some(m => { const mod = uiState.conditionsById.get(m.id); return mod && Array.isArray(mod.medication_questions) && mod.medication_questions.length; });
   return (plan.tier2.missing || []).length > 0 || (plan.tier2.applied || []).length > 0 || plan.modules.some(m => { const mod = uiState.conditionsById.get(m.id); return mod && Array.isArray(mod.tier2) && mod.tier2.length; });
 }
 
@@ -848,13 +848,15 @@ function peopleStepMedications(container, person) {
     const mod = uiState.conditionsById.get(m.id);
     for (const q of (mod && mod.medication_questions) || []) if (!seen.has(q.id)) seen.set(q.id, { ...q, moduleName: mod.name });
   }
+  // Questions asked of everyone: medicines that interact with food whatever the conditions (warfarin, grapefruit-sensitive drugs, levothyroxine).
+  for (const mod of uiState.conditionsById.values()) if (mod.auto_by_medication) for (const q of mod.medication_questions || []) if (q.global && !seen.has(q.id)) seen.set(q.id, { ...q, moduleName: mod.name, global: true });
   person.medications = person.medications || {};
-  const qs = [...seen.values()];
+  const qs = [...seen.values()].sort((a, b) => Number(!!b.global) - Number(!!a.global));
   container.innerHTML = `
-    <p>Some medications change the rules. Answer what applies; the plan will set aside any rule that a medication makes unsafe and say why.</p>
+    <p>Some medicines change what you should eat. Answer what applies. A yes turns on the matching food rule, and sets aside any rule the medicine makes unsafe, with the reason shown.</p>
     ${qs.length ? qs.map(q => `<div class="card">
       <span class="label">${uiEsc(q.text)}</span>
-      <div class="small muted" style="margin-bottom:.5rem">Asked by ${uiEsc(q.moduleName)}.</div>
+      <div class="small muted" style="margin-bottom:.5rem">${q.global ? 'Asked of everyone.' : `Asked by ${uiEsc(q.moduleName)}.`}</div>
       ${uiYesNo('med-' + q.id, person.medications[q.id] === true ? true : person.medications[q.id] === false ? false : null)}
     </div>`).join('') : uiEmptyState('No medication questions apply to the modules you selected.')}`;
   for (const q of qs) peopleBindSeg(container, person, 'medications', 'med-' + q.id, v => { person.medications[q.id] = v === 'yes'; }, { rerender: false });
