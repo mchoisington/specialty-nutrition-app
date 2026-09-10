@@ -31,6 +31,8 @@ const i = (food, grams, display) => ({ food: F[food], grams, display });
 const gio = grams => i('oliveOil', grams, `${grams >= 20 ? '1½ tbsp' : grams >= 13 ? '1 tbsp' : '2 tsp'} garlic-infused olive oil`);
 const tops = grams => i('scallion', grams, `${Math.round(grams / 10)} spring onion green tops, sliced`);
 const stockCup = (grams, n) => i('stock', grams, `${n} homemade chicken stock without onion or garlic`);
+// Both-diet recipes use water or a quick vegetable stock: long-simmered meat stock is not tolerated on a low histamine trial.
+const waterCup = (grams, n) => i('water', grams, `${n} water`);   // the method suggests a quick vegetable stock made without onion or garlic
 
 // [id, name, meal, servings, active, total, skill, equipment, assemblyOnly, leftovers, writtenFor, ingredients, steps]
 const R = [];
@@ -65,11 +67,11 @@ add('lfh-chive-scrambled-eggs-rice-cakes', 'Chive scrambled eggs on rice cakes',
   [i('egg', 100, '2 eggs'), i('chives', 5, '1 tbsp chives, snipped'), i('butter', 10, '2 tsp butter'), i('riceCakes', 18, '2 brown rice cakes'), i('salt', 1, 'pinch of salt'), i('pepper', 1, 'black pepper')],
   ['Beat the eggs with the salt and chives.', 'Melt the butter in a small pan over low heat and stir the eggs slowly until just set.', 'Pile onto the rice cakes and finish with pepper.']);
 add('lfh-carrot-ginger-soup', 'Carrot and ginger soup', ['lunch'], 4, 15, 40, 'beginner', ['stove', 'blender'], false, 'good', BOTH,
-  [i('carrot', 600, '6 carrots, sliced'), i('potato', 200, '1 potato, diced'), i('ginger', 20, '2 tbsp fresh ginger, chopped'), stockCup(1000, '4 cups'), i('coconutMilk', 120, '½ cup coconut milk'), i('turmeric', 2, '½ tsp turmeric'), i('oliveOil', 15, '1 tbsp olive oil'), i('salt', 4, '¾ tsp salt')],
-  ['Warm the oil in a pot and cook the carrot, potato, and ginger 5 minutes.', 'Add the stock, turmeric, and salt. Simmer 20 minutes until the vegetables are soft.', 'Blend smooth, stir in the coconut milk, and reheat gently.']);
+  [i('carrot', 600, '6 carrots, sliced'), i('potato', 200, '1 potato, diced'), i('ginger', 20, '2 tbsp fresh ginger, chopped'), waterCup(1000, '4 cups'), i('coconutMilk', 120, '½ cup coconut milk'), i('turmeric', 2, '½ tsp turmeric'), i('oliveOil', 15, '1 tbsp olive oil'), i('salt', 4, '¾ tsp salt')],
+  ['Use plain water, or a quick vegetable stock you simmered under 30 minutes without onion or garlic. Warm the oil in a pot and cook the carrot, potato, and ginger 5 minutes.', 'Add the stock, turmeric, and salt. Simmer 20 minutes until the vegetables are soft.', 'Blend smooth, stir in the coconut milk, and reheat gently.']);
 add('lfh-pumpkin-coconut-soup', 'Pumpkin and coconut soup with cumin', ['lunch'], 4, 10, 30, 'beginner', ['stove', 'blender'], false, 'good', BOTH,
-  [i('pumpkin', 800, '800 g pumpkin or squash, cubed (or 2 cans pumpkin purée)'), i('coconutMilk', 200, '¾ cup coconut milk'), stockCup(700, '3 cups'), i('ginger', 15, '1 tbsp fresh ginger, grated'), i('cumin', 2, '1 tsp ground cumin'), tops(20), i('oliveOil', 15, '1 tbsp olive oil'), i('salt', 4, '¾ tsp salt')],
-  ['Warm the oil in a pot; cook the ginger and cumin 1 minute.', 'Add the pumpkin, stock, and salt. Simmer 15 to 20 minutes until soft.', 'Blend smooth with the coconut milk. Serve with the spring onion tops on top.']);
+  [i('pumpkin', 800, '800 g pumpkin or squash, cubed (or 2 cans pumpkin purée)'), i('coconutMilk', 200, '¾ cup coconut milk'), waterCup(700, '3 cups'), i('ginger', 15, '1 tbsp fresh ginger, grated'), i('cumin', 2, '1 tsp ground cumin'), tops(20), i('oliveOil', 15, '1 tbsp olive oil'), i('salt', 4, '¾ tsp salt')],
+  ['Use plain water, or a quick vegetable stock you simmered under 30 minutes without onion or garlic. Warm the oil in a pot; cook the ginger and cumin 1 minute.', 'Add the pumpkin, stock, and salt. Simmer 15 to 20 minutes until soft.', 'Blend smooth with the coconut milk. Serve with the spring onion tops on top.']);
 add('lfh-beef-broccoli-stir-fry', 'Beef and broccoli stir-fry', ['dinner'], 3, 20, 35, 'comfortable', ['stove'], false, 'ok', BOTH,
   [i('beef', 400, '400 g lean beef, thinly sliced'), i('broccoli', 350, '350 g broccoli florets'), i('ginger', 15, '1 tbsp fresh ginger, grated'), gio(15), i('sesameOil', 10, '2 tsp toasted sesame oil'), i('cornstarch', 8, '1 tbsp cornstarch'), i('water', 120, '½ cup water'), i('salt', 4, '¾ tsp salt'), i('rice', 200, '1 cup white rice, uncooked')],
   ['Cook the rice. Toss the beef with the cornstarch and half the salt.', 'Heat the garlic-infused oil in a wok over high heat. Sear the beef in two batches, 2 minutes each; lift out.', 'Add the broccoli, ginger, and water. Cover and steam 3 minutes. Return the beef, add the sesame oil and remaining salt, and toss until glossy. Serve over the rice.']);
@@ -77,8 +79,8 @@ add('lfh-baked-trout-dill-potatoes', 'Baked trout with dill and buttered potatoe
   [i('trout', 300, '2 trout fillets (300 g)'), i('potato', 400, '400 g small potatoes, halved'), i('butter', 20, '1½ tbsp butter'), i('dill', 2, '2 tsp dried dill (or 2 tbsp fresh)'), i('chives', 6, '2 tbsp chives, snipped'), i('oliveOil', 10, '2 tsp olive oil'), i('salt', 3, '½ tsp salt')],
   ['Heat the oven to 200 °C (400 °F). Boil the potatoes 15 minutes until tender; drain and toss with the butter and chives.', 'Lay the trout on a lined tray, brush with oil, and season with dill and salt. Bake 10 to 12 minutes until it flakes.', 'Serve together.']);
 add('lfh-chicken-rice-noodle-soup', 'Chicken and rice noodle soup with chard', ['lunch', 'dinner'], 4, 15, 35, 'beginner', ['stove'], false, 'ok', BOTH,
-  [i('chicken', 400, '400 g chicken breast, diced'), i('riceNoodles', 300, '300 g cooked rice noodles'), i('carrot', 150, '2 carrots, thinly sliced'), i('chard', 150, '150 g chard leaves, shredded'), i('ginger', 15, '1 tbsp fresh ginger, sliced'), stockCup(1200, '5 cups'), tops(30), i('salt', 4, '¾ tsp salt')],
-  ['Bring the stock, ginger, and salt to a simmer. Add the chicken and carrot and simmer 8 minutes.', 'Add the chard and cook 2 minutes.', 'Divide the noodles between bowls, ladle over the soup, and top with the spring onion tops.']);
+  [i('chicken', 400, '400 g chicken breast, diced'), i('riceNoodles', 300, '300 g cooked rice noodles'), i('carrot', 150, '2 carrots, thinly sliced'), i('chard', 150, '150 g chard leaves, shredded'), i('ginger', 15, '1 tbsp fresh ginger, sliced'), waterCup(1200, '5 cups'), tops(30), i('salt', 4, '¾ tsp salt')],
+  ['Use plain water, or a quick vegetable stock you simmered under 30 minutes without onion or garlic. Bring the stock, ginger, and salt to a simmer. Add the chicken and carrot and simmer 8 minutes.', 'Add the chard and cook 2 minutes.', 'Divide the noodles between bowls, ladle over the soup, and top with the spring onion tops.']);
 add('lfh-cinnamon-rice-pudding', 'Cinnamon rice pudding', ['snack'], 4, 5, 40, 'beginner', ['stove'], false, 'ok', BOTH,
   [i('rice', 100, '½ cup short-grain white rice'), i('lfMilk', 600, '2½ cups lactose-free milk'), i('maple', 40, '2 tbsp maple syrup'), i('cinnamon', 2, '½ tsp cinnamon'), i('cardamom', 1, '¼ tsp ground cardamom'), i('vanilla', 4, '1 tsp vanilla extract')],
   ['Simmer the rice and milk in a heavy pan, stirring often, 30 to 35 minutes until thick and creamy.', 'Stir in the maple syrup, cinnamon, cardamom, and vanilla. Serve warm or chilled.']);
@@ -110,8 +112,8 @@ add('lfh-kale-potato-frittata', 'Kale and potato frittata', ['breakfast', 'lunch
   [i('egg', 400, '8 eggs'), i('potato', 300, '2 potatoes, thinly sliced'), i('kale', 100, '2 cups kale, shredded'), i('chives', 8, '3 tbsp chives, snipped'), i('mozzarella', 80, '80 g fresh mozzarella, torn'), i('oliveOil', 20, '1½ tbsp olive oil'), i('salt', 4, '¾ tsp salt'), i('pepper', 1, 'black pepper')],
   ['Cook the potato slices in the oil in an ovenproof pan over medium heat, covered, 10 minutes until tender. Add the kale and cook 2 minutes.', 'Beat the eggs with chives, salt, and pepper; pour over. Scatter the mozzarella.', 'Cook 5 minutes on the stove, then finish under a hot grill or in a 200 °C oven 8 to 10 minutes until set.']);
 add('lfh-turkey-rice-soup', 'Turkey, carrot, and rice soup', ['lunch'], 4, 15, 40, 'beginner', ['stove'], false, 'ok', BOTH,
-  [i('turkey', 400, '400 g ground turkey'), i('rice', 100, '½ cup white rice'), i('carrot', 200, '3 carrots, diced'), i('zucchini', 150, '1 zucchini, diced'), stockCup(1200, '5 cups'), i('thyme', 2, '2 sprigs thyme'), i('bay', 1, '1 bay leaf'), i('oliveOil', 15, '1 tbsp olive oil'), i('salt', 4, '¾ tsp salt')],
-  ['Brown the turkey in the oil, breaking it up.', 'Add the carrot, stock, rice, thyme, bay, and salt. Simmer 20 minutes.', 'Add the zucchini and cook 5 minutes more. Remove the bay leaf.']);
+  [i('turkey', 400, '400 g ground turkey'), i('rice', 100, '½ cup white rice'), i('carrot', 200, '3 carrots, diced'), i('zucchini', 150, '1 zucchini, diced'), waterCup(1200, '5 cups'), i('thyme', 2, '2 sprigs thyme'), i('bay', 1, '1 bay leaf'), i('oliveOil', 15, '1 tbsp olive oil'), i('salt', 4, '¾ tsp salt')],
+  ['Use plain water, or a quick vegetable stock you simmered under 30 minutes without onion or garlic. Brown the turkey in the oil, breaking it up.', 'Add the carrot, stock, rice, thyme, bay, and salt. Simmer 20 minutes.', 'Add the zucchini and cook 5 minutes more. Remove the bay leaf.']);
 add('lfh-coconut-chia-pudding', 'Coconut chia pudding with blueberries', ['breakfast', 'snack'], 2, 5, 5, 'beginner', ['none'], true, 'ok', BOTH,
   [i('chia', 40, '¼ cup chia seeds'), i('coconutMilk', 250, '1 cup coconut milk'), i('maple', 20, '1 tbsp maple syrup'), i('vanilla', 2, '½ tsp vanilla extract'), i('blueberries', 100, '⅔ cup blueberries')],
   ['Stir the chia, coconut milk, maple, and vanilla. Refrigerate at least 2 hours or overnight.', 'Top with blueberries.']);
@@ -237,12 +239,13 @@ add('lh-apple-carrot-muffins', 'Apple and carrot muffins', ['breakfast', 'snack'
 // ---------------------------------------------------------------- verify and write
 const conditions = J('conditions.json').modules, dictionaries = J('dictionaries.json');
 const matcher = buildMatcher(dictionaries);
+matcher.dietLists = J('diet-lists.json');
 const person = mods => ({ id: 'x', name: 'x', adult: true, age: 50, modules: mods, allergens: [], preferences: { avoid_tags: [], avoid_terms: [] }, medications: {}, tier2: {}, phases: {}, modes: {}, acknowledged: [], flags: {}, variants: {} });
 const plans = { 'low-fodmap': buildPlan({ person: person(['ibs-low-fodmap']), conditions, dictionaries, today: new Date() }), 'low-histamine': buildPlan({ person: person(['mcas']), conditions, dictionaries, today: new Date() }) };
 let bad = 0;
 for (const r of R) for (const fam of r.diet_written_for) {
   const c = checkRecipe(r, plans[fam], matcher, foodsById, {});
-  if (c.verdict !== 'pass') { bad++; console.log(`FAIL ${r.id} for ${fam}: ${c.hits.map(h => h.label + ' <- ' + h.terms.join('/')).join('; ')}${c.unrecognized.length ? ' unrec: ' + c.unrecognized.join(', ') : ''}`); }
+  if (c.verdict !== 'pass') { bad++; console.log(`FAIL ${r.id} for ${fam}: ${c.hits.map(h => h.label + ' <- ' + h.terms.join('/')).join('; ')}${c.unrecognized.length ? ' unrec: ' + c.unrecognized.join(', ') : ''}${c.notApproved && c.notApproved.length ? ' not approved: ' + c.notApproved.map(n => n.label).join(' | ') : ''}`); }
 }
 const ids = new Set(R.map(r => r.id)); if (ids.size !== R.length) throw new Error('duplicate ids');
 const existing = J('recipes.json').filter(r => !/^(lf|lh|lfh)-/.test(r.id));

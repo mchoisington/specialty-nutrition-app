@@ -1,0 +1,2701 @@
+{
+  "version": 1,
+  "notes": [
+    "Approved-food lists for the two elimination diets the app plans for. In strict mode (the default when a plan restricts one of these families) a recipe is safe only when every ingredient is on the list or on the person's own tolerated list.",
+    "Low FODMAP: foods that the Monash-group composition papers and the Halmos 2014 trial diet list as low FODMAP at a usual serve. Where a serving threshold is published only in the Monash app it is not reproduced here; the portion field then says 'usual serve' and the item note says so. Foods whose safe serve is small are marked 'small serve' with the published basis.",
+    "Low histamine: foods that the SIGHI compatibility list rates as well tolerated (0), as encoded in this app's dictionary from the SIGHI list and Comas-Baste 2020. The SIGHI leaflet could not be machine-read in this build, so items whose rating was not re-checked against the leaflet carry verified: false and a note. Freshness matters more than the list: fresh or quickly frozen, cooked and eaten the same day.",
+    "Every item carries sources. A person can add foods they tolerate and remove foods they react to; those live on the person, never in this file."
+  ],
+  "families": {
+    "low-fodmap": {
+      "label": "low FODMAP",
+      "module": "ibs-low-fodmap",
+      "tags": [
+        "fodmap-fructan",
+        "fodmap-gos",
+        "fodmap-lactose",
+        "fodmap-fructose",
+        "fodmap-sorbitol",
+        "fodmap-mannitol"
+      ],
+      "sources": [
+        "halmos-2014",
+        "varney-2017",
+        "muir-2007",
+        "muir-2009",
+        "biesiekierski-2011"
+      ],
+      "intro": "Foods that are low FODMAP at a usual serve during the elimination phase. Amounts matter: a few items are safe only in a small serve, and stacking several 'small serve' foods in one meal adds up. Portion thresholds published only in the Monash app are not reproduced here.",
+      "groups": [
+        {
+          "name": "Vegetables",
+          "items": [
+            {
+              "term": "carrot",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "cucumber",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "lettuce",
+              "aliases": [
+                "romaine",
+                "iceberg",
+                "butterhead",
+                "cos lettuce",
+                "rocket",
+                "arugula",
+                "endive",
+                "radicchio",
+                "mixed salad leaves",
+                "salad leaves",
+                "mixed leaves",
+                "salad greens"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "zucchini",
+              "aliases": [
+                "courgette"
+              ],
+              "portion": "usual serve",
+              "note": "large amounts carry some fructan",
+              "sources": [
+                "muir-2009",
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "bell pepper",
+              "aliases": [
+                "red pepper",
+                "green pepper",
+                "yellow pepper",
+                "capsicum",
+                "sweet pepper",
+                "roasted red pepper",
+                "roasted peppers"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "tomato",
+              "aliases": [
+                "tomatoes",
+                "cherry tomatoes",
+                "tomato paste",
+                "tomato puree",
+                "passata",
+                "chopped tomatoes"
+              ],
+              "portion": "usual serve",
+              "note": "fresh and canned tomato are low FODMAP at a usual serve; very large amounts add fructose",
+              "sources": [
+                "muir-2009",
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "potato",
+              "aliases": [
+                "potatoes",
+                "new potatoes",
+                "baby potatoes"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "spinach",
+              "aliases": [
+                "baby spinach"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "kale",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "chard",
+              "aliases": [
+                "swiss chard",
+                "silverbeet"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "bok choy",
+              "aliases": [
+                "pak choi",
+                "pak choy"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "cabbage",
+              "aliases": [
+                "white cabbage",
+                "red cabbage",
+                "chinese cabbage",
+                "napa cabbage"
+              ],
+              "portion": "usual serve",
+              "note": "savoy cabbage carries more; keep to a usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "broccoli",
+              "aliases": [
+                "broccoli florets",
+                "broccolini",
+                "tenderstem"
+              ],
+              "portion": "usual serve of the heads",
+              "note": "the stalks carry more fructan than the heads",
+              "sources": [
+                "muir-2009",
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "eggplant",
+              "aliases": [
+                "aubergine"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "pumpkin",
+              "aliases": [
+                "pumpkin puree",
+                "kabocha",
+                "japanese pumpkin"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "butternut squash",
+              "aliases": [
+                "butternut"
+              ],
+              "portion": "small serve",
+              "note": "carries some GOS and mannitol; keep the serve small",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "parsnip",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "turnip",
+              "aliases": [
+                "swede",
+                "rutabaga"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "radish",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "corn",
+              "aliases": [
+                "sweetcorn",
+                "sweet corn",
+                "corn kernels"
+              ],
+              "portion": "small serve",
+              "note": "half a cob; larger serves carry sorbitol",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "green beans",
+              "aliases": [
+                "string beans",
+                "french beans"
+              ],
+              "portion": "small serve",
+              "note": "about 15 beans; more carries sorbitol. The dictionary treats green beans as a caution, so recipes with them still show caution",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "olives",
+              "aliases": [
+                "olive"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "ginger",
+              "aliases": [
+                "fresh ginger",
+                "ginger root"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "chives",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "spring onion green tops",
+              "aliases": [
+                "spring onion greens",
+                "scallion greens",
+                "scallion tops",
+                "green onion tops",
+                "green tops of spring onions",
+                "spring onion tops"
+              ],
+              "portion": "usual serve",
+              "note": "green leaves only; the white bulb is high in fructan",
+              "sources": [
+                "muir-2007"
+              ]
+            },
+            {
+              "term": "leek greens",
+              "aliases": [
+                "leek tops",
+                "green tops of leeks"
+              ],
+              "portion": "usual serve",
+              "note": "green leaves only",
+              "sources": [
+                "muir-2007"
+              ]
+            },
+            {
+              "term": "chilli",
+              "aliases": [
+                "chili",
+                "red chilli",
+                "green chilli",
+                "chili flakes",
+                "chilli flakes"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "bean sprouts",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "bamboo shoots",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "water chestnuts",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "seaweed",
+              "aliases": [
+                "nori",
+                "kelp"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "fennel bulb",
+              "aliases": [
+                "fennel"
+              ],
+              "portion": "small serve",
+              "note": "carries fructan in larger serves",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "edamame",
+              "portion": "small serve",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "okra",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "lemongrass",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Fruit",
+          "items": [
+            {
+              "term": "banana",
+              "aliases": [
+                "firm banana",
+                "bananas"
+              ],
+              "portion": "one firm banana",
+              "note": "ripe bananas carry more fructan; choose firm",
+              "sources": [
+                "muir-2009",
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "blueberries",
+              "aliases": [
+                "blueberry"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "strawberries",
+              "aliases": [
+                "strawberry"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "raspberries",
+              "aliases": [
+                "raspberry"
+              ],
+              "portion": "small serve",
+              "note": "about 30 berries; more carries fructan",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "grapes",
+              "aliases": [
+                "grape"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "kiwi",
+              "aliases": [
+                "kiwifruit",
+                "kiwi fruit"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "orange",
+              "aliases": [
+                "oranges",
+                "mandarin",
+                "clementine",
+                "tangerine",
+                "orange juice"
+              ],
+              "portion": "one fruit",
+              "note": "juice in small amounts only",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "lemon",
+              "aliases": [
+                "lemon juice",
+                "lemon zest"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "lime",
+              "aliases": [
+                "lime juice",
+                "lime zest"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "pineapple",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "cantaloupe",
+              "aliases": [
+                "rockmelon"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "honeydew",
+              "aliases": [
+                "honeydew melon"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "papaya",
+              "aliases": [
+                "pawpaw"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "passionfruit",
+              "aliases": [
+                "passion fruit"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "dragon fruit",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "rhubarb",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "cranberries",
+              "aliases": [
+                "cranberry"
+              ],
+              "portion": "small serve",
+              "sources": [
+                "muir-2009"
+              ]
+            },
+            {
+              "term": "starfruit",
+              "portion": "usual serve",
+              "sources": [
+                "muir-2009"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Grains and starches",
+          "items": [
+            {
+              "term": "rice",
+              "aliases": [
+                "white rice",
+                "brown rice",
+                "basmati",
+                "jasmine rice",
+                "wild rice",
+                "rice flour",
+                "rice noodles",
+                "rice noodle",
+                "rice cakes",
+                "rice paper",
+                "rice milk",
+                "rice bran",
+                "rice malt syrup",
+                "rice crackers"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "oats",
+              "aliases": [
+                "rolled oats",
+                "oatmeal",
+                "porridge oats",
+                "oat bran"
+              ],
+              "portion": "half a cup dry",
+              "note": "larger serves carry GOS and fructan",
+              "sources": [
+                "biesiekierski-2011",
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "quinoa",
+              "portion": "usual serve",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "buckwheat",
+              "aliases": [
+                "buckwheat flour",
+                "buckwheat groats",
+                "soba"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "millet",
+              "portion": "usual serve",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "polenta",
+              "aliases": [
+                "cornmeal",
+                "corn flour",
+                "cornflour",
+                "corn tortillas",
+                "corn tortilla",
+                "popcorn",
+                "corn chips",
+                "tortilla chips"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "gluten-free pasta",
+              "aliases": [
+                "gluten free pasta",
+                "corn and rice pasta",
+                "rice pasta",
+                "corn pasta",
+                "quinoa pasta"
+              ],
+              "portion": "usual serve",
+              "note": "corn, rice, or quinoa based; not chickpea or lentil pasta",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "gluten-free bread",
+              "aliases": [
+                "gluten free bread"
+              ],
+              "portion": "two slices",
+              "note": "check the flour base; some are made with apple or honey",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "sourdough spelt bread",
+              "aliases": [
+                "spelt sourdough"
+              ],
+              "portion": "two slices",
+              "note": "the long ferment lowers fructan; ordinary spelt bread is not the same",
+              "sources": [
+                "biesiekierski-2011",
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "teff",
+              "portion": "usual serve",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "sorghum",
+              "portion": "usual serve",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "tapioca",
+              "aliases": [
+                "tapioca starch",
+                "tapioca flour",
+                "cassava"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "cornstarch",
+              "aliases": [
+                "corn starch",
+                "potato starch",
+                "arrowroot"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "baking powder",
+              "aliases": [
+                "baking soda",
+                "bicarbonate of soda",
+                "cream of tartar",
+                "yeast",
+                "dried yeast"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Meat, fish, eggs, and plant protein",
+          "items": [
+            {
+              "term": "chicken",
+              "aliases": [
+                "chicken breast",
+                "chicken thighs",
+                "chicken thigh",
+                "turkey",
+                "ground turkey",
+                "turkey mince",
+                "duck"
+              ],
+              "portion": "usual serve",
+              "note": "plain meat is FODMAP free; check marinades and stuffing",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "beef",
+              "aliases": [
+                "ground beef",
+                "beef mince",
+                "steak",
+                "lamb",
+                "lamb mince",
+                "pork",
+                "pork loin",
+                "pork chops",
+                "veal",
+                "bacon",
+                "ham",
+                "prosciutto"
+              ],
+              "portion": "usual serve",
+              "note": "plain meat is FODMAP free; cured meats can carry garlic or onion in the seasoning",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "fish",
+              "aliases": [
+                "cod",
+                "haddock",
+                "salmon",
+                "trout",
+                "tuna",
+                "tilapia",
+                "halibut",
+                "hake",
+                "pollock",
+                "sardines",
+                "mackerel",
+                "sea bass",
+                "snapper",
+                "white fish",
+                "smoked salmon",
+                "canned tuna"
+              ],
+              "portion": "usual serve",
+              "note": "plain fish is FODMAP free",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "shellfish",
+              "aliases": [
+                "shrimp",
+                "prawns",
+                "prawn",
+                "crab",
+                "lobster",
+                "mussels",
+                "clams",
+                "scallops",
+                "squid",
+                "calamari"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "egg",
+              "aliases": [
+                "eggs",
+                "egg whites",
+                "egg white",
+                "egg yolk"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "firm tofu",
+              "aliases": [
+                "tofu"
+              ],
+              "portion": "usual serve",
+              "note": "firm tofu, pressed; silken tofu carries GOS",
+              "sources": [
+                "biesiekierski-2011",
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "tempeh",
+              "portion": "usual serve",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "peanuts",
+              "aliases": [
+                "peanut",
+                "peanut butter"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "walnuts",
+              "aliases": [
+                "walnut"
+              ],
+              "portion": "small handful",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "pecans",
+              "aliases": [
+                "pecan"
+              ],
+              "portion": "small handful",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "macadamia",
+              "aliases": [
+                "macadamia nuts",
+                "macadamias"
+              ],
+              "portion": "small handful",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "pine nuts",
+              "aliases": [
+                "pine nut"
+              ],
+              "portion": "one tablespoon",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "brazil nuts",
+              "aliases": [
+                "brazil nut"
+              ],
+              "portion": "small handful",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "hazelnuts",
+              "aliases": [
+                "hazelnut"
+              ],
+              "portion": "ten nuts",
+              "note": "more carries GOS",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "almonds",
+              "aliases": [
+                "almond",
+                "almond milk",
+                "almond butter",
+                "almond flour",
+                "ground almonds"
+              ],
+              "portion": "ten nuts",
+              "note": "more carries GOS; almond milk is low FODMAP at a cup",
+              "sources": [
+                "biesiekierski-2011",
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "chia seeds",
+              "aliases": [
+                "chia"
+              ],
+              "portion": "two tablespoons",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "flaxseed",
+              "aliases": [
+                "flax",
+                "linseed",
+                "linseeds",
+                "ground flaxseed"
+              ],
+              "portion": "one tablespoon",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "hemp seeds",
+              "aliases": [
+                "hemp",
+                "hemp hearts"
+              ],
+              "portion": "two tablespoons",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "pumpkin seeds",
+              "aliases": [
+                "pepitas",
+                "pumpkin seed"
+              ],
+              "portion": "two tablespoons",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "sunflower seeds",
+              "aliases": [
+                "sunflower seed"
+              ],
+              "portion": "two tablespoons",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            },
+            {
+              "term": "sesame seeds",
+              "aliases": [
+                "sesame",
+                "tahini"
+              ],
+              "portion": "one tablespoon",
+              "sources": [
+                "biesiekierski-2011"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Dairy and alternatives",
+          "items": [
+            {
+              "term": "lactose-free milk",
+              "aliases": [
+                "lactose free milk",
+                "lactose-free whole milk",
+                "lactose-free low-fat milk",
+                "lactose-free skim milk"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "lactose-free yogurt",
+              "aliases": [
+                "lactose-free yoghurt",
+                "lactose-free plain yogurt",
+                "lactose-free greek yogurt"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "lactose-free cream",
+              "aliases": [
+                "lactose-free light cream"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "hard cheese",
+              "aliases": [
+                "cheddar",
+                "parmesan",
+                "parmigiano",
+                "pecorino",
+                "swiss cheese",
+                "gruyere",
+                "gruyère",
+                "gouda",
+                "edam",
+                "manchego",
+                "emmental",
+                "colby",
+                "monterey jack",
+                "havarti"
+              ],
+              "portion": "usual serve",
+              "note": "aged cheeses are almost lactose free",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "mozzarella",
+              "aliases": [
+                "fresh mozzarella"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "feta",
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "brie",
+              "aliases": [
+                "camembert"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "goat cheese",
+              "aliases": [
+                "goat's cheese",
+                "chevre"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "butter",
+              "aliases": [
+                "ghee",
+                "clarified butter"
+              ],
+              "portion": "usual serve",
+              "note": "butter is fat; lactose is negligible",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "coconut milk",
+              "aliases": [
+                "coconut cream",
+                "canned coconut milk"
+              ],
+              "portion": "half a cup",
+              "note": "larger serves carry sorbitol",
+              "sources": [
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "macadamia milk",
+              "portion": "usual serve",
+              "sources": [
+                "varney-2017"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Fats, sweeteners, and pantry",
+          "items": [
+            {
+              "term": "olive oil",
+              "aliases": [
+                "extra virgin olive oil"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "garlic-infused olive oil",
+              "aliases": [
+                "garlic-infused oil",
+                "garlic infused oil",
+                "garlic oil"
+              ],
+              "portion": "usual serve",
+              "note": "strained; fructans do not dissolve in oil",
+              "sources": [
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "canola oil",
+              "aliases": [
+                "rapeseed oil",
+                "vegetable oil",
+                "sunflower oil",
+                "coconut oil",
+                "sesame oil",
+                "avocado oil",
+                "peanut oil"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "sugar",
+              "aliases": [
+                "white sugar",
+                "caster sugar",
+                "granulated sugar",
+                "brown sugar",
+                "icing sugar",
+                "powdered sugar",
+                "raw sugar"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "maple syrup",
+              "aliases": [
+                "pure maple syrup"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "rice malt syrup",
+              "aliases": [
+                "brown rice syrup"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "golden syrup",
+              "portion": "small serve",
+              "sources": [
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "stevia",
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "dark chocolate",
+              "aliases": [
+                "cocoa",
+                "cocoa powder",
+                "cacao"
+              ],
+              "portion": "small serve",
+              "note": "about 30 g of dark chocolate; milk chocolate carries lactose",
+              "sources": [
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "vanilla extract",
+              "aliases": [
+                "vanilla"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "salt",
+              "aliases": [
+                "sea salt",
+                "table salt",
+                "kosher salt"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "black pepper",
+              "aliases": [
+                "pepper",
+                "white pepper",
+                "peppercorns"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "herbs",
+              "aliases": [
+                "basil",
+                "parsley",
+                "cilantro",
+                "coriander",
+                "dill",
+                "mint",
+                "oregano",
+                "rosemary",
+                "thyme",
+                "sage",
+                "tarragon",
+                "bay leaf",
+                "bay leaves",
+                "marjoram",
+                "lemongrass",
+                "curry leaves"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "spices",
+              "aliases": [
+                "cumin",
+                "turmeric",
+                "paprika",
+                "smoked paprika",
+                "cinnamon",
+                "ground ginger",
+                "nutmeg",
+                "cardamom",
+                "cloves",
+                "allspice",
+                "coriander seed",
+                "ground coriander",
+                "fennel seed",
+                "mustard seed",
+                "star anise",
+                "saffron",
+                "caraway",
+                "five spice",
+                "garam masala",
+                "sumac",
+                "za'atar"
+              ],
+              "portion": "usual serve",
+              "note": "check spice blends for onion or garlic powder",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "vinegar",
+              "aliases": [
+                "white wine vinegar",
+                "red wine vinegar",
+                "cider vinegar",
+                "apple cider vinegar",
+                "rice vinegar",
+                "balsamic vinegar",
+                "malt vinegar"
+              ],
+              "portion": "usual serve",
+              "note": "balsamic in small amounts",
+              "sources": [
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "soy sauce",
+              "aliases": [
+                "tamari",
+                "fish sauce",
+                "oyster sauce",
+                "worcestershire sauce"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "mustard",
+              "aliases": [
+                "dijon mustard",
+                "wholegrain mustard"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "mayonnaise",
+              "portion": "usual serve",
+              "note": "check for onion or garlic",
+              "sources": [
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "miso",
+              "portion": "small serve",
+              "sources": [
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "capers",
+              "portion": "usual serve",
+              "sources": [
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "jam",
+              "aliases": [
+                "strawberry jam",
+                "raspberry jam",
+                "marmalade"
+              ],
+              "portion": "small serve",
+              "note": "from low FODMAP fruit, without high-fructose corn syrup",
+              "sources": [
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "homemade stock without onion or garlic",
+              "aliases": [
+                "homemade chicken stock",
+                "homemade stock",
+                "homemade vegetable stock",
+                "stock without onion or garlic",
+                "water"
+              ],
+              "portion": "usual serve",
+              "note": "shop stock cubes almost always carry onion and garlic",
+              "sources": [
+                "halmos-2014"
+              ]
+            },
+            {
+              "term": "coffee",
+              "aliases": [
+                "espresso",
+                "black tea",
+                "green tea",
+                "peppermint tea",
+                "white tea"
+              ],
+              "portion": "usual serve",
+              "note": "chamomile, fennel, and oolong teas carry fructan",
+              "sources": [
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "wine",
+              "aliases": [
+                "red wine",
+                "white wine"
+              ],
+              "portion": "one glass",
+              "sources": [
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "beer",
+              "portion": "one can",
+              "sources": [
+                "varney-2017"
+              ]
+            },
+            {
+              "term": "cooking spray",
+              "aliases": [
+                "nonstick cooking spray",
+                "oil spray"
+              ],
+              "portion": "usual serve",
+              "note": "plain oil spray",
+              "sources": [
+                "halmos-2014"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "low-histamine": {
+      "label": "low histamine",
+      "module": "mcas",
+      "tags": [
+        "histamine-high",
+        "histamine-aged",
+        "histamine-fermented"
+      ],
+      "sources": [
+        "sighi-list",
+        "comas-baste-2020"
+      ],
+      "intro": "Foods the SIGHI list rates as well tolerated, for a short elimination trial. Freshness matters as much as the food: fresh or quickly frozen, cooked and eaten the same day, no leftovers, no long-simmered stocks. Items marked 'not re-checked' come from the app's dictionary and general low histamine practice and were not re-verified against the leaflet in this build; check them against the SIGHI leaflet you have.",
+      "groups": [
+        {
+          "name": "Vegetables",
+          "items": [
+            {
+              "term": "carrot",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "zucchini",
+              "aliases": [
+                "courgette"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "cucumber",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "lettuce",
+              "aliases": [
+                "romaine",
+                "iceberg",
+                "butterhead",
+                "cos lettuce",
+                "lamb's lettuce",
+                "mixed salad leaves",
+                "salad leaves",
+                "mixed leaves",
+                "salad greens"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "kale",
+              "portion": "usual serve",
+              "verified": false,
+              "note": "not re-checked against the leaflet",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "chard",
+              "aliases": [
+                "swiss chard"
+              ],
+              "portion": "usual serve",
+              "verified": false,
+              "note": "not re-checked against the leaflet",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "bok choy",
+              "aliases": [
+                "pak choi",
+                "chinese cabbage",
+                "napa cabbage"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "cabbage",
+              "aliases": [
+                "white cabbage",
+                "red cabbage"
+              ],
+              "portion": "usual serve",
+              "note": "fresh, not fermented",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "broccoli",
+              "aliases": [
+                "broccoli florets"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "cauliflower",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "potato",
+              "aliases": [
+                "potatoes",
+                "new potatoes"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "sweet potato",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "pumpkin",
+              "aliases": [
+                "pumpkin puree",
+                "butternut squash",
+                "butternut",
+                "squash"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "beetroot",
+              "aliases": [
+                "beets",
+                "beet"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "radish",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "celery",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "fennel",
+              "aliases": [
+                "fennel bulb"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "leek",
+              "aliases": [
+                "leeks"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "onion",
+              "aliases": [
+                "onions",
+                "shallot",
+                "shallots",
+                "spring onion",
+                "spring onions",
+                "scallion",
+                "scallions",
+                "green onion",
+                "spring onion green tops"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "garlic",
+              "aliases": [
+                "garlic clove",
+                "garlic cloves",
+                "garlic-infused olive oil"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "chives",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "asparagus",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "corn",
+              "aliases": [
+                "sweetcorn",
+                "sweet corn"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "green beans",
+              "aliases": [
+                "string beans",
+                "french beans"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "peas",
+              "aliases": [
+                "green peas",
+                "garden peas"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "parsnip",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "turnip",
+              "aliases": [
+                "swede",
+                "rutabaga",
+                "kohlrabi"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "artichoke",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "okra",
+              "portion": "usual serve",
+              "verified": false,
+              "note": "not re-checked against the leaflet",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "bell pepper",
+              "aliases": [
+                "red pepper",
+                "green pepper",
+                "yellow pepper",
+                "capsicum",
+                "sweet pepper",
+                "roasted red pepper",
+                "roasted red bell pepper",
+                "roasted peppers"
+              ],
+              "portion": "usual serve",
+              "verified": false,
+              "note": "sweet peppers are widely used on low histamine plans; not re-checked against the leaflet",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "ginger",
+              "aliases": [
+                "fresh ginger",
+                "ginger root"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Fruit",
+          "items": [
+            {
+              "term": "apple",
+              "aliases": [
+                "apples"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "pear",
+              "aliases": [
+                "pears"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "blueberries",
+              "aliases": [
+                "blueberry"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "cantaloupe",
+              "aliases": [
+                "rockmelon",
+                "honeydew",
+                "honeydew melon",
+                "melon",
+                "watermelon"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "mango",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "peach",
+              "aliases": [
+                "nectarine",
+                "apricot"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "cherries",
+              "aliases": [
+                "cherry",
+                "sweet cherries"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "pomegranate",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "lychee",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "persimmon",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "grapes",
+              "aliases": [
+                "grape"
+              ],
+              "portion": "usual serve",
+              "verified": false,
+              "note": "not re-checked against the leaflet",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "blackberries",
+              "aliases": [
+                "blackberry",
+                "cranberries",
+                "cranberry",
+                "gooseberries"
+              ],
+              "portion": "usual serve",
+              "verified": false,
+              "note": "not re-checked against the leaflet",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "firm banana",
+              "aliases": [
+                "banana",
+                "bananas"
+              ],
+              "portion": "one, just ripe",
+              "verified": false,
+              "note": "very ripe bananas are less tolerated; not re-checked against the leaflet",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "coconut",
+              "aliases": [
+                "coconut milk",
+                "coconut cream",
+                "desiccated coconut",
+                "coconut flakes"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Grains and starches",
+          "items": [
+            {
+              "term": "rice",
+              "aliases": [
+                "white rice",
+                "brown rice",
+                "basmati",
+                "jasmine rice",
+                "rice flour",
+                "rice noodles",
+                "rice noodle",
+                "rice cakes",
+                "rice paper",
+                "rice milk",
+                "puffed rice",
+                "rice crackers"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "oats",
+              "aliases": [
+                "rolled oats",
+                "oatmeal",
+                "porridge oats",
+                "oat milk"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "quinoa",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "millet",
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "corn",
+              "aliases": [
+                "polenta",
+                "cornmeal",
+                "cornflour",
+                "corn flour",
+                "corn tortillas",
+                "corn tortilla",
+                "popcorn",
+                "corn chips"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "buckwheat",
+              "aliases": [
+                "buckwheat flour",
+                "buckwheat groats"
+              ],
+              "portion": "usual serve",
+              "verified": false,
+              "note": "not re-checked against the leaflet",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "amaranth",
+              "aliases": [
+                "teff"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "wheat flour",
+              "aliases": [
+                "plain flour",
+                "all-purpose flour",
+                "flour",
+                "spelt",
+                "spelt flour",
+                "pasta",
+                "spaghetti",
+                "penne",
+                "fusilli",
+                "macaroni",
+                "couscous",
+                "barley",
+                "bulgur",
+                "semolina"
+              ],
+              "portion": "usual serve",
+              "note": "plain wheat is tolerated; the histamine problem in bread is yeast and long ferments, not the grain",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "bread",
+              "aliases": [
+                "whole-wheat bread",
+                "white bread",
+                "toast",
+                "flatbread",
+                "tortilla",
+                "tortillas",
+                "crispbread",
+                "crackers"
+              ],
+              "portion": "usual serve",
+              "note": "plain bread; sourdough and rye are less tolerated because of the ferment",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "gluten-free pasta",
+              "aliases": [
+                "gluten free pasta",
+                "corn and rice pasta",
+                "rice pasta"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "cornstarch",
+              "aliases": [
+                "corn starch",
+                "potato starch",
+                "tapioca",
+                "tapioca starch",
+                "arrowroot"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "baking powder",
+              "aliases": [
+                "baking soda",
+                "bicarbonate of soda"
+              ],
+              "portion": "usual serve",
+              "note": "baking powder, not yeast",
+              "sources": [
+                "sighi-list"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Meat, fish, eggs, and plant protein",
+          "items": [
+            {
+              "term": "fresh chicken",
+              "aliases": [
+                "chicken",
+                "chicken breast",
+                "chicken thighs",
+                "chicken thigh",
+                "turkey",
+                "ground turkey",
+                "turkey mince"
+              ],
+              "portion": "usual serve",
+              "note": "fresh or quickly frozen; never marinated for days, never leftover",
+              "sources": [
+                "sighi-list",
+                "comas-baste-2020"
+              ]
+            },
+            {
+              "term": "fresh beef",
+              "aliases": [
+                "beef",
+                "ground beef",
+                "beef mince",
+                "steak",
+                "lamb",
+                "lamb mince",
+                "veal",
+                "fresh pork",
+                "pork loin",
+                "pork chops",
+                "pork"
+              ],
+              "portion": "usual serve",
+              "note": "fresh or quickly frozen; not cured, smoked, or aged",
+              "sources": [
+                "sighi-list",
+                "comas-baste-2020"
+              ]
+            },
+            {
+              "term": "fresh white fish",
+              "aliases": [
+                "cod",
+                "haddock",
+                "hake",
+                "pollock",
+                "plaice",
+                "sole",
+                "halibut",
+                "tilapia",
+                "trout",
+                "rainbow trout",
+                "perch",
+                "pike",
+                "white fish",
+                "fresh fish",
+                "frozen fish"
+              ],
+              "portion": "usual serve",
+              "note": "fresh or frozen straight after catch; not canned, smoked, or scombroid (tuna, mackerel, sardines)",
+              "sources": [
+                "sighi-list",
+                "comas-baste-2020"
+              ]
+            },
+            {
+              "term": "salmon",
+              "portion": "usual serve",
+              "verified": false,
+              "note": "fresh or quickly frozen only; not smoked. Not re-checked against the leaflet",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "egg",
+              "aliases": [
+                "eggs",
+                "egg yolk",
+                "egg yolks"
+              ],
+              "portion": "usual serve, cooked",
+              "note": "cooked through; raw egg white is a histamine liberator",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "macadamia",
+              "aliases": [
+                "macadamia nuts",
+                "macadamias"
+              ],
+              "portion": "small handful",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "pumpkin seeds",
+              "aliases": [
+                "pepitas",
+                "pumpkin seed"
+              ],
+              "portion": "two tablespoons",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "chia seeds",
+              "aliases": [
+                "chia",
+                "flaxseed",
+                "flax",
+                "linseed",
+                "hemp seeds",
+                "hemp"
+              ],
+              "portion": "two tablespoons",
+              "verified": false,
+              "note": "not re-checked against the leaflet",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "sunflower seeds",
+              "aliases": [
+                "sunflower seed",
+                "sesame seeds",
+                "sesame",
+                "tahini",
+                "pine nuts",
+                "almonds",
+                "almond",
+                "almond butter",
+                "pistachios",
+                "chestnuts"
+              ],
+              "portion": "small serve",
+              "verified": false,
+              "note": "often tolerated in small amounts; not re-checked against the leaflet",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "chickpeas",
+              "aliases": [
+                "lentils",
+                "red lentils",
+                "black beans",
+                "kidney beans",
+                "white beans",
+                "cannellini beans",
+                "butter beans",
+                "tofu"
+              ],
+              "portion": "small serve",
+              "verified": false,
+              "note": "legumes are rated as occasionally tolerated; small serves, freshly cooked. Not re-checked against the leaflet",
+              "sources": [
+                "sighi-list"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Dairy and alternatives",
+          "items": [
+            {
+              "term": "milk",
+              "aliases": [
+                "whole milk",
+                "skim milk",
+                "semi-skimmed milk",
+                "lactose-free milk",
+                "lactose-free low-fat milk",
+                "lactose-free whole milk"
+              ],
+              "portion": "usual serve",
+              "note": "fresh pasteurised milk",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "cream",
+              "aliases": [
+                "light cream",
+                "double cream",
+                "heavy cream",
+                "whipping cream",
+                "lactose-free cream"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "butter",
+              "aliases": [
+                "ghee",
+                "clarified butter"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "fresh mozzarella",
+              "aliases": [
+                "mozzarella"
+              ],
+              "portion": "usual serve",
+              "note": "young cheese; histamine builds with ageing",
+              "sources": [
+                "sighi-list",
+                "comas-baste-2020"
+              ]
+            },
+            {
+              "term": "ricotta",
+              "aliases": [
+                "cottage cheese",
+                "cream cheese",
+                "quark",
+                "mascarpone",
+                "paneer",
+                "fresh cheese",
+                "young cheese"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list",
+                "comas-baste-2020"
+              ]
+            },
+            {
+              "term": "rice milk",
+              "aliases": [
+                "oat milk",
+                "coconut milk"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Fats, sweeteners, and pantry",
+          "items": [
+            {
+              "term": "olive oil",
+              "aliases": [
+                "extra virgin olive oil"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "canola oil",
+              "aliases": [
+                "rapeseed oil",
+                "sunflower oil",
+                "coconut oil",
+                "vegetable oil",
+                "sesame oil"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "sugar",
+              "aliases": [
+                "white sugar",
+                "caster sugar",
+                "granulated sugar",
+                "brown sugar",
+                "icing sugar"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "maple syrup",
+              "aliases": [
+                "pure maple syrup",
+                "honey",
+                "rice malt syrup"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "vanilla extract",
+              "aliases": [
+                "vanilla"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "salt",
+              "aliases": [
+                "sea salt",
+                "table salt"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "herbs",
+              "aliases": [
+                "parsley",
+                "basil",
+                "dill",
+                "oregano",
+                "thyme",
+                "rosemary",
+                "sage",
+                "mint",
+                "bay leaf",
+                "bay leaves",
+                "coriander",
+                "cilantro",
+                "tarragon",
+                "marjoram"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "mild spices",
+              "aliases": [
+                "cumin",
+                "ground coriander",
+                "coriander seed",
+                "turmeric",
+                "cardamom",
+                "ground ginger",
+                "caraway",
+                "fennel seed",
+                "saffron",
+                "sweet paprika",
+                "paprika"
+              ],
+              "portion": "usual serve",
+              "note": "mild spices; hot spices (chilli, cayenne, hot paprika) and mixes like curry powder are liberators",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "cinnamon",
+              "aliases": [
+                "nutmeg",
+                "black pepper",
+                "pepper"
+              ],
+              "portion": "small serve",
+              "verified": false,
+              "note": "a pinch is usual on low histamine plans; larger amounts are questioned. Not re-checked against the leaflet",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "water",
+              "aliases": [
+                "sparkling water",
+                "quick vegetable stock",
+                "homemade vegetable stock"
+              ],
+              "portion": "usual serve",
+              "note": "a vegetable stock simmered under 30 minutes and used the same day; long-cooked meat stocks and stock cubes are not tolerated",
+              "sources": [
+                "sighi-list",
+                "comas-baste-2020"
+              ]
+            },
+            {
+              "term": "herbal tea",
+              "aliases": [
+                "chamomile tea",
+                "rooibos",
+                "peppermint tea"
+              ],
+              "portion": "usual serve",
+              "sources": [
+                "sighi-list"
+              ]
+            },
+            {
+              "term": "cooking spray",
+              "aliases": [
+                "nonstick cooking spray",
+                "oil spray"
+              ],
+              "portion": "usual serve",
+              "note": "plain oil spray",
+              "sources": [
+                "sighi-list"
+              ]
+            }
+          ]
+        }
+      ],
+      "avoid_examples": [
+        {
+          "term": "tomato",
+          "why": "commonly reported trigger"
+        },
+        {
+          "term": "spinach",
+          "why": "histamine-rich"
+        },
+        {
+          "term": "eggplant",
+          "why": "histamine-rich"
+        },
+        {
+          "term": "avocado",
+          "why": "histamine-rich"
+        },
+        {
+          "term": "aged cheese",
+          "why": "histamine builds with ageing"
+        },
+        {
+          "term": "cured meat",
+          "why": "cured, smoked, aged"
+        },
+        {
+          "term": "canned fish",
+          "why": "scombroid and canned fish"
+        },
+        {
+          "term": "shellfish",
+          "why": "high histamine"
+        },
+        {
+          "term": "vinegar",
+          "why": "fermented"
+        },
+        {
+          "term": "soy sauce",
+          "why": "fermented"
+        },
+        {
+          "term": "wine",
+          "why": "fermented; alcohol also blocks the enzyme that clears histamine"
+        },
+        {
+          "term": "sauerkraut",
+          "why": "fermented"
+        },
+        {
+          "term": "strawberries",
+          "why": "liberator"
+        },
+        {
+          "term": "citrus",
+          "why": "liberator"
+        },
+        {
+          "term": "pineapple",
+          "why": "liberator"
+        },
+        {
+          "term": "chocolate",
+          "why": "liberator"
+        },
+        {
+          "term": "walnuts",
+          "why": "liberator"
+        },
+        {
+          "term": "peanuts",
+          "why": "liberator"
+        },
+        {
+          "term": "yeast extract",
+          "why": "high histamine"
+        },
+        {
+          "term": "stock cube",
+          "why": "yeast extract and long-cooked"
+        },
+        {
+          "term": "leftovers",
+          "why": "histamine rises in stored cooked food"
+        }
+      ]
+    }
+  }
+}

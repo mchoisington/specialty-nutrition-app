@@ -170,6 +170,7 @@ export function cautionWhy(check) {
   if (check.exceeds && check.exceeds.length) parts.push('one serving is over the daily ' + check.exceeds.map(e => String(e.nutrient).replace(/_(mg|mcg|g|kcal)$/, '').replace(/_/g, ' ')).join(', '));
   if (check.unknownRisk && check.unknownRisk.length) parts.push('unknown-risk ingredient');
   if (check.unrecognized && check.unrecognized.length) parts.push('ingredient not recognized: ' + check.unrecognized.slice(0, 3).join(', '));
+  if (check.notApproved && check.notApproved.length) parts.push('not on the approved list: ' + [...new Set(check.notApproved.map(n => n.label))].slice(0, 3).join(', ') + (check.notApproved.some(n => n.why === 'reacts') ? ' (you reacted to it)' : ''));
   return parts.join('; ') || 'needs a look';
 }
 

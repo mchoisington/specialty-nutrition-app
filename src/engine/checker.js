@@ -1,6 +1,7 @@
 // Checks foods, ingredient text, and recipes against a plan.
 // Verdicts: fail (hard exclusion hit), caution (soft avoid, unknown-risk term, or unrecognized text while an allergen is selected), pass.
 // Unrecognized text is always reported. It is never counted as safe.
+import { strictCheck } from './dietlists.js';
 import { recipeTotals, derived, round } from './nutrition.js';
 
 function evaluateTags(tagMap, plan, matcher, opts = {}) {
@@ -96,6 +97,8 @@ export function checkRecipe(recipe, plan, matcher, foodsById, person = {}) {
     vsLimits.push({ nutrient: n, perServing: round(v, 1), dailyLimit: lim.value, pctOfDaily: round(v / lim.value * 100), exceedsInOneServing: v > lim.value, missingData: !!(perServing._missing && perServing._missing[n]) });
   }
   const exceeds = vsLimits.filter(x => x.exceedsInOneServing);
-  const finalVerdict = exceeds.length && verdict !== 'fail' ? 'caution' : verdict;
-  return { verdict: finalVerdict, hits, preferHits, termHits, verifyLabel, unknownRisk, unrecognized, tags: tagMap, perServing, vsLimits, exceeds, missingFoods: nut.missingFoods };
+  // Strict mode (approved-food lists): every ingredient must be on the family's list or the person's tolerated list.
+  const strict = matcher && matcher.dietLists ? strictCheck(recipe, plan, matcher.dietLists, foodsById, person) : { families: [], notApproved: [] };
+  const finalVerdict = (exceeds.length || strict.notApproved.length) && verdict !== 'fail' ? 'caution' : verdict;
+  return { verdict: finalVerdict, hits, preferHits, termHits, verifyLabel, unknownRisk, unrecognized, tags: tagMap, perServing, vsLimits, exceeds, missingFoods: nut.missingFoods, strictFamilies: strict.families, notApproved: strict.notApproved };
 }

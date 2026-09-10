@@ -24,10 +24,10 @@ import { renderRecipesScreen } from './ui/recipes.js';
 import { renderOwnerScreen } from './ui/owner.js';
 import { getDb, ensureDeviceIdentity, registerDevice, readOwner, isOwner } from './engine/sync.js';
 
-const APP_DATA_FILES = ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'recipes-open', 'recipes-usda', 'articles', 'swaps'];
+const APP_DATA_FILES = ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'recipes-open', 'recipes-usda', 'articles', 'swaps', 'diet-lists'];
 
 function appEmptyFor(name) {
-  return name === 'dictionaries' ? { tags: {}, entries: [] } : name === 'articles' ? {} : name === 'swaps' ? { families: {}, swaps: [] } : [];
+  return name === 'dictionaries' ? { tags: {}, entries: [] } : name === 'articles' ? {} : name === 'swaps' ? { families: {}, swaps: [] } : name === 'diet-lists' ? { families: {} } : [];
 }
 
 export async function loadData() {
@@ -370,6 +370,7 @@ async function appBoot() {
   uiState.data = appNormalizeData(data);
   uiState.dataProblems = problems;
   uiState.matcher = buildMatcher(uiState.data.dictionaries);
+  uiState.matcher.dietLists = uiState.data['diet-lists'] || { families: {} };   // approved-food lists for strict mode
   uiState.conditionsById = new Map(uiState.data.conditions.map(m => [m.id, m]));
   uiState.sourcesById = new Map(uiState.data.sources.map(s => [s.id, s]));
   uiState.foodsById = new Map(uiState.data.foods.map(f => [f.id, f]));
