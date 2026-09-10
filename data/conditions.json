@@ -1075,7 +1075,7 @@
           "kind": "info",
           "tier": 1,
           "strength": "must",
-          "text": "Portion size determines FODMAP load. Many foods are low FODMAP at small portions and high at large portions. The food database carries serving-size thresholds, not binary allowed/avoid.",
+          "text": "Portion size determines FODMAP load. Many foods are low FODMAP at small portions and high at large portions. This app does not encode those portion thresholds: a food tagged high FODMAP is treated as high at any amount, which is the cautious reading. The Monash University FODMAP Diet app carries the tested portion sizes.",
           "sources": [
             "monash-fodmap",
             "aga-ibs-diet-2022"
