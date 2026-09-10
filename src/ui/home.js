@@ -3,6 +3,7 @@ import { uiState, uiEsc, uiActivePerson, uiSetActive, uiPlanFor, uiNoticeHTML, u
 import { todayTargetInfo } from './today.js';
 
 export function renderWelcomeScreen(root) {
+  if (uiState.lite) { renderLiteWelcome(root); return; }
   root.innerHTML = `
     <section class="welcome" aria-labelledby="welcome-h">
       ${uiBrandMark({ label: 'Peace Meal' })}
@@ -23,6 +24,28 @@ export function renderWelcomeScreen(root) {
       </ul>
       <a class="btn primary big" href="#/people/new">Set up the first person</a>
       <p class="small muted">Everything stays on this device. Nothing is sent anywhere. Any medical targets, like a sodium or protein limit, come from your doctor or dietitian. The app never makes those numbers up.</p>
+    </section>`;
+}
+
+// The lite version's first screen: one person, plain words, one button.
+function renderLiteWelcome(root) {
+  root.innerHTML = `
+    <section class="welcome" aria-labelledby="welcome-h">
+      ${uiBrandMark({ label: 'Peace Meal for one' })}
+      <div>
+        <h1 id="welcome-h">Peace Meal for one</h1>
+        <p class="welcome-lede">Meals that fit your body, and a record your doctor can use.</p>
+        <p class="welcome-sub">If certain foods make you sick and you are juggling a list of things you cannot eat, this app does the remembering for you. It plans a week of meals and snacks that fit your rules, keeps track of what you ate and how you felt, watches your weight, and turns all of it into a report you can hand to your doctor.</p>
+      </div>
+      <ul class="welcome-points">
+        <li>${uiIcon('list')}<span><strong>Tell it once what you cannot eat.</strong> Allergies, conditions like MCAS, celiac, lactose intolerance, or IBS, and anything else you avoid. Forty-two conditions and diets are built in, each from published medical guidance.</span></li>
+        <li>${uiIcon('calendar')}<span><strong>Get a week of meals and snacks that fit.</strong> Every one is checked against your list. Do not like one? Tap the arrows to swap it, or the heart to see it more often.</span></li>
+        <li>${uiIcon('clock')}<span><strong>Log your day in a minute.</strong> "I ate this" for each meal, "How do you feel?" when something comes on, and your weight in one box.</span></li>
+        <li>${uiIcon('cite')}<span><strong>Print a report for your doctor.</strong> What you ate, what you felt and when, your weight over time, and which foods keep showing up before a bad day.</span></li>
+        <li>${uiIcon('check-circle')}<span><strong>Check a package at the store.</strong> Paste the ingredient list, or take a photo of it, and get a plain answer: fine, caution, or no, and why.</span></li>
+      </ul>
+      <a class="btn primary big" href="#/people/new">Start: tell it about you</a>
+      <p class="small muted">Everything stays on this phone or computer. Nothing is sent anywhere. The app records and plans; it does not diagnose or treat, and any medical targets come from your doctor or dietitian.</p>
     </section>`;
 }
 
