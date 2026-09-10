@@ -5,6 +5,7 @@ import { nutrientsForGrams, recipeTotals, scaleTotals, addTotals, emptyTotals, c
 import { checkRecipe, checkFood } from '../engine/checker.js';
 import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiModal, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiNutrientLabel, uiVerdictWord, uiVerdictChip, uiSegmented, uiPageHeader, uiSection, uiChip, uiIcon, uiRing, uiMeter, uiStatTile, uiNoticeHTML, uiEmptyState, uiSwitch } from './common.js';
 import { weekGet } from './week.js';
+import { householdWeekGet } from './household.js';
 import { recipesTasteHTML, recipesBindTaste, recipesIsNever } from './recipes.js';
 
 const TODAY_MEALS = [{ id: 'breakfast', label: 'Breakfast' }, { id: 'lunch', label: 'Lunch' }, { id: 'dinner', label: 'Dinner' }, { id: 'snacks', label: 'Snacks' }];
@@ -192,7 +193,7 @@ function todayMealsHTML(person, plan, entries) {
           </div>`;
         }).join('') || '<p class="small muted" style="padding:8px 0">Nothing logged.</p>'}</div>
       </section>`;
-    }).join('')}</div>`, { id: 'today-meals-h', action: `<button class="btn small" type="button" id="today-copy-yesterday">Copy yesterday</button><button class="btn small" type="button" id="today-from-plan">${uiIcon('calendar')}Add from this week's plan</button>` });
+    }).join('')}</div>`, { id: 'today-meals-h', action: `<button class="btn small" type="button" id="today-copy-yesterday">Copy yesterday</button><button class="btn small" type="button" id="today-from-plan">${uiIcon('calendar')}Add from this week's plan</button>${uiState.profile.people.length > 1 && uiState.profile.household && uiState.profile.household.built ? `<button class="btn small" type="button" id="today-from-household">${uiIcon('people')}Add from the household plan</button>` : ''}` });
 }
 
 function todayWeightHTML(person) {
@@ -282,6 +283,15 @@ function todayBind(root, person, plan, date) {
     if (!meals.length) { uiToast('The week plan has no meals for this date.'); return; }
     for (const m of meals) todayAddDiaryEntry(person, { date, meal: m.slot, kind: 'recipe', ref: m.recipe, amount: 1, unit: 'serving' });
     uiToast(`Added ${meals.length} planned meal${meals.length === 1 ? '' : 's'}.`); uiState.rerender();
+  });
+  const fromHh = root.querySelector('#today-from-household');
+  if (fromHh) fromHh.addEventListener('click', () => {
+    const week = householdWeekGet();
+    const day = week ? week.days.find(d => d.date === date) : null;
+    const meals = day ? day.meals.filter(m => m.recipe && (m.eaters || []).includes(person.id)) : [];
+    if (!meals.length) { uiToast(`${person.name} is not at any household meal on this date.`); return; }
+    for (const m of meals) todayAddDiaryEntry(person, { date, meal: m.slot, kind: 'recipe', ref: m.recipe, amount: 1, unit: 'serving' });
+    uiToast(`Added ${meals.length} household meal${meals.length === 1 ? '' : 's'} for ${person.name}.`); uiState.rerender();
   });
   root.querySelector('#today-log-weight').addEventListener('click', () => {
     const lb = Number(root.querySelector('#today-weight-lb').value);

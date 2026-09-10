@@ -293,3 +293,16 @@ Per-day cooking, this week only. A day's cooking chip and minutes on the Week sc
 Spice. `src/engine/spice.js` estimates a heat level (0 none, 1 mild, 2 medium, 3 hot) from the title and ingredient text with three term tiers, a faint tier that only counts in pairs (curry powder, paprika), a zero tier that never counts (black pepper, ginger), and adjustments for "optional", a pinch, sweet chili sauce, and "chile-free". Three medium ingredients add up to hot. `preferences.spice` is one of any, none, mild, medium, hot: recipes above the level are excluded from the week, Recipes (with a "hidden by your settings" link), Pantry, and swaps; recipes inside the level get a small score nudge. The estimate and the terms that drove it are shown on the recipe.
 
 Welcome. The first screen no longer uses the word "rule"; it lists who the app is for and what it does.
+
+## 10. Household week (September 10, 2026)
+
+One shared week for the whole table, on the Together screen, planned seating by seating. A seating is one meal on one day and the people rostered for it. `src/engine/household.js`:
+
+- **Roster.** `profile.household.pattern[personId][day][slot] = false` marks a person's usual absences (Alex out Tuesday and Thursday dinner); `household.roster[date][slot] = [ids]` is a per-date exception and wins. Guests are out unless rostered in. `rosterFor()` resolves both.
+- **Seating plan.** Each distinct set of eaters gets the strictest combined plan (`buildGroupPlan`) and a synthetic person (`seatingPerson`): every allergen, every soft avoid and avoid word, the strictest spice level, every skipped cuisine, everyone's favorites and never-agains, and the cook's kitchen. Recipes are checked once per seating and cached (`makeSeatingCache`), so a week with four combinations checks each recipe four times, not thirty.
+- **Cook.** `household.cook` (per-date `cook_by_date` wins; first adult by default) supplies time, cooking days, skill, and equipment. Seatings with only children are assembly-only and never cook.
+- **Servings** equal the number of eaters at the seating; batch cooking makes leftovers that later seatings can use when the dish clears every eater there. Snacks are a household setting (`snacks_per_day`, default one afternoon snack). `budget` (default on) rewards ingredient overlap across the whole week.
+- **Changes.** The first view after Plan or Regenerate is frozen in `household.week_snapshot`. Roster taps mark affected meals stale ("Update just those N meals" re-picks only them, `householdRepick`); a day's cooking chip or minutes goes through the same three-choice preview as the Week screen; swaps are `meal_overrides['date:slot']` on top. Cook, snacks, and budget changes rebuild the base. Per-date data is pruned when the week rolls.
+- **Grocery.** The Grocery screen has a "List for" select: a person's week or the household week (`grocery_for = 'household'`), with the same edits, ticks, and change log keyed to a `household` pseudo-person. **Today** gains "Add from the household plan", which logs only the meals the person was rostered for.
+
+Known simplification: daily nutrient limits are checked per seating against the day's running total of household meals, not per person; a person's own Week and Today screens remain the place where their own daily numbers are tracked.

@@ -23,7 +23,7 @@ All data stays in the browser on that device. Use Settings to export a backup fi
 | `data/dictionaries.json` | Ingredient terms to tags. This is the only thing the app uses to recognize allergens and restricted foods |
 | `data/foods.json` | Curated USDA FoodData Central subset. Numbers come from USDA files by FDC ID and are never edited by hand |
 | `data/recipes.json` | Seed recipes with time, skill, equipment, and ingredient links to foods. Nutrients are computed, not stored |
-| `src/engine/` | The deterministic rules engine, checker, planner, and grocery builder |
+| `src/engine/` | The deterministic rules engine, checker, planner, household week, and grocery builder |
 | `src/ui/` | Screens |
 | `tools/` | USDA importer, recipe importers, meal-slot fixer, validator, single-file bundler |
 | `test/` | Engine tests |

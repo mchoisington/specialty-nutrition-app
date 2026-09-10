@@ -271,4 +271,5 @@ export function recipeMeal(r, slot) {
   const want = isSnackSlot(slot) ? 'snack' : slot;
   return !r.meal || !r.meal.length || r.meal.includes(want);
 }
+export function summarizeCheck(c) { return summarize(c); }
 function summarize(c) { return { verdict: c.verdict, hits: c.hits.map(h => ({ tag: h.tag, label: h.label, hard: h.hard })), exceeds: c.exceeds.map(e => e.nutrient), nutritionUnknown: !!(c.perServing && c.perServing._missing && c.perServing._missing.kcal) && !c.perServing.kcal }; }

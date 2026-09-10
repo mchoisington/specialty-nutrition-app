@@ -3,7 +3,7 @@ const KEY = 'peace-meal:v1';
 const OLD_KEY = 'specialty-nutrition-app:v1';
 
 export function defaultProfile() {
-  return { version: 2, people: [], log: [], diary: [], weights: [], exercise: [], pantry: [], grocery_adjustments: {}, grocery_changes: {}, custom_recipes: [], recipe_collections: { nhs: false, wikibooks: true, usda: false }, activePerson: null, created: new Date().toISOString() };
+  return { version: 2, people: [], log: [], diary: [], weights: [], exercise: [], pantry: [], grocery_adjustments: {}, grocery_changes: {}, custom_recipes: [], recipe_collections: { nhs: false, wikibooks: true, usda: false }, household: { cook: null, cook_by_date: {}, pattern: {}, roster: {}, snacks_per_day: 1, budget: true, seed: 0, day_overrides: {}, meal_overrides: {}, week_snapshot: null }, activePerson: null, created: new Date().toISOString() };
 }
 
 export function newPerson(name = 'Me') {

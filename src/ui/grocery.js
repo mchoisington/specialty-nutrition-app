@@ -3,6 +3,7 @@
 import { buildGroceryList, applyAdjustments, diffGrocery, groceryText } from '../engine/grocery.js';
 import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiWeekKey, uiFmtDate, uiFmtNum, uiToast, uiCopyText, uiPersist, uiIsoDate, uiToday, uiDownload, uiPageHeader, uiSection, uiChip, uiIcon, uiNoticeHTML, uiEmptyState } from './common.js';
 import { weekGet } from './week.js';
+import { householdWeekGet, householdPseudoPerson } from './household.js';
 
 const GROCERY_DAY_NAMES = { sun: 'Sunday', mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday' };
 const GROCERY_SLOT_LABEL = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' };
@@ -37,10 +38,18 @@ export function groceryStore(person) {
 
 // Recomputes the list from the current week and appends any difference from the last snapshot to the change log.
 // Call after anything that can change the week (regenerate, swap, eaters). Returns { week, base }.
+// The Grocery screen shops for the active person's week, or for the household week when "List for" says so.
+export function groceryTarget() {
+  const p = uiState.profile;
+  if (p.grocery_for === 'household' && p.people.length > 1 && p.household && p.household.built) return householdPseudoPerson();
+  return uiActivePerson();
+}
+function groceryWeekFor(person) { return person.id === 'household' ? householdWeekGet() : weekGet(person, uiPlanFor(person)); }
+
 export function grocerySyncChanges(person, reason = 'Plan changed') {
   if (!uiState.data.recipes.length) return null;
-  const plan = uiPlanFor(person);
-  const week = weekGet(person, plan);
+  const week = groceryWeekFor(person);
+  if (!week) return null;
   const base = buildGroceryList(week, uiState.recipesById, uiState.foodsById);
   // Display-only ingredient lines (imported recipes not yet linked to foods) carry no food id; the app cannot put them on a list.
   base.items = base.items.filter(i => i.food && i.food !== 'undefined');
@@ -101,8 +110,8 @@ export function groceryAddExtra(person, { food, grams, quantity, note, use }) {
 }
 
 // The list as the shopper sees it: computed, then adjusted, then extras appended.
-export function groceryComputeList(person) {
-  const synced = grocerySyncChanges(person, 'Plan changed');
+export function groceryComputeList(person, reason = 'Plan changed') {
+  const synced = grocerySyncChanges(person, reason);
   if (!synced) return null;
   const { adjustments } = groceryStore(person);
   const adjusted = applyAdjustments(synced.base, adjustments);
@@ -143,23 +152,30 @@ export function groceryIcsForWeek(week, person, opts = {}) {
 function groceryChangeWord(t) { return t === 'added' ? 'Added' : t === 'removed' ? 'Removed' : 'Changed'; }
 
 export function renderGroceryScreen(root) {
-  const person = uiActivePerson();
-  const plan = uiPlanFor(person);
+  const person = groceryTarget();
+  const isHousehold = person.id === 'household';
+  const plan = isHousehold ? null : uiPlanFor(person);
   if (!uiState.data.recipes.length) {
     root.innerHTML = `${uiPageHeader('Grocery')}${uiEmptyState('No recipes are loaded, so there is no week to shop for.', '', 'list')}`;
     return;
   }
-  const { week, list } = groceryComputeList(person);
+  const computed = groceryComputeList(person, uiState.householdReason || 'Plan changed');
+  uiState.householdReason = null;
+  if (!computed) { root.innerHTML = `${uiPageHeader('Grocery')}${uiEmptyState('The household week has not been planned yet.', '<a class="btn small" href="#/together">Open Together</a>', 'list')}`; return; }
+  const { week, list } = computed;
+  const canHousehold = uiState.profile.people.length > 1 && uiState.profile.household && uiState.profile.household.built;
+  const forSelect = `<label class="visually-hidden" for="grocery-for">List for</label><select id="grocery-for" style="width:auto">${uiState.profile.people.map(p => `<option value="${uiEsc(p.id)}" ${!isHousehold && p.id === person.id ? 'selected' : ''}>${uiEsc(p.name)}'s week</option>`).join('')}${canHousehold ? `<option value="household" ${isHousehold ? 'selected' : ''}>Household week</option>` : ''}</select>`;
   const { adjustments, changes } = groceryStore(person);
   const checked = groceryLoadChecked(person);
   const groups = Object.entries(list.groups);
   const active = list.items.filter(i => !i.removed);
   const sodiumItems = active.filter(grocerySodiumFlag);
   const household = Math.max(1, Number((person.cooking || {}).household) || 1);
-  const sodiumMatters = !!(plan.limits.sodium_mg || plan.modules.some(m => /hypertension|heart-failure|ckd|kidney/.test(m.id)));
+  const sodiumMatters = isHousehold ? uiState.profile.people.some(p => { const pl = uiPlanFor(p); return !!(pl.limits.sodium_mg || pl.modules.some(m => /hypertension|heart-failure|ckd|kidney/.test(m.id))); }) : !!(plan.limits.sodium_mg || plan.modules.some(m => /hypertension|heart-failure|ckd|kidney/.test(m.id)));
+  const seatCount = isHousehold ? week.days.reduce((n, d) => n + d.meals.filter(m => m.recipe).length, 0) : 0;
   root.innerHTML = `
-    ${uiPageHeader('Grocery', `Week starting ${uiFmtDate(week.days[0].date)}: ${active.length} items across ${groups.length} store sections. Quantities are summed from recipe grams for the servings you will make. Ticks are remembered on this device for this week.`)}
-    ${uiSection('Cooking for', `<p class="small muted">Household: ${household}. Change the number of eaters for any day (guests, someone away) and the week and list update; the change is logged below.</p>
+    ${uiPageHeader('Grocery', `Week starting ${uiFmtDate(week.days[0].date)}: ${active.length} items across ${groups.length} store sections. Quantities are summed from recipe grams for the servings you will make. Ticks are remembered on this device for this week.`, forSelect)}
+    ${isHousehold ? uiSection('Cooking for', `<p class="small muted">The household week: ${seatCount} seatings, each scaled to who is at the table. Change who is home on the <a href="#/together">Together</a> screen and this list follows.</p>`, { id: 'grocery-eaters-h' }) : uiSection('Cooking for', `<p class="small muted">Household: ${household}. Change the number of eaters for any day (guests, someone away) and the week and list update; the change is logged below.</p>
       <div class="grocery-days">${week.days.map(d => `<label>${uiEsc(uiFmtDate(d.date))}<input type="number" inputmode="numeric" min="1" max="20" value="${d.eaters}" data-eaters="${uiEsc(d.date)}" data-day="${uiEsc(d.day)}" aria-label="Eaters on ${uiEsc(uiFmtDate(d.date))}"></label>`).join('')}</div>`, { id: 'grocery-eaters-h' })}
     ${sodiumItems.length && sodiumMatters ? uiNoticeHTML({ level: 'warn', text: `Sodium: ${sodiumItems.map(i => i.name).join(', ')} can carry a lot of salt. Canned goods, broths, and rotisserie chicken are the usual traps. Choose no-salt-added or low-sodium versions and rinse canned beans and vegetables. The plan counts the USDA value for the food as listed.` }) : sodiumItems.length ? `<p class="small muted">Sodium note: ${sodiumItems.map(i => uiEsc(i.name)).join(', ')} tend to be salty. Low-sodium versions exist for most.</p>` : ''}
     ${groups.length ? `<div class="stack-2">${groups.map(([g, items]) => `<section class="grocery-group" aria-labelledby="g-${uiEsc(g).replace(/\W+/g, '-')}">
@@ -182,6 +198,11 @@ export function renderGroceryScreen(root) {
     <div class="action-bar sticky"><button class="btn primary" type="button" id="grocery-copy">${uiIcon('copy')}Copy</button><button class="btn" type="button" id="grocery-share">${uiIcon('share')}Share</button><button class="btn" type="button" id="grocery-ics">${uiIcon('calendar')}Calendar</button></div>
     <p class="small muted">The .ics file puts each day's meals on your calendar as an all-day event; Google Calendar, Apple Calendar, and Skylight can import an .ics file. There is no direct Google Keep or Skylight list integration, so Share or Copy is the way to get the list into those apps.</p>
   `;
+  root.querySelector('#grocery-for').addEventListener('change', e => {
+    if (e.target.value === 'household') uiState.profile.grocery_for = 'household';
+    else { uiState.profile.grocery_for = null; uiState.profile.activePerson = e.target.value; }
+    uiPersist(); uiState.rerender();
+  });
   root.querySelectorAll('[data-food]').forEach(inp => inp.addEventListener('change', () => {
     if (inp.checked) checked.add(inp.dataset.food); else checked.delete(inp.dataset.food);
     grocerySaveChecked(person, checked);
