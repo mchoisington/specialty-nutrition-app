@@ -87,17 +87,27 @@ test('POTS tier 2 without number runs in tier 1 only with notice', () => {
   assert.equal(p2.targets.sodium_mg.min, 5000);
 });
 
-test('phase gating: elimination rules apply in elimination, not in reintroduction; expiry blocks', () => {
+test('phase gating: elimination rules apply in elimination, not in reintroduction; a phase never ends on its own; a check-in asks', () => {
   const today = new Date('2026-09-05');
   const p1 = buildPlan({ person: person({ modules: ['ibs-low-fodmap'], phases: { 'ibs-low-fodmap': { phase: 'elimination', started: '2026-08-20' } } }), conditions, today });
   assert.ok(p1.avoid['fodmap-fructan']);
-  assert.equal(p1.phases[0].status, 'ready-to-advance');
+  assert.equal(p1.phases[0].status, 'active');
+  assert.equal(p1.phases[0].suggested, '2 to 6 weeks');
   const p2 = buildPlan({ person: person({ modules: ['ibs-low-fodmap'], phases: { 'ibs-low-fodmap': { phase: 'reintroduction', started: '2026-08-20' } } }), conditions, today });
   assert.equal(p2.avoid['fodmap-fructan'], undefined);
   assert.ok(p2.behavior.some(b => b.rule === 'fm-always'));
-  const p3 = buildPlan({ person: person({ modules: ['ibs-low-fodmap'], phases: { 'ibs-low-fodmap': { phase: 'elimination', started: '2026-06-01' } } }), conditions, today });
-  assert.equal(p3.phases[0].status, 'expired');
-  assert.ok(p3.notices.some(n => n.code === 'phase-expired' && n.level === 'block'));
+  // months past the protocol's suggested length: still active, still restricting, no block, no expiry notice
+  const p3 = buildPlan({ person: person({ modules: ['ibs-low-fodmap'], phases: { 'ibs-low-fodmap': { phase: 'elimination', started: '2026-01-01' } } }), conditions, today });
+  assert.equal(p3.phases[0].status, 'active');
+  assert.ok(p3.avoid['fodmap-fructan'], 'elimination rules keep applying indefinitely');
+  assert.ok(!p3.notices.some(n => /expired/.test(n.code)));
+  // a check-in reminder set 4 weeks ago at "every 4 weeks" is due; at "every 8 weeks" it is not
+  const p4 = buildPlan({ person: person({ modules: ['ibs-low-fodmap'], phases: { 'ibs-low-fodmap': { phase: 'elimination', started: '2026-01-01', check_in_weeks: 4, check_in_from: '2026-08-08' } } }), conditions, today });
+  assert.equal(p4.phases[0].status, 'check-in');
+  assert.ok(p4.notices.some(n => n.code === 'phase-check-in' && n.level === 'warn'));
+  assert.ok(p4.avoid['fodmap-fructan'], 'a due check-in changes nothing by itself');
+  const p5 = buildPlan({ person: person({ modules: ['ibs-low-fodmap'], phases: { 'ibs-low-fodmap': { phase: 'elimination', started: '2026-01-01', check_in_weeks: 8, check_in_from: '2026-08-08' } } }), conditions, today });
+  assert.equal(p5.phases[0].status, 'active');
 });
 
 test('pregnancy disables keto and elimination protocols', () => {

@@ -79,7 +79,7 @@ export function renderPlanScreen(root) {
         ${c.status === 'needs-ack' ? `<div class="conflict-foot"><button class="btn small" type="button" data-ack="${uiEsc(c.ackKey)}">I understand</button></div>` : ''}
       </div>`).join('')}</div>` : '<p class="muted small">No conflicts between the selected modules.</p>', { id: 'plan-conflicts-h' })}
 
-    ${uiSection('Phases', plan.phases.length ? `<div class="stack-2">${plan.phases.map(ph => planPhaseCard(ph)).join('')}</div>` : '<p class="muted small">No time-limited protocols are active.</p>', { id: 'plan-phases-h' })}
+    ${uiSection('Phases', plan.phases.length ? `<div class="stack-2">${plan.phases.map(ph => planPhaseCard(ph)).join('')}</div>` : '<p class="muted small">No phased protocols are active.</p>', { id: 'plan-phases-h' })}
 
     ${uiSection('Modes', plan.modes.length ? `<div class="stack-2">${plan.modes.map(md => planModeCard(md, person)).join('')}</div>` : '<p class="muted small">No two-mode conditions are active.</p>', { id: 'plan-modes-h' })}
 
@@ -110,9 +110,25 @@ export function renderPlanScreen(root) {
     const def = s.tag && uiState.matcher ? uiState.matcher.tagDef(s.tag) : null;
     uiModal(`${s.tag ? `<div class="row">${uiChip(s.tone === 'stop' ? 'hard stop' : s.tone === 'caution' ? 'soft' : 'prefer', s.tone)} <code class="small">${uiEsc(s.tag)}</code></div>` : ''}${def && def.description ? `<p class="small muted">${uiEsc(def.description)}</p>` : ''}${s.note ? `<p class="small">${uiEsc(s.note)}</p>` : ''}<h3>Rules behind this (${(s.rules || []).length})</h3>${uiRulesList(s.rules)}`, { title: s.title });
   }));
+  root.querySelectorAll('[data-phase-check]').forEach(sel => sel.addEventListener('change', () => {
+    person.phases = person.phases || {};
+    const cur = person.phases[sel.dataset.phaseCheck] || { phase: (uiState.conditionsById.get(sel.dataset.phaseCheck).phases[0] || {}).id, started: uiIsoDate(uiToday()) };
+    const n = Number(sel.value);
+    if (n > 0) { cur.check_in_weeks = n; cur.check_in_from = uiIsoDate(uiToday()); } else { delete cur.check_in_weeks; delete cur.check_in_from; }
+    person.phases[sel.dataset.phaseCheck] = cur;
+    uiPersist(); uiToast(n > 0 ? `The app will ask how it is going in ${n} weeks.` : 'No reminder. The phase stays until you change it.'); uiState.rerender();
+  }));
+  root.querySelectorAll('[data-phase-keep]').forEach(b => b.addEventListener('click', () => {
+    person.phases = person.phases || {};
+    const cur = person.phases[b.dataset.phaseKeep] || {};
+    cur.check_in_from = uiIsoDate(uiToday());
+    person.phases[b.dataset.phaseKeep] = cur;
+    uiPersist(); uiToast(cur.check_in_weeks ? `Keeping going. The app will ask again in ${cur.check_in_weeks} weeks.` : 'Keeping going.'); uiState.rerender();
+  }));
   root.querySelectorAll('[data-phase-next]').forEach(b => b.addEventListener('click', () => {
     person.phases = person.phases || {};
-    person.phases[b.dataset.phaseNext] = { phase: b.dataset.next, started: uiIsoDate(uiToday()) };
+    const prev = person.phases[b.dataset.phaseNext] || {};
+    person.phases[b.dataset.phaseNext] = { phase: b.dataset.next, started: uiIsoDate(uiToday()), ...(prev.check_in_weeks ? { check_in_weeks: prev.check_in_weeks, check_in_from: uiIsoDate(uiToday()) } : {}) };
     uiPersist(); uiToast('Phase updated.'); uiState.rerender();
   }));
   root.querySelectorAll('[data-phase-restart]').forEach(b => b.addEventListener('click', () => {
@@ -157,12 +173,16 @@ function planPhaseCard(ph) {
   const mod = uiState.conditionsById.get(ph.module);
   const phases = (mod && mod.phases) || [];
   const curIdx = phases.findIndex(p => p.id === ph.phase);
-  const status = ph.status === 'expired' ? uiChip('expired', 'stop') : ph.status === 'ready-to-advance' ? uiChip('ready to advance', 'pass') : uiChip('active', 'olive');
+  const status = ph.check_in_due ? uiChip('check-in due', 'caution') : uiChip('active, no end date', 'olive');
+  const opts = [[0, 'No reminder'], [2, 'Every 2 weeks'], [4, 'Every 4 weeks'], [6, 'Every 6 weeks'], [8, 'Every 8 weeks'], [12, 'Every 12 weeks']];
   return `<div class="card">
     <div class="row"><strong>${uiEsc(ph.moduleName)}</strong> ${status}</div>
-    <ol class="timeline">${phases.map((p, i) => `<li class="${i < curIdx ? 'done' : i === curIdx ? 'current' : ''}"><div class="timeline-title">${uiEsc(p.label || p.id)}${i === curIdx ? ' (now)' : ''}</div><div class="timeline-sub">${i === curIdx ? `Started ${uiEsc(ph.started)}, ${ph.weeks} weeks elapsed. ` : ''}${p.min_weeks ? `Minimum ${p.min_weeks} weeks. ` : ''}${p.max_weeks ? `Maximum ${p.max_weeks} weeks.` : i === curIdx && !p.min_weeks ? 'Open-ended.' : ''}</div></li>`).join('')}</ol>
+    <ol class="timeline">${phases.map((p, i) => { const sug = p.min_weeks && p.max_weeks ? `${p.min_weeks} to ${p.max_weeks} weeks` : p.min_weeks ? `at least ${p.min_weeks} weeks` : p.max_weeks ? `up to ${p.max_weeks} weeks` : ''; return `<li class="${i < curIdx ? 'done' : i === curIdx ? 'current' : ''}"><div class="timeline-title">${uiEsc(p.label || p.id)}${i === curIdx ? ' (now)' : ''}</div><div class="timeline-sub">${i === curIdx ? `Since ${uiEsc(ph.started)}, ${ph.weeks} weeks. ` : ''}${sug ? `The protocol usually runs this for ${sug}; ` : ''}it stays until you change it.</div></li>`; }).join('')}</ol>
+    ${ph.check_in_due ? uiNoticeHTML({ level: 'warn', text: `Check-in: how is the ${ph.label} phase going? Keep going, or move on. Nothing changes until you choose.` }) : ''}
+    <div class="field"><label for="ph-check-${uiEsc(ph.module)}">Ask me how it is going</label><select id="ph-check-${uiEsc(ph.module)}" data-phase-check="${uiEsc(ph.module)}" style="width:auto">${opts.map(([v, l]) => `<option value="${v}" ${(ph.check_in_weeks || 0) === v ? 'selected' : ''}>${l}</option>`).join('')}</select><div class="hint">A reminder only. The phase does not end by itself.</div></div>
     <div class="btn-row">
-      ${ph.next ? `<button class="btn small primary" type="button" data-phase-next="${uiEsc(ph.module)}" data-next="${uiEsc(ph.next)}">Move to ${uiEsc(ph.nextLabel)}</button>` : '<span class="small muted">Final phase.</span>'}
+      ${ph.check_in_due ? `<button class="btn small primary" type="button" data-phase-keep="${uiEsc(ph.module)}">Keep going${ph.check_in_weeks ? `, ask again in ${ph.check_in_weeks} weeks` : ''}</button>` : ''}
+      ${ph.next ? `<button class="btn small ${ph.check_in_due ? '' : 'primary'}" type="button" data-phase-next="${uiEsc(ph.module)}" data-next="${uiEsc(ph.next)}">Move to ${uiEsc(ph.nextLabel)}</button>` : '<span class="small muted">Final phase.</span>'}
       <button class="btn small" type="button" data-phase-restart="${uiEsc(ph.module)}" data-phase="${uiEsc(ph.phase)}">Restart phase</button>
     </div>
   </div>`;

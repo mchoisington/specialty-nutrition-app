@@ -264,18 +264,18 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
     const phase = state && m.phases.find(p => p.id === state.phase) ? m.phases.find(p => p.id === state.phase) : m.phases[0];
     const started = state && state.started ? new Date(state.started) : today;
     const weeks = Math.max(0, daysBetween(started, today) / 7);
-    let status = 'active';
-    if (phase.max_weeks && weeks > phase.max_weeks) status = 'expired';
-    else if (phase.min_weeks && weeks >= phase.min_weeks) status = 'ready-to-advance';
+    // A phase never ends on its own. It stays until the person moves it. An optional check-in reminder (every N weeks
+    // from when it was set) asks whether to keep going or move on; the protocol's suggested length is shown as information.
+    const checkWeeks = state && Number(state.check_in_weeks) > 0 ? Number(state.check_in_weeks) : null;
+    const checkFrom = state && state.check_in_from ? new Date(state.check_in_from) : started;
+    const sinceCheck = Math.max(0, daysBetween(checkFrom, today) / 7);
+    const status = checkWeeks && sinceCheck >= checkWeeks ? 'check-in' : 'active';
     const nextPhase = m.phases[m.phases.indexOf(phase) + 1] || null;
-    phases.push({ module: m.id, moduleName: m.name, phase: phase.id, label: phase.label || phase.id, started: started.toISOString().slice(0, 10), weeks: Math.round(weeks * 10) / 10, min_weeks: phase.min_weeks || null, max_weeks: phase.max_weeks || null, status, next: nextPhase ? nextPhase.id : null, nextLabel: nextPhase ? (nextPhase.label || nextPhase.id) : null });
-    if (!state) notices.push({ level: 'info', code: 'phase-started', module: m.id, text: `${m.name}: starting the ${phase.label || phase.id} phase today. Phase lengths are set by the protocol and the app will prompt you when it is time to move on.` });
-    if (status === 'expired') {
-      const ackKey = `phase-expired|${m.id}|${phase.id}`;
-      const acked = (person.acknowledged || []).includes(ackKey);
-      notices.push({ level: acked ? 'warn' : 'block', code: 'phase-expired', module: m.id, ackKey, text: `${m.name}: the ${phase.label || phase.id} phase has passed its maximum of ${phase.max_weeks} weeks. ${nextPhase ? 'Move to ' + (nextPhase.label || nextPhase.id) + '.' : ''} Staying restricted longer than the protocol is not recommended.` });
-    } else if (status === 'ready-to-advance' && nextPhase) {
-      notices.push({ level: 'info', code: 'phase-ready', module: m.id, text: `${m.name}: you have completed the minimum ${phase.min_weeks} weeks of ${phase.label || phase.id}. You can move to ${nextPhase.label || nextPhase.id} when ready.` });
+    const suggested = phase.min_weeks && phase.max_weeks ? `${phase.min_weeks} to ${phase.max_weeks} weeks` : phase.min_weeks ? `at least ${phase.min_weeks} weeks` : phase.max_weeks ? `up to ${phase.max_weeks} weeks` : null;
+    phases.push({ module: m.id, moduleName: m.name, phase: phase.id, label: phase.label || phase.id, started: started.toISOString().slice(0, 10), weeks: Math.round(weeks * 10) / 10, min_weeks: phase.min_weeks || null, max_weeks: phase.max_weeks || null, suggested, status, check_in_weeks: checkWeeks, check_in_due: status === 'check-in', next: nextPhase ? nextPhase.id : null, nextLabel: nextPhase ? (nextPhase.label || nextPhase.id) : null });
+    if (!state) notices.push({ level: 'info', code: 'phase-started', module: m.id, text: `${m.name}: on the ${phase.label || phase.id} phase from today. It stays until you change it${suggested ? `; the protocol usually runs it for ${suggested}` : ''}. If you want the app to ask how it is going, set a check-in on the Plan screen.`, link: '#/plan' });
+    if (status === 'check-in') {
+      notices.push({ level: 'warn', code: 'phase-check-in', module: m.id, text: `${m.name}: it has been ${Math.floor(sinceCheck)} week${Math.floor(sinceCheck) === 1 ? '' : 's'} since you asked to be reminded about the ${phase.label || phase.id} phase (${Math.round(weeks)} weeks in total). Keep going${nextPhase ? `, or move to ${nextPhase.label || nextPhase.id}` : ''}? Nothing changes until you choose.`, link: '#/plan', linkLabel: 'Choose on the Plan screen' });
     }
     const phaseRuleIds = new Set();
     for (const p of m.phases) for (const r of p.rules || []) phaseRuleIds.add(r);

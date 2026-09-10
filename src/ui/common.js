@@ -162,7 +162,8 @@ export function uiNoticeHTML(n, opts = {}) {
   const confirm = n.confirmId && opts.person && !(opts.person.confirmations || []).includes(n.confirmId)
     ? `<label class="choice"><input type="checkbox" data-confirm="${uiEsc(n.confirmId)}"><span class="choice-body">I confirm this.</span></label>` : '';
   const icon = level === 'block' ? 'stop' : level === 'warn' ? 'alert' : 'info';
-  return `<div class="notice ${level}" role="${level === 'block' ? 'alert' : 'status'}">${uiIcon(icon, { cls: 'notice-icon' })}<div class="notice-head">${head}</div><div class="notice-body"><div>${uiEsc(n.text)}</div>${ack}${confirm}</div></div>`;
+  const link = n.link ? `<a class="btn small" href="${uiEsc(n.link)}">${uiEsc(n.linkLabel || 'Open')}</a>` : '';
+  return `<div class="notice ${level}" role="${level === 'block' ? 'alert' : 'status'}">${uiIcon(icon, { cls: 'notice-icon' })}<div class="notice-head">${head}</div><div class="notice-body"><div>${uiEsc(n.text)}</div>${ack}${confirm}${link}</div></div>`;
 }
 
 // Wires the "I understand" buttons and confirmation checkboxes that uiNoticeHTML renders.
