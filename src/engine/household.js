@@ -7,7 +7,7 @@ import { checkRecipe } from './checker.js';
 import { emptyTotals, addTotals, recipeTotals } from './nutrition.js';
 import { cuisineSkipped } from './cuisine.js';
 import { spiceSkipped, spicePreference } from './spice.js';
-import { DAYS, daySlots, isSnackSlot, isComponent, recipeMeal, scoreRecipe, minutesAvailable, canCookOn, summarizeCheck } from './planner.js';
+import { DAYS, daySlots, isSnackSlot, isComponent, recipeMeal, scoreRecipe, minutesAvailable, canCookOn, summarizeCheck, planNoLeftovers } from './planner.js';
 
 export function householdDefaults() {
   return { cook: null, cook_by_date: {}, pattern: {}, roster: {}, snacks_per_day: 1, budget: true, seed: 0, day_overrides: {}, meal_overrides: {}, week_snapshot: null };
@@ -144,7 +144,8 @@ export function buildHouseholdWeek({ people, household, conditions, dictionaries
       const snack = isSnackSlot(slot);
       const mealCanCook = canCook && !seating.kidsOnly;
       // leftovers first when there is enough for everyone at this seating and the dish clears every eater's rules
-      const lo = snack ? null : leftovers.find(l => l.servings >= eaters.length && (i - l.madeOn) <= 3 && recipeMeal(l.recipe, slot) && seating.checks.has(l.recipe.id));
+      const fresh = planNoLeftovers(seating.plan);   // any eater on a freshness rule: this seating takes no leftovers and batches nothing
+      const lo = snack || fresh ? null : leftovers.find(l => l.servings >= eaters.length && (i - l.madeOn) <= 3 && recipeMeal(l.recipe, slot) && seating.checks.has(l.recipe.id));
       if (lo && (!mealCanCook || ((cook && cook.cooking && cook.cooking.leftovers) === 'good' && rnd() < 0.5))) {
         lo.servings -= eaters.length;
         dayTotals = addTotals(dayTotals, recipeTotals(lo.recipe, foodsById).perServing);
@@ -156,7 +157,7 @@ export function buildHouseholdWeek({ people, household, conditions, dictionaries
       if (!pick) { unmet.push({ date: dateKey, slot, names: seating.names }); meals.push({ slot, recipe: null, source: 'none', eaters: seating.ids, names: seating.names, seating: seating.key }); continue; }
       dayTotals = addTotals(dayTotals, recipeTotals(pick.r, foodsById).perServing);
       const lt = (cook && cook.cooking && cook.cooking.leftovers) || 'ok';
-      const batch = !snack && mealCanCook && lt !== 'poor' && (pick.r.leftovers === 'good' || pick.r.leftovers === 'ok');
+      const batch = !fresh && !snack && mealCanCook && lt !== 'poor' && (pick.r.leftovers === 'good' || pick.r.leftovers === 'ok');
       const servingsMade = batch ? Math.max(pick.r.servings || eaters.length, eaters.length * 2) : eaters.length;
       if (servingsMade > eaters.length) leftovers.push({ recipe: pick.r, servings: servingsMade - eaters.length, madeOn: i });
       for (const ing of pick.r.ingredients || []) if (ing.food) weekFoods.add(ing.food);

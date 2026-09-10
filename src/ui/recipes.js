@@ -5,7 +5,7 @@ import { round } from '../engine/nutrition.js';
 import { CUISINES, CUISINE_LABEL, cuisineSkipped } from '../engine/cuisine.js';
 import { recipeHeat, spiceSkipped, spicePreference } from '../engine/spice.js';
 import { isComponent } from '../engine/planner.js';
-import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiModal, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiNutrientLabel, uiVerdictWord, uiTagLabel, uiPageHeader, uiChip, uiIcon, uiNoticeHTML, uiEmptyState } from './common.js';
+import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiModal, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiNutrientLabel, uiVerdictWord, uiTagLabel, uiPageHeader, uiChip, uiIcon, uiNoticeHTML, uiEmptyState, uiSourcesHTML } from './common.js';
 import { todayAddDiaryEntry, todayIsFavorite, todayToggleFavorite } from './today.js';
 import { weekGet, weekSetOverride } from './week.js';
 import { recipesEdLinkSheet, recipesEdEditorModal, recipesEdDraftFrom, recipesEdBlankDraft, recipesEdPasteModal, recipesEdDeleteCustom } from './recipes-edit.js';
@@ -32,11 +32,23 @@ export function recipesSourceKey(r) {
 }
 const RECIPES_SOURCE_LABEL = { mine: 'Mine', nhs: 'NHS', parentclub: 'Parent Club', nhlbi: 'NHLBI', wikibooks: 'Wikibooks', usda: 'USDA', 'peace-meal': 'Peace Meal' };
 const RECIPES_SOURCE_TONE = { mine: 'plum', nhs: 'info', parentclub: 'info', nhlbi: 'info', wikibooks: 'neutral', usda: 'caution', 'peace-meal': 'olive' };
-export function recipesSourceChip(r) { const k = recipesSourceKey(r); return uiChip(RECIPES_SOURCE_LABEL[k], RECIPES_SOURCE_TONE[k]); }
+export function recipesSourceChip(r) { const k = recipesSourceKey(r); return uiChip(RECIPES_SOURCE_LABEL[k], RECIPES_SOURCE_TONE[k]) + recipesDietChips(r); }
+const RECIPES_FAMILY_LABEL = { 'low-fodmap': 'low FODMAP', 'low-histamine': 'low histamine' };
+// "adapted" for a swap-layer copy; "written for" on Peace Meal's own diet recipes.
+export function recipesDietChips(r) {
+  let out = '';
+  if (r.adapted) out += uiChip('adapted: ' + (r.adapted.label || r.adapted.family), 'plum', { attrs: `title="Made from ${uiEsc(r.adapted.fromName)} with sourced swaps"` });
+  if (Array.isArray(r.diet_written_for) && r.diet_written_for.length) out += uiChip('written for ' + r.diet_written_for.map(f => RECIPES_FAMILY_LABEL[f] || f).join(' and '), 'olive');
+  return out;
+}
 
 let recipesIndexCache = null;
+// The active person's pool: base recipes plus adapted copies for the diet families their plan restricts.
+function recipesPool() {
+  try { const p = uiActivePerson(); const plan = p ? uiPlanFor(p) : null; return plan && uiState.recipesForPlan ? uiState.recipesForPlan(plan) : uiState.data.recipes; } catch { return uiState.data.recipes; }
+}
 function recipesIndex() {
-  const pool = uiState.data.recipes;
+  const pool = recipesPool();
   if (recipesIndexCache && recipesIndexCache.pool === pool) return recipesIndexCache;
   const rows = new Map();
   const cuisineCount = {};
@@ -166,6 +178,8 @@ export function recipesDetailModal(recipeId, person, plan, opts = {}) {
   const canPlan = check.verdict === 'pass';   // the week only takes recipes that pass every check
   const m = uiModal(`
     <div class="verdict compact ${check.verdict}"><span class="verdict-word">${uiVerdictWord(check.verdict)}</span> <span class="small">${check.hits.length ? 'Matches: ' + check.hits.map(h => uiEsc(h.label) + (h.hard ? ' (hard)' : '')).join(', ') : 'No avoid tags matched.'}${check.exceeds.length ? ' One serving exceeds the daily ' + check.exceeds.map(e => uiEsc(uiNutrientLabel(e.nutrient))).join(', ') + '.' : ''}${check.verifyLabel && check.verifyLabel.length ? ' Check the label for: ' + check.verifyLabel.map(v => uiEsc(v.label)).join(', ') + '.' : ''}</span></div>
+    ${r.adapted ? uiNoticeHTML({ level: 'info', text: `Adapted from "${r.adapted.fromName}" for a ${r.adapted.label} diet. ${r.adapted.swaps.map(sw => sw.to ? `${sw.from} became ${sw.to}: ${sw.how}` : `${sw.from} was left out: ${sw.how}`).join(' ')}${r.nutrition_approx ? ' The nutrition numbers are the original recipe\'s published figures and are approximate after these swaps.' : ' Nutrition is recomputed from the new ingredients.'}` }) : ''}
+    ${r.adapted ? `<p class="small muted">Swap sources: ${uiSourcesHTML([...new Set(r.adapted.swaps.flatMap(sw => sw.sources || []))])}</p>` : ''}
     <div class="row recipe-meta">${recipesSourceChip(r)}${r.featured ? `<span class="featured-star">${uiIcon('star', { fill: true })}Featured</span>` : ''}${r.linked_by_household ? uiChip('linked by you', 'pass') : ''}${!hasNut ? uiChip('no nutrition data', 'caution') : ''}${component ? uiChip('sauce or basic', 'neutral', { attrs: 'title="A component: kept in the library, never scheduled as a meal on its own"' }) : ''}${heat.level ? uiChip(heat.label, heat.level >= 3 ? 'stop' : heat.level === 2 ? 'caution' : 'info', { soft: true, attrs: `title="Estimated from: ${uiEsc(heat.terms.join(', '))}"` }) : ''}</div>
     <dl class="kv">
       <dt>Time</dt><dd>${r.active_min} min active, ${r.total_min} min total${r.times_estimated ? ' <span class="muted">(estimated)</span>' : ''}</dd>
@@ -189,7 +203,7 @@ export function recipesDetailModal(recipeId, person, plan, opts = {}) {
     </div>
     <div class="recipe-cols">
       <div><h3>Ingredients</h3>
-        <ul>${(r.ingredients || []).map(i => { const f = i.food ? uiState.foodsById.get(i.food) : null; const label = i.display || (f ? f.short || f.name : i.food); return `<li>${uiEsc(label)} ${f ? `<span class="muted small num">(${uiFmtNum(i.grams)} g${i.estimated ? ', estimated' : ''}${i.display && f ? `, ${uiEsc(f.short || f.name)}` : ''})</span>` : i.food ? '<span class="muted small">(food not in database)</span>' : '<span class="muted small">(not linked)</span>'}</li>`; }).join('')}</ul>
+        <ul>${(r.ingredients || []).map(i => { const f = i.food ? uiState.foodsById.get(i.food) : null; const label = i.display || (f ? f.short || f.name : i.food); return `<li>${uiEsc(label)}${i.replaces ? ` <span class="muted small">(in place of ${uiEsc(i.replaces)})</span>` : ''} ${f ? `<span class="muted small num">(${uiFmtNum(i.grams)} g${i.estimated ? ', estimated' : ''}${i.display && f ? `, ${uiEsc(f.short || f.name)}` : ''})</span>` : i.food ? '<span class="muted small">(food not in database)</span>' : '<span class="muted small">(not linked)</span>'}</li>`; }).join('')}</ul>
         ${check.unrecognized.length ? `<p class="small"><strong>Not recognized:</strong> ${check.unrecognized.map(uiEsc).join('; ')}. The app does not assume these are safe.</p>` : ''}</div>
       <div><h3>Steps</h3>
         <ol>${(r.steps || []).map(s => `<li>${uiEsc(s)}</li>`).join('')}</ol>
@@ -248,7 +262,7 @@ function recipesFiltered(person, plan) {
   const favs = new Set((person.favorites && person.favorites.recipes) || []);
   const out = [];
   let more = false, checked = 0, skippedCount = 0;
-  for (const r of uiState.data.recipes) {
+  for (const r of recipesPool()) {
     const row = idx.rows.get(r.id);
     if (!row) continue;
     if (recipesUi.fav && !favs.has(r.id)) continue;

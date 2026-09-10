@@ -98,6 +98,10 @@ function learnRenderHow(root) {
       <p>A diet that is not on the list can be added by name. It becomes a module marked "Defined by you" with soft rules and no evidence rating. It never loosens an allergen or a condition rule.</p>
       <h2>Nutrient data</h2>
       <p>Every food is a USDA FoodData Central record (SR Legacy or Foundation Foods), keyed by its FDC ID. The import script writes the food table; nobody edits numbers by hand. Where USDA has no value for a nutrient (added sugar, for example), the app shows "no data" rather than an estimate.</p>
+      <h2>Adapted recipes and the swap list</h2>
+      <p>When a recipe is blocked for a low FODMAP or low histamine plan only by ingredients on the swap list (<code>data/swaps.json</code>), the app offers an adapted copy: garlic becomes garlic-infused olive oil, onion becomes chives or spring onion green tops, wheat pasta becomes corn and rice pasta, milk becomes lactose-free milk, tomato becomes roasted red pepper, aged cheese becomes fresh mozzarella, cured meat becomes fresh chicken, and vinegar and fermented sauces are left out. Every swap cites its source. The adapted copy goes through the same checker as any recipe and is dropped if it still trips a rule. It appears only in the pool of a person whose plan restricts that family, labelled "adapted", and it never overrides an allergen. For Peace Meal's own recipes the nutrition is recomputed from the new ingredients; for recipes that only carry published per-serving numbers the copy keeps those numbers and is marked approximate.</p>
+      <p>Peace Meal also ships its own recipes written for these diets, labelled "written for low FODMAP" or "written for low histamine", with every ingredient linked to a USDA food. The low histamine set is written to be eaten fresh, and a plan with the freshness rule schedules no leftovers.</p>
+      <p>For a low histamine trial the reference list is the SIGHI food compatibility list from the Swiss Interest Group Histamine Intolerance (<a href="https://www.histaminintoleranz.ch/en/downloads.html" target="_blank" rel="noopener noreferrer">histaminintoleranz.ch, downloads</a>), free for personal use and copyright SIGHI; it is not bundled into the app.</p>
       <h2>FODMAP tags are not Monash-verified</h2>
       <p>The low FODMAP module is built from published studies and USDA data. It does not use the Monash University database, and its tags carry a "not Monash-verified" notice. Portion notes matter: many foods are low FODMAP in a small serving and high in a large one.</p>
       <h2>Elimination phases</h2>
@@ -188,6 +192,7 @@ function learnRenderSources(root) {
         <li>Wikibooks recipes show no nutrition until ingredients are linked in the editor.</li>
         <li><code>tags</code> is empty on every imported recipe because the tag vocabulary is controlled; tags are added by hand or by the dictionary at run time.</li>
         <li>Recipes you write yourself ("Mine") and ingredient links you add are stored on this device in your profile, never in the data files.</li>
+        <li>Adapted copies made by the swap list (<code>data/swaps.json</code>) are built on this device from the recipes above and are never written back to the data files. Four derived food records (lactose-free milk, low-fat milk, yogurt, and cream) copy the USDA numbers of their base food with the lactose tags removed; they are marked <code>dataset: "derived"</code> in <code>foods.json</code>.</li>
       </ul>
 
       <h2>Peace Meal recipes</h2>

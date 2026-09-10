@@ -173,6 +173,8 @@ export function cautionWhy(check) {
   return parts.join('; ') || 'needs a look';
 }
 
+// True when the plan carries a freshness rule (mcas-freshness): cook fresh, no planned leftovers.
+export function planNoLeftovers(plan) { return !!(plan && (plan.behavior || []).some(b => (b.rule || b.id) === 'mcas-freshness')); }
 export function isComponent(r) { return Array.isArray(r.meal) && r.meal.length === 1 && r.meal[0] === 'component'; }
 
 // dayOverrides: { 'YYYY-MM-DD': { can_cook, minutes } } for this week only; snacksPerDay: this week's snack count, if set.
@@ -206,6 +208,8 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
   const perDay = person.servings_by_day || {}; // { 'sun': 4 } overrides for guests
   const unmet = [];
   const weekFoods = new Set();
+  // A freshness rule (low histamine trial) means no planned leftovers: histamine rises in cooked food that sits.
+  const noLeftovers = planNoLeftovers(plan);
 
   for (let i = 0; i < 7; i++) {
     const date = new Date(startDate.getTime() + i * 86400000);
@@ -220,7 +224,7 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
     for (const slot of daySlotList) {
       const snack = isSnackSlot(slot);
       // use leftovers first on no-cook days, or when leftovers tolerance is good (never as a snack)
-      const lo = snack ? null : leftovers.find(l => l.servings >= eaters && (i - l.madeOn) <= 3 && recipeMeal(l.recipe, slot));
+      const lo = snack || noLeftovers ? null : leftovers.find(l => l.servings >= eaters && (i - l.madeOn) <= 3 && recipeMeal(l.recipe, slot));
       if (lo && (!canCook || cooking.leftovers === 'good' && rnd() < 0.5)) {
         lo.servings -= eaters;
         const per = recipeTotals(lo.recipe, foodsById).perServing;
@@ -239,7 +243,7 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
       const pick = scored[0];
       const per = recipeTotals(pick.r, foodsById).perServing;
       dayTotals = addTotals(dayTotals, per);
-      const batch = !snack && canCook && (cooking.leftovers !== 'poor') && (pick.r.leftovers === 'good' || pick.r.leftovers === 'ok');
+      const batch = !noLeftovers && !snack && canCook && (cooking.leftovers !== 'poor') && (pick.r.leftovers === 'good' || pick.r.leftovers === 'ok');
       const servingsMade = batch ? Math.max(pick.r.servings || eaters, eaters * 2) : eaters;
       if (servingsMade > eaters) leftovers.push({ recipe: pick.r, servings: servingsMade - eaters, madeOn: i });
       for (const ing of pick.r.ingredients || []) if (ing.food) weekFoods.add(ing.food);
@@ -248,7 +252,7 @@ export function buildWeekPlan({ person, plan, recipes, foodsById, matcher, start
     }
     days.push({ date: dateKey, day: DAYS[dayIdx], canCook, eaters, minutes, overridden: !!ov, meals: dayMeals, totals: dayTotals });
   }
-  return { days, excluded, unmet, eligibleCount: eligible.length, skippedNoNutrition, seed, slots: daySlotList, snacks: snackPlan(person, plan, snacksPerDay) };
+  return { days, excluded, unmet, eligibleCount: eligible.length, skippedNoNutrition, seed, slots: daySlotList, snacks: snackPlan(person, plan, snacksPerDay), noLeftovers };
 }
 
 // Picks new meals for the named slots of one day, leaving every other meal in the week exactly as it is.

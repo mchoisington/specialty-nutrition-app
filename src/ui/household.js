@@ -4,7 +4,7 @@ import { buildHouseholdWeek, householdRepick, householdCandidates, rosterFor, co
 import { mealFits, SLOT_LABEL, DAYS } from '../engine/planner.js';
 import { emptyTotals, addTotals, recipeTotals } from '../engine/nutrition.js';
 import { buildGroceryList } from '../engine/grocery.js';
-import { uiState, uiEsc, uiPersist, uiToast, uiModal, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiVerdictWord, uiVerdictChip, uiSection, uiChip, uiIcon, uiAvatar, uiSwitch, uiEmptyState, uiNoticeHTML, uiNavigate } from './common.js';
+import { uiState, uiEsc, uiPersist, uiToast, uiModal, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiVerdictWord, uiVerdictChip, uiSection, uiChip, uiIcon, uiAvatar, uiSwitch, uiEmptyState, uiNoticeHTML, uiNavigate, uiPlanFor } from './common.js';
 import { weekRecipeModal } from './week.js';
 
 const HH_DAY_NAMES = { sun: 'Sunday', mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday' };
@@ -45,7 +45,7 @@ export function householdWeekGet() {
   let week = uiState.householdCache && uiState.householdCache.sig === sig ? uiState.householdCache.week : null;
   if (!week) {
     const [y, m, d] = householdStart().split('-').map(Number);
-    week = buildHouseholdWeek({ people, household: h, conditions: uiState.data.conditions, dictionaries: uiState.data.dictionaries, recipes: uiState.data.recipes, foodsById: uiState.foodsById, matcher: uiState.matcher, startDate: new Date(Date.UTC(y, m - 1, d)), seed: h.seed || 0, today: uiToday() });
+    week = buildHouseholdWeek({ people, household: h, conditions: uiState.data.conditions, dictionaries: uiState.data.dictionaries, recipes: householdPool(people), foodsById: uiState.foodsById, matcher: uiState.matcher, startDate: new Date(Date.UTC(y, m - 1, d)), seed: h.seed || 0, today: uiToday() });
     uiState.householdCache = { sig, week };
   }
   // work on a copy of the days so the cached build stays pristine
@@ -210,7 +210,7 @@ export function householdBind(root) {
     for (const s of stale) byDay.set(s.di, (byDay.get(s.di) || []).concat(s.slot));
     let n = 0;
     for (const [di, slots] of byDay) {
-      const { meals } = householdRepick({ week, di, slots, people, household: h, conditions: uiState.data.conditions, dictionaries: uiState.data.dictionaries, recipes: uiState.data.recipes, foodsById: uiState.foodsById, matcher: uiState.matcher });
+      const { meals } = householdRepick({ week, di, slots, people, household: h, conditions: uiState.data.conditions, dictionaries: uiState.data.dictionaries, recipes: householdPool(people), foodsById: uiState.foodsById, matcher: uiState.matcher });
       week.days[di].meals = week.days[di].meals.map(m => meals.find(x => x.slot === m.slot) || m);
       for (const s of slots) delete h.meal_overrides[`${week.days[di].date}:${s}`];
       n += meals.length;
@@ -280,10 +280,14 @@ function householdPatternModal(person) {
   });
 }
 
+// Recipes for a household: the base pool plus adapted copies for every diet family any eater's plan restricts.
+function householdPool(people) {
+  try { return uiState.recipesForPlans ? uiState.recipesForPlans(people.map(p => uiPlanFor(p))) : uiState.data.recipes; } catch { return uiState.data.recipes; }
+}
 function householdSwapModal(h, people, week, di, slot) {
   const day = week.days[di];
   const current = day.meals.find(m => m.slot === slot);
-  const { eaters, rows } = householdCandidates({ week, di, slot, people, household: h, recipes: uiState.data.recipes, foodsById: uiState.foodsById, n: 6, exclude: current && current.recipe });
+  const { eaters, rows } = householdCandidates({ week, di, slot, people, household: h, recipes: householdPool(people), foodsById: uiState.foodsById, n: 6, exclude: current && current.recipe });
   const m = uiModal(`
     <p class="small muted">Top alternatives for ${SLOT_LABEL[slot] || slot} on ${HH_DAY_NAMES[day.day]} for ${uiEsc(eaters.map(p => p.name).join(', ') || 'nobody')}, scored the way the planner scores them. Only recipes that pass every eater's checks are listed.</p>
     ${rows.length ? `<div class="list">${rows.map(x => `<div class="list-row"><div class="list-main">
@@ -311,7 +315,7 @@ function householdProposeDayChange(h, people, week, di, patch, revert) {
   const store = () => { h.day_overrides[day.date] = { can_cook: next.canCook, minutes: next.minutes }; };
   const applyDay = () => { day.canCook = next.canCook; day.minutes = next.minutes; day.overridden = true; };
   if (!misfits.length) { store(); applyDay(); householdSaveSnapshot(h, week); householdTouch(words); uiToast(`${words}, this week only. Every meal still fits, so nothing moved.`); uiState.rerender(); return; }
-  const picked = householdRepick({ week, di, slots: misfits.map(m => m.slot), people, household: h, conditions: uiState.data.conditions, dictionaries: uiState.data.dictionaries, recipes: uiState.data.recipes, foodsById: uiState.foodsById, matcher: uiState.matcher, canCook: next.canCook, minutes: next.minutes });
+  const picked = householdRepick({ week, di, slots: misfits.map(m => m.slot), people, household: h, conditions: uiState.data.conditions, dictionaries: uiState.data.dictionaries, recipes: householdPool(people), foodsById: uiState.foodsById, matcher: uiState.matcher, canCook: next.canCook, minutes: next.minutes });
   const afterMeals = day.meals.map(m => picked.meals.find(p => p.slot === m.slot) || m);
   let acted = false;
   const m = uiModal(`

@@ -5370,7 +5370,10 @@
         "cashew cream",
         "cream of wheat",
         "cream soda",
-        "cream of rice"
+        "cream of rice",
+        "lactose-free cream",
+        "lactose free cream",
+        "lactose-free light cream"
       ]
     },
     {
@@ -7396,7 +7399,16 @@
       "except": [
         "garlic infused oil",
         "garlic-infused oil",
-        "garlic oil"
+        "garlic oil",
+        "garlic-infused olive oil",
+        "garlic infused olive oil",
+        "garlic-infused",
+        "garlic infused",
+        "without onion or garlic",
+        "no onion or garlic",
+        "without garlic",
+        "no garlic",
+        "garlic-free"
       ],
       "sources": [
         "muir-2007",
@@ -7956,7 +7968,16 @@
         "small-particle-friendly"
       ],
       "match": "word",
-      "note": "straining removes some lactose; fat level varies (0% to 10%), so no fat tag"
+      "note": "straining removes some lactose; fat level varies (0% to 10%), so no fat tag",
+      "except": [
+        "lactose-free yogurt",
+        "lactose-free yoghurt",
+        "lactose free yogurt",
+        "lactose free yoghurt",
+        "lactose-free plain yogurt",
+        "lactose-free plain yoghurt",
+        "lactose-free greek yogurt"
+      ]
     },
     {
       "term": "green 3",
@@ -7996,6 +8017,19 @@
       "portion_note": "green tops only during elimination; white bulb is high; threshold not encoded",
       "sources": [
         "muir-2007"
+      ],
+      "except": [
+        "spring onion green tops",
+        "spring onion tops",
+        "spring onion greens",
+        "green tops of spring onions",
+        "scallion greens",
+        "scallion tops",
+        "green tops of scallions",
+        "green onion tops",
+        "green onion greens",
+        "green tops of green onions",
+        "chives or spring onion green tops"
       ]
     },
     {
@@ -8436,7 +8470,12 @@
         "full-fat-dairy"
       ],
       "match": "word",
-      "note": ""
+      "note": "",
+      "except": [
+        "lactose-free cream",
+        "lactose free cream",
+        "lactose-free light cream"
+      ]
     },
     {
       "term": "hemp heart",
@@ -9522,17 +9561,27 @@
         "lactose-hidden"
       ],
       "match": "word",
-      "note": "the sugar itself as an ingredient or filler; milk-derived"
+      "note": "the sugar itself as an ingredient or filler; milk-derived",
+      "except": [
+        "lactose-free",
+        "lactose free",
+        "lactose-free milk",
+        "lactose-free low-fat milk",
+        "lactose-free whole milk",
+        "lactose-free plain yogurt",
+        "lactose-free yogurt",
+        "lactose-free cream"
+      ]
     },
     {
       "term": "lactose-free milk",
       "tags": [
         "allergen-milk",
-        "lactose-low",
-        "calcium-rich"
+        "calcium-rich",
+        "potassium-high-food"
       ],
       "match": "word",
-      "note": "lactase-treated; still cow's milk protein for allergy; low FODMAP"
+      "note": "lactose already split into glucose and galactose; same nutrients as milk, no lactose load (NIH 2010 lactose consensus)"
     },
     {
       "term": "lager",
@@ -9669,6 +9718,24 @@
       "portion_note": "the white bulb is high in fructans; the green leaves are lower in the cited data; threshold not encoded, treat the whole leek as high FODMAP",
       "sources": [
         "muir-2007"
+      ],
+      "except": [
+        "without onion or garlic",
+        "no onion or garlic",
+        "without onion",
+        "no onion",
+        "onion-free",
+        "spring onion green tops",
+        "spring onion tops",
+        "spring onion greens",
+        "green tops of spring onions",
+        "green onion tops",
+        "green onion greens",
+        "green tops of green onions",
+        "leek greens",
+        "leek tops",
+        "green tops of leeks",
+        "chives or spring onion green tops"
       ]
     },
     {
@@ -10019,7 +10086,17 @@
         "calcium-rich"
       ],
       "match": "word",
-      "note": ""
+      "note": "",
+      "except": [
+        "lactose-free",
+        "lactose free",
+        "lactose-free milk",
+        "lactose-free low-fat milk",
+        "lactose-free whole milk",
+        "lactose-free plain yogurt",
+        "lactose-free yogurt",
+        "lactose-free cream"
+      ]
     },
     {
       "term": "low-fat yogurt",
@@ -10044,7 +10121,17 @@
         "calcium-rich"
       ],
       "match": "word",
-      "note": ""
+      "note": "",
+      "except": [
+        "lactose-free",
+        "lactose free",
+        "lactose-free milk",
+        "lactose-free low-fat milk",
+        "lactose-free whole milk",
+        "lactose-free plain yogurt",
+        "lactose-free yogurt",
+        "lactose-free cream"
+      ]
     },
     {
       "term": "lox",
@@ -10775,7 +10862,14 @@
         "pea milk",
         "macadamia milk",
         "flax milk",
-        "milk thistle"
+        "milk thistle",
+        "lactose-free milk",
+        "lactose free milk",
+        "lactose-free whole milk",
+        "lactose-free low-fat milk",
+        "lactose-free lowfat milk",
+        "lactose-free skim milk",
+        "lactose-free semi-skimmed milk"
       ]
     },
     {
@@ -10828,7 +10922,17 @@
         "fodmap-lactose"
       ],
       "match": "word",
-      "note": ""
+      "note": "",
+      "except": [
+        "lactose-free",
+        "lactose free",
+        "lactose-free milk",
+        "lactose-free low-fat milk",
+        "lactose-free whole milk",
+        "lactose-free plain yogurt",
+        "lactose-free yogurt",
+        "lactose-free cream"
+      ]
     },
     {
       "term": "milkfat",
@@ -11503,7 +11607,13 @@
         "zucchini noodle",
         "buckwheat noodle",
         "mung bean noodle",
-        "bean thread noodle"
+        "bean thread noodle",
+        "rice noodles",
+        "glass noodles",
+        "buckwheat noodles",
+        "zucchini noodles",
+        "kelp noodles",
+        "soba noodles"
       ]
     },
     {
@@ -11749,6 +11859,24 @@
       "sources": [
         "muir-2007",
         "halmos-2014"
+      ],
+      "except": [
+        "without onion or garlic",
+        "no onion or garlic",
+        "without onion",
+        "no onion",
+        "onion-free",
+        "spring onion green tops",
+        "spring onion tops",
+        "spring onion greens",
+        "green tops of spring onions",
+        "green onion tops",
+        "green onion greens",
+        "green tops of green onions",
+        "leek greens",
+        "leek tops",
+        "green tops of leeks",
+        "chives or spring onion green tops"
       ]
     },
     {
@@ -12196,7 +12324,9 @@
         "quinoa pasta",
         "brown rice pasta",
         "buckwheat pasta",
-        "edamame pasta"
+        "edamame pasta",
+        "gluten-free corn and rice pasta",
+        "corn and rice pasta"
       ],
       "sources": [
         "biesiekierski-2011"
@@ -14261,7 +14391,7 @@
         "refined-grain"
       ],
       "match": "word",
-      "note": "gluten-free"
+      "note": "see rice noodles"
     },
     {
       "term": "rice pasta",
@@ -14752,6 +14882,19 @@
       "portion_note": "green tops are low in fructans; the white bulb is high (Muir 2007 measured spring onion); threshold not encoded, treat whole scallions as high FODMAP and use green tops only during elimination",
       "sources": [
         "muir-2007"
+      ],
+      "except": [
+        "spring onion green tops",
+        "spring onion tops",
+        "spring onion greens",
+        "green tops of spring onions",
+        "scallion greens",
+        "scallion tops",
+        "green tops of scallions",
+        "green onion tops",
+        "green onion greens",
+        "green tops of green onions",
+        "chives or spring onion green tops"
       ]
     },
     {
@@ -15054,6 +15197,24 @@
       "portion_note": "high FODMAP at typical portions; no low-FODMAP portion",
       "sources": [
         "muir-2007"
+      ],
+      "except": [
+        "without onion or garlic",
+        "no onion or garlic",
+        "without onion",
+        "no onion",
+        "onion-free",
+        "spring onion green tops",
+        "spring onion tops",
+        "spring onion greens",
+        "green tops of spring onions",
+        "green onion tops",
+        "green onion greens",
+        "green tops of green onions",
+        "leek greens",
+        "leek tops",
+        "green tops of leeks",
+        "chives or spring onion green tops"
       ]
     },
     {
@@ -15281,7 +15442,17 @@
         "calcium-rich"
       ],
       "match": "word",
-      "note": ""
+      "note": "",
+      "except": [
+        "lactose-free",
+        "lactose free",
+        "lactose-free milk",
+        "lactose-free low-fat milk",
+        "lactose-free whole milk",
+        "lactose-free plain yogurt",
+        "lactose-free yogurt",
+        "lactose-free cream"
+      ]
     },
     {
       "term": "skin-on",
@@ -16224,6 +16395,19 @@
       "portion_note": "green tops only during elimination; white bulb is high; threshold not encoded",
       "sources": [
         "muir-2007"
+      ],
+      "except": [
+        "spring onion green tops",
+        "spring onion tops",
+        "spring onion greens",
+        "green tops of spring onions",
+        "scallion greens",
+        "scallion tops",
+        "green tops of scallions",
+        "green onion tops",
+        "green onion greens",
+        "green tops of green onions",
+        "chives or spring onion green tops"
       ]
     },
     {
@@ -18453,7 +18637,17 @@
         "calcium-rich"
       ],
       "match": "word",
-      "note": ""
+      "note": "",
+      "except": [
+        "lactose-free",
+        "lactose free",
+        "lactose-free milk",
+        "lactose-free low-fat milk",
+        "lactose-free whole milk",
+        "lactose-free plain yogurt",
+        "lactose-free yogurt",
+        "lactose-free cream"
+      ]
     },
     {
       "term": "whole milk yogurt",
@@ -18788,7 +18982,16 @@
         "small-particle-friendly"
       ],
       "match": "word",
-      "note": "spelling variant of yogurt"
+      "note": "spelling variant of yogurt",
+      "except": [
+        "lactose-free yogurt",
+        "lactose-free yoghurt",
+        "lactose free yogurt",
+        "lactose free yoghurt",
+        "lactose-free plain yogurt",
+        "lactose-free plain yoghurt",
+        "lactose-free greek yogurt"
+      ]
     },
     {
       "term": "yogurt",
@@ -18802,7 +19005,16 @@
         "small-particle-friendly"
       ],
       "match": "word",
-      "note": "lactose-low applies to yogurt with live cultures (Phase 1 Part A 5); heat-treated yogurt loses this. Regular yogurt is still restricted in FODMAP elimination; lactose-free yogurt is not. restrict only when serum potassium is high, per KDIGO/KDOQI; plant potassium is less bioavailable"
+      "note": "lactose-low applies to yogurt with live cultures (Phase 1 Part A 5); heat-treated yogurt loses this. Regular yogurt is still restricted in FODMAP elimination; lactose-free yogurt is not. restrict only when serum potassium is high, per KDIGO/KDOQI; plant potassium is less bioavailable",
+      "except": [
+        "lactose-free yogurt",
+        "lactose-free yoghurt",
+        "lactose free yogurt",
+        "lactose free yoghurt",
+        "lactose-free plain yogurt",
+        "lactose-free plain yoghurt",
+        "lactose-free greek yogurt"
+      ]
     },
     {
       "term": "yuba",
@@ -19761,6 +19973,418 @@
       "note": "grapefruit-type citrus for the medication interaction tag",
       "sources": [
         "bailey-2013"
+      ]
+    },
+    {
+      "term": "garlic-infused olive oil",
+      "tags": [
+        "olive-oil"
+      ],
+      "match": "phrase",
+      "note": "fructans are water-soluble, not oil-soluble: strained garlic-infused oil is low FODMAP (Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "garlic-infused",
+      "tags": [
+        "olive-oil"
+      ],
+      "match": "phrase",
+      "note": "an infused oil, not garlic itself; see garlic-infused olive oil",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "green tops of scallions",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "green tops of spring onions",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "green tops of green onions",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "scallion greens",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "scallion tops",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "spring onion greens",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "spring onion tops",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "green onion tops",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "green onion greens",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "green part of the scallion",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "green parts of scallions",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "chives",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "word",
+      "note": "low FODMAP herb used in place of onion (Monash-group data)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "fresh chives",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "see chives",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "lactose-free yogurt",
+      "tags": [
+        "allergen-milk",
+        "histamine-fermented",
+        "fermented-live-culture",
+        "calcium-rich"
+      ],
+      "match": "phrase",
+      "note": "lactose removed; still a fermented food for the histamine list",
+      "sources": [
+        "nih-lactose-2010",
+        "sighi-list"
+      ]
+    },
+    {
+      "term": "lactose-free yoghurt",
+      "tags": [
+        "allergen-milk",
+        "histamine-fermented",
+        "fermented-live-culture",
+        "calcium-rich"
+      ],
+      "match": "phrase",
+      "note": "see lactose-free yogurt",
+      "sources": [
+        "nih-lactose-2010",
+        "sighi-list"
+      ]
+    },
+    {
+      "term": "lactose-free cream",
+      "tags": [
+        "allergen-milk",
+        "full-fat-dairy"
+      ],
+      "match": "phrase",
+      "note": "lactose removed",
+      "sources": [
+        "nih-lactose-2010"
+      ]
+    },
+    {
+      "term": "gluten-free pasta",
+      "tags": [
+        "refined-grain"
+      ],
+      "match": "phrase",
+      "note": "corn, rice, or quinoa pasta; no wheat",
+      "sources": [
+        "fda-gf-2013"
+      ]
+    },
+    {
+      "term": "gluten-free bread",
+      "tags": [
+        "refined-grain"
+      ],
+      "match": "phrase",
+      "note": "no wheat; check the label for the base flour",
+      "sources": [
+        "fda-gf-2013"
+      ]
+    },
+    {
+      "term": "rice noodles",
+      "tags": [
+        "refined-grain"
+      ],
+      "match": "phrase",
+      "note": "made from rice flour, not wheat; the plain word \"noodles\" is treated as wheat, this phrase is not",
+      "sources": [
+        "fda-gf-2013"
+      ]
+    },
+    {
+      "term": "oyster mushrooms",
+      "tags": [
+        "histamine-high"
+      ],
+      "match": "phrase",
+      "note": "low FODMAP per Monash-group data (unlike button mushrooms, which carry mannitol); kept on the histamine list with other mushrooms",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "olives",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "word",
+      "note": "table olives; brined, so on a strict low histamine trial treat them as fermented and check"
+    },
+    {
+      "term": "mustard",
+      "tags": [
+        "basic-ingredient"
+      ],
+      "match": "word",
+      "note": "prepared mustard contains vinegar"
+    },
+    {
+      "term": "polenta",
+      "tags": [
+        "refined-grain"
+      ],
+      "match": "word",
+      "note": "cornmeal"
+    },
+    {
+      "term": "cornmeal",
+      "tags": [
+        "refined-grain"
+      ],
+      "match": "word",
+      "note": "ground corn"
+    },
+    {
+      "term": "chili flakes",
+      "tags": [
+        "spicy"
+      ],
+      "match": "phrase",
+      "note": "dried chili"
+    },
+    {
+      "term": "chilli flakes",
+      "tags": [
+        "spicy"
+      ],
+      "match": "phrase",
+      "note": "dried chili"
+    },
+    {
+      "term": "spring onion green tops",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "green onion green tops",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "scallion green tops",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "spring onion green tops only",
+      "tags": [
+        "vegetable"
+      ],
+      "match": "phrase",
+      "note": "the green leaves of the spring onion are low FODMAP; the white bulb carries the fructans (Monash-group data, Varney 2017)",
+      "sources": [
+        "varney-2017"
+      ]
+    },
+    {
+      "term": "lactose-free plain yogurt",
+      "tags": [
+        "allergen-milk",
+        "histamine-fermented",
+        "fermented-live-culture",
+        "calcium-rich"
+      ],
+      "match": "phrase",
+      "note": "lactose already split; still a milk allergen",
+      "sources": [
+        "nih-lactose-2010"
+      ]
+    },
+    {
+      "term": "lactose-free plain yoghurt",
+      "tags": [
+        "allergen-milk",
+        "histamine-fermented",
+        "fermented-live-culture",
+        "calcium-rich"
+      ],
+      "match": "phrase",
+      "note": "lactose already split; still a milk allergen",
+      "sources": [
+        "nih-lactose-2010"
+      ]
+    },
+    {
+      "term": "lactose-free greek yogurt",
+      "tags": [
+        "allergen-milk",
+        "histamine-fermented",
+        "fermented-live-culture",
+        "calcium-rich"
+      ],
+      "match": "phrase",
+      "note": "lactose already split; still a milk allergen",
+      "sources": [
+        "nih-lactose-2010"
+      ]
+    },
+    {
+      "term": "lactose-free low-fat milk",
+      "tags": [
+        "allergen-milk",
+        "calcium-rich",
+        "low-fat-dairy"
+      ],
+      "match": "phrase",
+      "note": "lactose already split; still a milk allergen",
+      "sources": [
+        "nih-lactose-2010"
+      ]
+    },
+    {
+      "term": "lactose-free whole milk",
+      "tags": [
+        "allergen-milk",
+        "calcium-rich",
+        "full-fat-dairy",
+        "potassium-high-food"
+      ],
+      "match": "phrase",
+      "note": "lactose already split; still a milk allergen",
+      "sources": [
+        "nih-lactose-2010"
       ]
     }
   ],

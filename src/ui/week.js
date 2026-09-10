@@ -17,7 +17,7 @@ export function weekGet(person, plan) {
   const key = uiWeekKey(person);
   if (uiState.weekCache.has(key)) return uiState.weekCache.get(key);
   const wo = weekThisWeek(person);
-  const week = buildWeekPlan({ person, plan, recipes: uiState.data.recipes, foodsById: uiState.foodsById, matcher: uiState.matcher, startDate: uiToday(), seed: person.planSeed || 0, dayOverrides: wo.days, snacksPerDay: wo.snacks_per_day });
+  const week = buildWeekPlan({ person, plan, recipes: uiState.recipesForPlan ? uiState.recipesForPlan(plan) : uiState.data.recipes, foodsById: uiState.foodsById, matcher: uiState.matcher, startDate: uiToday(), seed: person.planSeed || 0, dayOverrides: wo.days, snacksPerDay: wo.snacks_per_day });
   weekApplySnapshot(week, person);
   weekApplyOverrides(week, person, plan);
   uiState.weekCache.set(key, week);
@@ -194,7 +194,7 @@ function weekProposeDayChange(person, plan, week, di, patch, revert) {
     uiToast(`${settingWords}, this week only. Every meal on ${name} still fits, so nothing moved.`); uiState.rerender();
     return;
   }
-  const picked = repickSlots({ week, di, slots: misfits.map(m => m.slot), person, plan, recipes: uiState.data.recipes, foodsById: uiState.foodsById, matcher: uiState.matcher, canCook: next.canCook, minutes: next.minutes });
+  const picked = repickSlots({ week, di, slots: misfits.map(m => m.slot), person, plan, recipes: uiState.recipesForPlan ? uiState.recipesForPlan(plan) : uiState.data.recipes, foodsById: uiState.foodsById, matcher: uiState.matcher, canCook: next.canCook, minutes: next.minutes });
   const before = weekDayTotals(day.meals);
   const afterMeals = day.meals.map(m => picked.meals.find(p => p.slot === m.slot) || m);
   const after = weekDayTotals(afterMeals);
@@ -262,7 +262,7 @@ function weekProposeSnackChange(person, plan, week, count, revert) {
     acted = true; wo.snacks_per_day = count;
     for (let di = 0; di < week.days.length; di++) {
       const day = week.days[di];
-      const picked = added.length ? repickSlots({ week, di, slots: added, person, plan, recipes: uiState.data.recipes, foodsById: uiState.foodsById, matcher: uiState.matcher }).meals : [];
+      const picked = added.length ? repickSlots({ week, di, slots: added, person, plan, recipes: uiState.recipesForPlan ? uiState.recipesForPlan(plan) : uiState.data.recipes, foodsById: uiState.foodsById, matcher: uiState.matcher }).meals : [];
       const kept = day.meals.filter(x => !removed.includes(x.slot));
       day.meals = nextSlots.map(s => kept.find(x => x.slot === s) || picked.find(x => x.slot === s) || { slot: s, recipe: null, source: 'none' });
     }
@@ -379,7 +379,7 @@ function weekSwapModal(di, slot, person, plan, week) {
     if (r) dayTotals = addTotals(dayTotals, recipeTotals(r, uiState.foodsById).perServing);
   }
   const recentIds = week.days.flatMap(d => d.meals.filter(m => m.recipe && !(d === day && m.slot === slot)).map(m => m.recipe));
-  const candidates = uiState.data.recipes.filter(r => recipeMeal(r, slot) && r.id !== (current && current.recipe));
+  const candidates = (uiState.recipesForPlan ? uiState.recipesForPlan(plan) : uiState.data.recipes).filter(r => recipeMeal(r, slot) && r.id !== (current && current.recipe));
   const favorites = (person.favorites && person.favorites.recipes) || [];
   const disliked = (person.disliked && person.disliked.recipes) || [];
   const scored = candidates.map(r => {

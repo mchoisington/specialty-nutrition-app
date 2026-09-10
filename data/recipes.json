@@ -8667,5 +8667,4494 @@
         }
       ]
     }
+  },
+  {
+    "id": "lfh-ginger-chicken-rice-bowl",
+    "name": "Ginger chicken and vegetable rice bowl",
+    "meal": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 2,
+    "active_min": 20,
+    "total_min": 30,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-171052",
+        "grams": 300,
+        "display": "300 g chicken breast, sliced"
+      },
+      {
+        "food": "fdc-168877",
+        "grams": 150,
+        "display": "¾ cup white rice, uncooked"
+      },
+      {
+        "food": "fdc-2258586",
+        "grams": 120,
+        "display": "2 carrots, cut into thin sticks"
+      },
+      {
+        "food": "fdc-169291",
+        "grams": 150,
+        "display": "1 zucchini, sliced"
+      },
+      {
+        "food": "fdc-169231",
+        "grams": 15,
+        "display": "1 tbsp fresh ginger, grated"
+      },
+      {
+        "food": "fdc-170005",
+        "grams": 30,
+        "display": "3 spring onion green tops, sliced"
+      },
+      {
+        "food": "fdc-171016",
+        "grams": 10,
+        "display": "2 tsp toasted sesame oil"
+      },
+      {
+        "food": "fdc-172336",
+        "grams": 10,
+        "display": "2 tsp canola oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 2,
+        "display": "½ tsp salt"
+      }
+    ],
+    "steps": [
+      "Cook the rice in plenty of water until tender, about 15 minutes; drain.",
+      "Heat the canola oil in a wide pan over high heat. Add the chicken with the salt and cook, turning, until browned and cooked through, 6 to 8 minutes. Lift out.",
+      "Add the carrot and zucchini to the pan and stir-fry 3 minutes. Add the ginger and cook 30 seconds.",
+      "Return the chicken, add the sesame oil and spring onion tops, toss, and serve over the rice."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-herb-roasted-chicken-potatoes",
+    "name": "Herb-roasted chicken thighs with potatoes and carrots",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 4,
+    "active_min": 15,
+    "total_min": 55,
+    "skill": "beginner",
+    "equipment": [
+      "oven"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-171052",
+        "grams": 600,
+        "display": "600 g boneless chicken thighs"
+      },
+      {
+        "food": "fdc-170026",
+        "grams": 600,
+        "display": "600 g potatoes, cut into chunks"
+      },
+      {
+        "food": "fdc-2258586",
+        "grams": 300,
+        "display": "4 carrots, cut into chunks"
+      },
+      {
+        "food": "fdc-173473",
+        "grams": 4,
+        "display": "2 sprigs fresh rosemary, leaves chopped"
+      },
+      {
+        "food": "fdc-173470",
+        "grams": 3,
+        "display": "3 sprigs fresh thyme"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 30,
+        "display": "2 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      },
+      {
+        "food": "fdc-170931",
+        "grams": 1,
+        "display": "black pepper"
+      }
+    ],
+    "steps": [
+      "Heat the oven to 220 °C (425 °F).",
+      "Toss the potatoes and carrots with half the oil, half the salt, and the rosemary on a large baking tray. Roast 20 minutes.",
+      "Rub the chicken with the rest of the oil, salt, the thyme leaves, and pepper. Nestle among the vegetables and roast 25 to 30 minutes more, until the chicken reaches 74 °C (165 °F) and the potatoes are golden."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-cod-chive-butter-rice",
+    "name": "Baked cod with chive butter and rice",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 2,
+    "active_min": 10,
+    "total_min": 30,
+    "skill": "beginner",
+    "equipment": [
+      "oven",
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-174191",
+        "grams": 320,
+        "display": "2 cod fillets (320 g)"
+      },
+      {
+        "food": "fdc-173410",
+        "grams": 25,
+        "display": "2 tbsp butter, softened"
+      },
+      {
+        "food": "fdc-169994",
+        "grams": 8,
+        "display": "2 tbsp chives, snipped"
+      },
+      {
+        "food": "fdc-168877",
+        "grams": 150,
+        "display": "¾ cup white rice, uncooked"
+      },
+      {
+        "food": "fdc-747447",
+        "grams": 200,
+        "display": "200 g broccoli florets"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 2,
+        "display": "½ tsp salt"
+      },
+      {
+        "food": "fdc-170931",
+        "grams": 1,
+        "display": "black pepper"
+      }
+    ],
+    "steps": [
+      "Heat the oven to 200 °C (400 °F). Cook the rice in plenty of water until tender; drain.",
+      "Mix the butter with the chives and a pinch of salt.",
+      "Lay the cod in a baking dish, season with salt and pepper, and top with the chive butter. Bake 12 to 15 minutes until the fish flakes.",
+      "Steam the broccoli 4 minutes. Serve the fish over the rice with the broccoli and the melted butter spooned over."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-turkey-zucchini-patties",
+    "name": "Turkey and zucchini patties with cucumber salad",
+    "meal": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 4,
+    "active_min": 20,
+    "total_min": 35,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-174493",
+        "grams": 500,
+        "display": "500 g ground turkey"
+      },
+      {
+        "food": "fdc-169291",
+        "grams": 200,
+        "display": "1 zucchini, grated and squeezed dry"
+      },
+      {
+        "food": "fdc-171287",
+        "grams": 50,
+        "display": "1 egg"
+      },
+      {
+        "food": "fdc-790214",
+        "grams": 30,
+        "display": "3 tbsp white rice flour"
+      },
+      {
+        "food": "fdc-169994",
+        "grams": 10,
+        "display": "3 tbsp chives, snipped"
+      },
+      {
+        "food": "fdc-170923",
+        "grams": 2,
+        "display": "1 tsp ground cumin"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 20,
+        "display": "1½ tbsp olive oil"
+      },
+      {
+        "food": "fdc-2346406",
+        "grams": 300,
+        "display": "1 cucumber, sliced"
+      },
+      {
+        "food": "fdc-171322",
+        "grams": 1,
+        "display": "1 tsp dried dill"
+      }
+    ],
+    "steps": [
+      "Mix the turkey, zucchini, egg, rice flour, chives, cumin, and salt. Shape into 8 patties.",
+      "Heat the oil in a wide pan over medium heat. Cook the patties 5 to 6 minutes per side until browned and cooked through (74 °C / 165 °F).",
+      "Toss the cucumber with the dill and a pinch of salt. Serve alongside."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-quinoa-rainbow-bowl",
+    "name": "Quinoa bowl with roasted pepper, cucumber, and pumpkin seeds",
+    "meal": [
+      "lunch"
+    ],
+    "servings": 2,
+    "active_min": 10,
+    "total_min": 25,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "good",
+    "ingredients": [
+      {
+        "food": "fdc-168874",
+        "grams": 120,
+        "display": "⅔ cup quinoa, uncooked"
+      },
+      {
+        "food": "fdc-170110",
+        "grams": 150,
+        "display": "1 roasted red bell pepper, sliced"
+      },
+      {
+        "food": "fdc-2346406",
+        "grams": 150,
+        "display": "½ cucumber, diced"
+      },
+      {
+        "food": "fdc-2258586",
+        "grams": 80,
+        "display": "1 carrot, grated"
+      },
+      {
+        "food": "fdc-2515380",
+        "grams": 20,
+        "display": "2 tbsp pumpkin seeds"
+      },
+      {
+        "food": "fdc-172232",
+        "grams": 6,
+        "display": "a handful of fresh basil, torn"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 20,
+        "display": "1½ tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 2,
+        "display": "½ tsp salt"
+      }
+    ],
+    "steps": [
+      "Rinse the quinoa and simmer in 1½ cups water, covered, 15 minutes. Rest 5 minutes and fluff.",
+      "Toss the warm quinoa with the oil and salt, then fold in the pepper, cucumber, carrot, and basil.",
+      "Top with the pumpkin seeds."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-banana-oat-porridge",
+    "name": "Banana and chia porridge",
+    "meal": [
+      "breakfast"
+    ],
+    "servings": 1,
+    "active_min": 5,
+    "total_min": 10,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-2346396",
+        "grams": 45,
+        "display": "½ cup rolled oats"
+      },
+      {
+        "food": "lf-milk-whole",
+        "grams": 250,
+        "display": "1 cup lactose-free milk"
+      },
+      {
+        "food": "fdc-173944",
+        "grams": 100,
+        "display": "1 firm banana, sliced"
+      },
+      {
+        "food": "fdc-2710819",
+        "grams": 10,
+        "display": "2 tsp chia seeds"
+      },
+      {
+        "food": "fdc-171320",
+        "grams": 1,
+        "display": "¼ tsp cinnamon"
+      },
+      {
+        "food": "fdc-169661",
+        "grams": 10,
+        "display": "2 tsp maple syrup"
+      }
+    ],
+    "steps": [
+      "Simmer the oats, milk, and chia in a small pan, stirring, 4 to 5 minutes until thick.",
+      "Stir in the cinnamon. Top with the banana and maple syrup."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-blueberry-rice-flour-pancakes",
+    "name": "Blueberry pancakes (rice flour and oats)",
+    "meal": [
+      "breakfast"
+    ],
+    "servings": 2,
+    "active_min": 15,
+    "total_min": 20,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-790214",
+        "grams": 100,
+        "display": "¾ cup white rice flour"
+      },
+      {
+        "food": "fdc-2346396",
+        "grams": 40,
+        "display": "½ cup rolled oats"
+      },
+      {
+        "food": "fdc-172803",
+        "grams": 6,
+        "display": "1½ tsp baking powder"
+      },
+      {
+        "food": "fdc-171287",
+        "grams": 50,
+        "display": "1 egg"
+      },
+      {
+        "food": "lf-milk-whole",
+        "grams": 220,
+        "display": "1 cup lactose-free milk"
+      },
+      {
+        "food": "fdc-169661",
+        "grams": 20,
+        "display": "1 tbsp maple syrup, plus more to serve"
+      },
+      {
+        "food": "fdc-2346411",
+        "grams": 100,
+        "display": "⅔ cup blueberries"
+      },
+      {
+        "food": "fdc-172336",
+        "grams": 10,
+        "display": "2 tsp canola oil for the pan"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 1,
+        "display": "pinch of salt"
+      }
+    ],
+    "steps": [
+      "Whisk the rice flour, oats, baking powder, and salt. Whisk in the egg, milk, and maple syrup to a thick batter; rest 5 minutes.",
+      "Heat a little oil in a nonstick pan over medium heat. Pour ¼-cup rounds, scatter blueberries on top, and cook 2 minutes until bubbles form; flip and cook 1 to 2 minutes more.",
+      "Serve with extra maple syrup."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-chive-scrambled-eggs-rice-cakes",
+    "name": "Chive scrambled eggs on rice cakes",
+    "meal": [
+      "breakfast"
+    ],
+    "servings": 1,
+    "active_min": 5,
+    "total_min": 10,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-171287",
+        "grams": 100,
+        "display": "2 eggs"
+      },
+      {
+        "food": "fdc-169994",
+        "grams": 5,
+        "display": "1 tbsp chives, snipped"
+      },
+      {
+        "food": "fdc-173410",
+        "grams": 10,
+        "display": "2 tsp butter"
+      },
+      {
+        "food": "fdc-170251",
+        "grams": 18,
+        "display": "2 brown rice cakes"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 1,
+        "display": "pinch of salt"
+      },
+      {
+        "food": "fdc-170931",
+        "grams": 1,
+        "display": "black pepper"
+      }
+    ],
+    "steps": [
+      "Beat the eggs with the salt and chives.",
+      "Melt the butter in a small pan over low heat and stir the eggs slowly until just set.",
+      "Pile onto the rice cakes and finish with pepper."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-carrot-ginger-soup",
+    "name": "Carrot and ginger soup",
+    "meal": [
+      "lunch"
+    ],
+    "servings": 4,
+    "active_min": 15,
+    "total_min": 40,
+    "skill": "beginner",
+    "equipment": [
+      "stove",
+      "blender"
+    ],
+    "assembly_only": false,
+    "leftovers": "good",
+    "ingredients": [
+      {
+        "food": "fdc-2258586",
+        "grams": 600,
+        "display": "6 carrots, sliced"
+      },
+      {
+        "food": "fdc-170026",
+        "grams": 200,
+        "display": "1 potato, diced"
+      },
+      {
+        "food": "fdc-169231",
+        "grams": 20,
+        "display": "2 tbsp fresh ginger, chopped"
+      },
+      {
+        "food": "fdc-172884",
+        "grams": 1000,
+        "display": "4 cups homemade chicken stock without onion or garlic"
+      },
+      {
+        "food": "fdc-170173",
+        "grams": 120,
+        "display": "½ cup coconut milk"
+      },
+      {
+        "food": "fdc-172231",
+        "grams": 2,
+        "display": "½ tsp turmeric"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 15,
+        "display": "1 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      }
+    ],
+    "steps": [
+      "Warm the oil in a pot and cook the carrot, potato, and ginger 5 minutes.",
+      "Add the stock, turmeric, and salt. Simmer 20 minutes until the vegetables are soft.",
+      "Blend smooth, stir in the coconut milk, and reheat gently."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-pumpkin-coconut-soup",
+    "name": "Pumpkin and coconut soup with cumin",
+    "meal": [
+      "lunch"
+    ],
+    "servings": 4,
+    "active_min": 10,
+    "total_min": 30,
+    "skill": "beginner",
+    "equipment": [
+      "stove",
+      "blender"
+    ],
+    "assembly_only": false,
+    "leftovers": "good",
+    "ingredients": [
+      {
+        "food": "fdc-168450",
+        "grams": 800,
+        "display": "800 g pumpkin or squash, cubed (or 2 cans pumpkin purée)"
+      },
+      {
+        "food": "fdc-170173",
+        "grams": 200,
+        "display": "¾ cup coconut milk"
+      },
+      {
+        "food": "fdc-172884",
+        "grams": 700,
+        "display": "3 cups homemade chicken stock without onion or garlic"
+      },
+      {
+        "food": "fdc-169231",
+        "grams": 15,
+        "display": "1 tbsp fresh ginger, grated"
+      },
+      {
+        "food": "fdc-170923",
+        "grams": 2,
+        "display": "1 tsp ground cumin"
+      },
+      {
+        "food": "fdc-170005",
+        "grams": 20,
+        "display": "2 spring onion green tops, sliced"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 15,
+        "display": "1 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      }
+    ],
+    "steps": [
+      "Warm the oil in a pot; cook the ginger and cumin 1 minute.",
+      "Add the pumpkin, stock, and salt. Simmer 15 to 20 minutes until soft.",
+      "Blend smooth with the coconut milk. Serve with the spring onion tops on top."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-beef-broccoli-stir-fry",
+    "name": "Beef and broccoli stir-fry",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 3,
+    "active_min": 20,
+    "total_min": 35,
+    "skill": "comfortable",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-2514743",
+        "grams": 400,
+        "display": "400 g lean beef, thinly sliced"
+      },
+      {
+        "food": "fdc-747447",
+        "grams": 350,
+        "display": "350 g broccoli florets"
+      },
+      {
+        "food": "fdc-169231",
+        "grams": 15,
+        "display": "1 tbsp fresh ginger, grated"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 15,
+        "display": "1 tbsp garlic-infused olive oil"
+      },
+      {
+        "food": "fdc-171016",
+        "grams": 10,
+        "display": "2 tsp toasted sesame oil"
+      },
+      {
+        "food": "fdc-169698",
+        "grams": 8,
+        "display": "1 tbsp cornstarch"
+      },
+      {
+        "food": "fdc-173647",
+        "grams": 120,
+        "display": "½ cup water"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      },
+      {
+        "food": "fdc-168877",
+        "grams": 200,
+        "display": "1 cup white rice, uncooked"
+      }
+    ],
+    "steps": [
+      "Cook the rice. Toss the beef with the cornstarch and half the salt.",
+      "Heat the garlic-infused oil in a wok over high heat. Sear the beef in two batches, 2 minutes each; lift out.",
+      "Add the broccoli, ginger, and water. Cover and steam 3 minutes. Return the beef, add the sesame oil and remaining salt, and toss until glossy. Serve over the rice."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-baked-trout-dill-potatoes",
+    "name": "Baked trout with dill and buttered potatoes",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 2,
+    "active_min": 10,
+    "total_min": 35,
+    "skill": "beginner",
+    "equipment": [
+      "oven",
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-173717",
+        "grams": 300,
+        "display": "2 trout fillets (300 g)"
+      },
+      {
+        "food": "fdc-170026",
+        "grams": 400,
+        "display": "400 g small potatoes, halved"
+      },
+      {
+        "food": "fdc-173410",
+        "grams": 20,
+        "display": "1½ tbsp butter"
+      },
+      {
+        "food": "fdc-171322",
+        "grams": 2,
+        "display": "2 tsp dried dill (or 2 tbsp fresh)"
+      },
+      {
+        "food": "fdc-169994",
+        "grams": 6,
+        "display": "2 tbsp chives, snipped"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 10,
+        "display": "2 tsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 3,
+        "display": "½ tsp salt"
+      }
+    ],
+    "steps": [
+      "Heat the oven to 200 °C (400 °F). Boil the potatoes 15 minutes until tender; drain and toss with the butter and chives.",
+      "Lay the trout on a lined tray, brush with oil, and season with dill and salt. Bake 10 to 12 minutes until it flakes.",
+      "Serve together."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-chicken-rice-noodle-soup",
+    "name": "Chicken and rice noodle soup with chard",
+    "meal": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 4,
+    "active_min": 15,
+    "total_min": 35,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-171052",
+        "grams": 400,
+        "display": "400 g chicken breast, diced"
+      },
+      {
+        "food": "fdc-168914",
+        "grams": 300,
+        "display": "300 g cooked rice noodles"
+      },
+      {
+        "food": "fdc-2258586",
+        "grams": 150,
+        "display": "2 carrots, thinly sliced"
+      },
+      {
+        "food": "fdc-169991",
+        "grams": 150,
+        "display": "150 g chard leaves, shredded"
+      },
+      {
+        "food": "fdc-169231",
+        "grams": 15,
+        "display": "1 tbsp fresh ginger, sliced"
+      },
+      {
+        "food": "fdc-172884",
+        "grams": 1200,
+        "display": "5 cups homemade chicken stock without onion or garlic"
+      },
+      {
+        "food": "fdc-170005",
+        "grams": 30,
+        "display": "3 spring onion green tops, sliced"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      }
+    ],
+    "steps": [
+      "Bring the stock, ginger, and salt to a simmer. Add the chicken and carrot and simmer 8 minutes.",
+      "Add the chard and cook 2 minutes.",
+      "Divide the noodles between bowls, ladle over the soup, and top with the spring onion tops."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-cinnamon-rice-pudding",
+    "name": "Cinnamon rice pudding",
+    "meal": [
+      "snack"
+    ],
+    "servings": 4,
+    "active_min": 5,
+    "total_min": 40,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-168877",
+        "grams": 100,
+        "display": "½ cup short-grain white rice"
+      },
+      {
+        "food": "lf-milk-whole",
+        "grams": 600,
+        "display": "2½ cups lactose-free milk"
+      },
+      {
+        "food": "fdc-169661",
+        "grams": 40,
+        "display": "2 tbsp maple syrup"
+      },
+      {
+        "food": "fdc-171320",
+        "grams": 2,
+        "display": "½ tsp cinnamon"
+      },
+      {
+        "food": "fdc-170919",
+        "grams": 1,
+        "display": "¼ tsp ground cardamom"
+      },
+      {
+        "food": "fdc-173471",
+        "grams": 4,
+        "display": "1 tsp vanilla extract"
+      }
+    ],
+    "steps": [
+      "Simmer the rice and milk in a heavy pan, stirring often, 30 to 35 minutes until thick and creamy.",
+      "Stir in the maple syrup, cinnamon, cardamom, and vanilla. Serve warm or chilled."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-macadamia-oat-bars",
+    "name": "Macadamia and pumpkin seed oat bars",
+    "meal": [
+      "snack"
+    ],
+    "servings": 8,
+    "active_min": 10,
+    "total_min": 30,
+    "skill": "beginner",
+    "equipment": [
+      "oven"
+    ],
+    "assembly_only": false,
+    "leftovers": "good",
+    "ingredients": [
+      {
+        "food": "fdc-2346396",
+        "grams": 180,
+        "display": "2 cups rolled oats"
+      },
+      {
+        "food": "fdc-2515378",
+        "grams": 60,
+        "display": "½ cup macadamia nuts, chopped"
+      },
+      {
+        "food": "fdc-2515380",
+        "grams": 40,
+        "display": "¼ cup pumpkin seeds"
+      },
+      {
+        "food": "fdc-169661",
+        "grams": 80,
+        "display": "¼ cup maple syrup"
+      },
+      {
+        "food": "fdc-330458",
+        "grams": 50,
+        "display": "¼ cup coconut oil, melted"
+      },
+      {
+        "food": "fdc-2710819",
+        "grams": 15,
+        "display": "1 tbsp chia seeds"
+      },
+      {
+        "food": "fdc-171320",
+        "grams": 1,
+        "display": "½ tsp cinnamon"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 1,
+        "display": "pinch of salt"
+      }
+    ],
+    "steps": [
+      "Heat the oven to 180 °C (350 °F) and line a 20 cm square tin.",
+      "Mix everything, press firmly into the tin, and bake 20 minutes until golden at the edges.",
+      "Cool completely before cutting into 8 bars."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-egg-fried-rice",
+    "name": "Egg fried rice with carrot and spring onion tops",
+    "meal": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 2,
+    "active_min": 15,
+    "total_min": 20,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-168877",
+        "grams": 150,
+        "display": "¾ cup white rice, cooked and cooled"
+      },
+      {
+        "food": "fdc-171287",
+        "grams": 100,
+        "display": "2 eggs, beaten"
+      },
+      {
+        "food": "fdc-2258586",
+        "grams": 100,
+        "display": "1 carrot, finely diced"
+      },
+      {
+        "food": "fdc-170005",
+        "grams": 30,
+        "display": "3 spring onion green tops, sliced"
+      },
+      {
+        "food": "fdc-169231",
+        "grams": 8,
+        "display": "2 tsp fresh ginger, grated"
+      },
+      {
+        "food": "fdc-172336",
+        "grams": 15,
+        "display": "1 tbsp canola oil"
+      },
+      {
+        "food": "fdc-171016",
+        "grams": 5,
+        "display": "1 tsp toasted sesame oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 3,
+        "display": "½ tsp salt"
+      }
+    ],
+    "steps": [
+      "Heat the canola oil in a wok. Scramble the eggs, break up, and push aside.",
+      "Add the carrot and ginger; stir-fry 2 minutes. Add the rice and salt and fry, tossing, 3 minutes.",
+      "Finish with the sesame oil and spring onion tops."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-halibut-herb-quinoa",
+    "name": "Pan-seared halibut with herb quinoa",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 2,
+    "active_min": 15,
+    "total_min": 30,
+    "skill": "comfortable",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-174200",
+        "grams": 300,
+        "display": "2 halibut fillets (300 g)"
+      },
+      {
+        "food": "fdc-168874",
+        "grams": 120,
+        "display": "⅔ cup quinoa, uncooked"
+      },
+      {
+        "food": "fdc-170416",
+        "grams": 10,
+        "display": "¼ cup parsley, chopped"
+      },
+      {
+        "food": "fdc-172232",
+        "grams": 6,
+        "display": "a handful of basil, chopped"
+      },
+      {
+        "food": "fdc-169994",
+        "grams": 6,
+        "display": "2 tbsp chives, snipped"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 25,
+        "display": "2 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 3,
+        "display": "½ tsp salt"
+      },
+      {
+        "food": "fdc-170931",
+        "grams": 1,
+        "display": "black pepper"
+      }
+    ],
+    "steps": [
+      "Simmer the quinoa in 1½ cups water, covered, 15 minutes; rest, then fold in the herbs and half the oil.",
+      "Pat the fish dry, season, and sear in the remaining oil over medium-high heat 3 to 4 minutes per side.",
+      "Serve on the quinoa."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-rosemary-lamb-mash",
+    "name": "Rosemary lamb steaks with mashed potato",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 2,
+    "active_min": 15,
+    "total_min": 35,
+    "skill": "comfortable",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-172487",
+        "grams": 300,
+        "display": "2 lamb leg steaks (300 g)"
+      },
+      {
+        "food": "fdc-170026",
+        "grams": 500,
+        "display": "500 g potatoes, peeled and cubed"
+      },
+      {
+        "food": "fdc-173410",
+        "grams": 20,
+        "display": "1½ tbsp butter"
+      },
+      {
+        "food": "lf-milk-whole",
+        "grams": 60,
+        "display": "¼ cup lactose-free milk"
+      },
+      {
+        "food": "fdc-173473",
+        "grams": 3,
+        "display": "1 sprig rosemary, chopped"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 10,
+        "display": "2 tsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      },
+      {
+        "food": "fdc-170931",
+        "grams": 1,
+        "display": "black pepper"
+      }
+    ],
+    "steps": [
+      "Boil the potatoes 15 minutes until soft; mash with the butter, milk, and half the salt.",
+      "Rub the lamb with oil, rosemary, salt, and pepper. Sear in a hot pan 3 to 4 minutes per side; rest 5 minutes.",
+      "Serve with the mash."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-melon-grape-cups",
+    "name": "Melon, grape, and blueberry fruit cups",
+    "meal": [
+      "snack"
+    ],
+    "servings": 2,
+    "active_min": 10,
+    "total_min": 10,
+    "skill": "beginner",
+    "equipment": [
+      "none"
+    ],
+    "assembly_only": true,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-746770",
+        "grams": 150,
+        "display": "1 cup cantaloupe, cubed"
+      },
+      {
+        "food": "fdc-2710816",
+        "grams": 150,
+        "display": "1 cup honeydew, cubed"
+      },
+      {
+        "food": "fdc-2346412",
+        "grams": 100,
+        "display": "⅔ cup grapes, halved"
+      },
+      {
+        "food": "fdc-2346411",
+        "grams": 80,
+        "display": "½ cup blueberries"
+      }
+    ],
+    "steps": [
+      "Toss the fruit together and chill briefly."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-chicken-tacos-corn-tortillas",
+    "name": "Cumin chicken tacos on corn tortillas",
+    "meal": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 3,
+    "active_min": 20,
+    "total_min": 30,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-171052",
+        "grams": 450,
+        "display": "450 g chicken breast, sliced"
+      },
+      {
+        "food": "fdc-173241",
+        "grams": 150,
+        "display": "6 corn tortillas"
+      },
+      {
+        "food": "fdc-170110",
+        "grams": 150,
+        "display": "1 red bell pepper, sliced"
+      },
+      {
+        "food": "fdc-2346389",
+        "grams": 100,
+        "display": "2 cups romaine, shredded"
+      },
+      {
+        "food": "fdc-169997",
+        "grams": 8,
+        "display": "a handful of cilantro"
+      },
+      {
+        "food": "fdc-170923",
+        "grams": 3,
+        "display": "1½ tsp ground cumin"
+      },
+      {
+        "food": "fdc-171329",
+        "grams": 2,
+        "display": "1 tsp paprika"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 15,
+        "display": "1 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 3,
+        "display": "½ tsp salt"
+      }
+    ],
+    "steps": [
+      "Toss the chicken with cumin, paprika, and salt. Cook in the oil over high heat 6 to 8 minutes with the pepper until done.",
+      "Warm the tortillas in a dry pan.",
+      "Fill with chicken, romaine, and cilantro."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-banana-oat-muffins",
+    "name": "Banana oat muffins",
+    "meal": [
+      "breakfast",
+      "snack"
+    ],
+    "servings": 10,
+    "active_min": 15,
+    "total_min": 35,
+    "skill": "beginner",
+    "equipment": [
+      "oven"
+    ],
+    "assembly_only": false,
+    "leftovers": "good",
+    "ingredients": [
+      {
+        "food": "fdc-2346396",
+        "grams": 150,
+        "display": "1⅔ cups rolled oats"
+      },
+      {
+        "food": "fdc-790214",
+        "grams": 100,
+        "display": "¾ cup white rice flour"
+      },
+      {
+        "food": "fdc-173944",
+        "grams": 250,
+        "display": "2 firm bananas, mashed"
+      },
+      {
+        "food": "fdc-171287",
+        "grams": 100,
+        "display": "2 eggs"
+      },
+      {
+        "food": "fdc-169661",
+        "grams": 60,
+        "display": "3 tbsp maple syrup"
+      },
+      {
+        "food": "fdc-172336",
+        "grams": 50,
+        "display": "¼ cup canola oil"
+      },
+      {
+        "food": "fdc-172803",
+        "grams": 8,
+        "display": "2 tsp baking powder"
+      },
+      {
+        "food": "fdc-171320",
+        "grams": 2,
+        "display": "1 tsp cinnamon"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 1,
+        "display": "pinch of salt"
+      }
+    ],
+    "steps": [
+      "Heat the oven to 180 °C (350 °F) and line a 10-hole muffin tin.",
+      "Mix the dry ingredients. Whisk the banana, eggs, maple, and oil; fold together.",
+      "Fill the cases and bake 20 to 22 minutes until springy."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-chicken-veg-skewers-rice",
+    "name": "Oregano chicken and vegetable skewers with rice",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 3,
+    "active_min": 20,
+    "total_min": 35,
+    "skill": "beginner",
+    "equipment": [
+      "oven",
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-171052",
+        "grams": 450,
+        "display": "450 g chicken breast, cubed"
+      },
+      {
+        "food": "fdc-169291",
+        "grams": 200,
+        "display": "1 zucchini, thick slices"
+      },
+      {
+        "food": "fdc-170110",
+        "grams": 150,
+        "display": "1 red bell pepper, chunks"
+      },
+      {
+        "food": "fdc-171328",
+        "grams": 2,
+        "display": "1 tsp dried oregano"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 25,
+        "display": "2 tbsp olive oil"
+      },
+      {
+        "food": "fdc-168877",
+        "grams": 200,
+        "display": "1 cup white rice, uncooked"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      },
+      {
+        "food": "fdc-170931",
+        "grams": 1,
+        "display": "black pepper"
+      }
+    ],
+    "steps": [
+      "Toss the chicken and vegetables with oil, oregano, salt, and pepper. Thread onto skewers.",
+      "Grill or bake at 220 °C (425 °F) 15 to 18 minutes, turning once, until the chicken reaches 74 °C (165 °F).",
+      "Serve over rice."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-kale-potato-frittata",
+    "name": "Kale and potato frittata",
+    "meal": [
+      "breakfast",
+      "lunch"
+    ],
+    "servings": 4,
+    "active_min": 15,
+    "total_min": 35,
+    "skill": "beginner",
+    "equipment": [
+      "stove",
+      "oven"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-171287",
+        "grams": 400,
+        "display": "8 eggs"
+      },
+      {
+        "food": "fdc-170026",
+        "grams": 300,
+        "display": "2 potatoes, thinly sliced"
+      },
+      {
+        "food": "fdc-323505",
+        "grams": 100,
+        "display": "2 cups kale, shredded"
+      },
+      {
+        "food": "fdc-169994",
+        "grams": 8,
+        "display": "3 tbsp chives, snipped"
+      },
+      {
+        "food": "fdc-170845",
+        "grams": 80,
+        "display": "80 g fresh mozzarella, torn"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 20,
+        "display": "1½ tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      },
+      {
+        "food": "fdc-170931",
+        "grams": 1,
+        "display": "black pepper"
+      }
+    ],
+    "steps": [
+      "Cook the potato slices in the oil in an ovenproof pan over medium heat, covered, 10 minutes until tender. Add the kale and cook 2 minutes.",
+      "Beat the eggs with chives, salt, and pepper; pour over. Scatter the mozzarella.",
+      "Cook 5 minutes on the stove, then finish under a hot grill or in a 200 °C oven 8 to 10 minutes until set."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-turkey-rice-soup",
+    "name": "Turkey, carrot, and rice soup",
+    "meal": [
+      "lunch"
+    ],
+    "servings": 4,
+    "active_min": 15,
+    "total_min": 40,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-174493",
+        "grams": 400,
+        "display": "400 g ground turkey"
+      },
+      {
+        "food": "fdc-168877",
+        "grams": 100,
+        "display": "½ cup white rice"
+      },
+      {
+        "food": "fdc-2258586",
+        "grams": 200,
+        "display": "3 carrots, diced"
+      },
+      {
+        "food": "fdc-169291",
+        "grams": 150,
+        "display": "1 zucchini, diced"
+      },
+      {
+        "food": "fdc-172884",
+        "grams": 1200,
+        "display": "5 cups homemade chicken stock without onion or garlic"
+      },
+      {
+        "food": "fdc-173470",
+        "grams": 2,
+        "display": "2 sprigs thyme"
+      },
+      {
+        "food": "fdc-170917",
+        "grams": 1,
+        "display": "1 bay leaf"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 15,
+        "display": "1 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      }
+    ],
+    "steps": [
+      "Brown the turkey in the oil, breaking it up.",
+      "Add the carrot, stock, rice, thyme, bay, and salt. Simmer 20 minutes.",
+      "Add the zucchini and cook 5 minutes more. Remove the bay leaf."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-coconut-chia-pudding",
+    "name": "Coconut chia pudding with blueberries",
+    "meal": [
+      "breakfast",
+      "snack"
+    ],
+    "servings": 2,
+    "active_min": 5,
+    "total_min": 5,
+    "skill": "beginner",
+    "equipment": [
+      "none"
+    ],
+    "assembly_only": true,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-2710819",
+        "grams": 40,
+        "display": "¼ cup chia seeds"
+      },
+      {
+        "food": "fdc-170173",
+        "grams": 250,
+        "display": "1 cup coconut milk"
+      },
+      {
+        "food": "fdc-169661",
+        "grams": 20,
+        "display": "1 tbsp maple syrup"
+      },
+      {
+        "food": "fdc-173471",
+        "grams": 2,
+        "display": "½ tsp vanilla extract"
+      },
+      {
+        "food": "fdc-2346411",
+        "grams": 100,
+        "display": "⅔ cup blueberries"
+      }
+    ],
+    "steps": [
+      "Stir the chia, coconut milk, maple, and vanilla. Refrigerate at least 2 hours or overnight.",
+      "Top with blueberries."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lfh-baked-cod-carrots-rice",
+    "name": "Baked cod with glazed carrots and parsley rice",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 2,
+    "active_min": 10,
+    "total_min": 35,
+    "skill": "beginner",
+    "equipment": [
+      "oven",
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-174191",
+        "grams": 320,
+        "display": "2 cod fillets (320 g)"
+      },
+      {
+        "food": "fdc-2258586",
+        "grams": 250,
+        "display": "3 carrots, sliced"
+      },
+      {
+        "food": "fdc-168877",
+        "grams": 150,
+        "display": "¾ cup white rice, uncooked"
+      },
+      {
+        "food": "fdc-173410",
+        "grams": 20,
+        "display": "1½ tbsp butter"
+      },
+      {
+        "food": "fdc-169661",
+        "grams": 10,
+        "display": "2 tsp maple syrup"
+      },
+      {
+        "food": "fdc-170416",
+        "grams": 8,
+        "display": "3 tbsp parsley, chopped"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 3,
+        "display": "½ tsp salt"
+      }
+    ],
+    "steps": [
+      "Cook the rice; fold in half the butter and the parsley.",
+      "Simmer the carrots in a little water with the rest of the butter and the maple syrup until tender and glazed, about 10 minutes.",
+      "Bake the cod, seasoned with salt, at 200 °C (400 °F) 12 to 15 minutes. Serve together."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap",
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists.",
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lf-tomato-basil-gf-pasta",
+    "name": "Tomato and basil gluten-free pasta with parmesan",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 2,
+    "active_min": 10,
+    "total_min": 25,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-168899",
+        "grams": 160,
+        "display": "160 g gluten-free corn and rice pasta"
+      },
+      {
+        "food": "fdc-170457",
+        "grams": 400,
+        "display": "4 ripe tomatoes, chopped"
+      },
+      {
+        "food": "fdc-172232",
+        "grams": 10,
+        "display": "a big handful of basil"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 20,
+        "display": "1½ tbsp garlic-infused olive oil"
+      },
+      {
+        "food": "fdc-173431",
+        "grams": 30,
+        "display": "¼ cup parmesan, grated"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 3,
+        "display": "½ tsp salt"
+      },
+      {
+        "food": "fdc-170931",
+        "grams": 1,
+        "display": "black pepper"
+      }
+    ],
+    "steps": [
+      "Cook the pasta a minute less than the packet says; drain, keeping a splash of water.",
+      "Warm the garlic-infused oil, add the tomatoes and salt, and cook 8 minutes to a loose sauce.",
+      "Toss with the pasta, basil, and parmesan, loosening with the pasta water."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-spinach-feta-omelette",
+    "name": "Spinach and feta omelette",
+    "meal": [
+      "breakfast",
+      "lunch"
+    ],
+    "servings": 1,
+    "active_min": 10,
+    "total_min": 10,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-171287",
+        "grams": 100,
+        "display": "2 eggs"
+      },
+      {
+        "food": "fdc-168463",
+        "grams": 60,
+        "display": "2 handfuls baby spinach"
+      },
+      {
+        "food": "fdc-2259796",
+        "grams": 30,
+        "display": "30 g feta, crumbled"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 10,
+        "display": "2 tsp olive oil"
+      },
+      {
+        "food": "fdc-169994",
+        "grams": 4,
+        "display": "1 tbsp chives"
+      },
+      {
+        "food": "fdc-170931",
+        "grams": 1,
+        "display": "black pepper"
+      }
+    ],
+    "steps": [
+      "Wilt the spinach in the oil; push to one side.",
+      "Pour in the beaten eggs, cook until nearly set, scatter feta and chives, fold, and serve."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-tuna-rice-salad",
+    "name": "Tuna and rice salad with lemon",
+    "meal": [
+      "lunch"
+    ],
+    "servings": 2,
+    "active_min": 15,
+    "total_min": 15,
+    "skill": "beginner",
+    "equipment": [
+      "none"
+    ],
+    "assembly_only": true,
+    "leftovers": "good",
+    "ingredients": [
+      {
+        "food": "fdc-334194",
+        "grams": 150,
+        "display": "1 can tuna in water, drained"
+      },
+      {
+        "food": "fdc-168877",
+        "grams": 150,
+        "display": "2 cups cooked white rice, cooled"
+      },
+      {
+        "food": "fdc-2346406",
+        "grams": 150,
+        "display": "½ cucumber, diced"
+      },
+      {
+        "food": "fdc-170110",
+        "grams": 100,
+        "display": "1 roasted red pepper, diced"
+      },
+      {
+        "food": "fdc-167747",
+        "grams": 20,
+        "display": "1½ tbsp lemon juice"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 20,
+        "display": "1½ tbsp olive oil"
+      },
+      {
+        "food": "fdc-169994",
+        "grams": 6,
+        "display": "2 tbsp chives"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 2,
+        "display": "¼ tsp salt"
+      }
+    ],
+    "steps": [
+      "Flake the tuna into the rice. Add the cucumber, pepper, and chives.",
+      "Dress with lemon, oil, and salt."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-lemon-herb-baked-chicken",
+    "name": "Lemon and oregano baked chicken with potatoes",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 4,
+    "active_min": 15,
+    "total_min": 55,
+    "skill": "beginner",
+    "equipment": [
+      "oven"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-171052",
+        "grams": 600,
+        "display": "600 g chicken thighs"
+      },
+      {
+        "food": "fdc-170026",
+        "grams": 700,
+        "display": "700 g potatoes, wedges"
+      },
+      {
+        "food": "fdc-167747",
+        "grams": 40,
+        "display": "juice of 1 lemon"
+      },
+      {
+        "food": "fdc-171328",
+        "grams": 3,
+        "display": "1½ tsp dried oregano"
+      },
+      {
+        "food": "fdc-173470",
+        "grams": 3,
+        "display": "3 sprigs thyme"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 30,
+        "display": "2 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 5,
+        "display": "1 tsp salt"
+      },
+      {
+        "food": "fdc-170931",
+        "grams": 1,
+        "display": "black pepper"
+      }
+    ],
+    "steps": [
+      "Toss everything together in a roasting tin.",
+      "Roast at 200 °C (400 °F) 45 to 50 minutes, turning once, until the chicken is cooked through and the potatoes are crisp."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-greek-salad-feta",
+    "name": "Greek-style salad with feta",
+    "meal": [
+      "lunch"
+    ],
+    "servings": 2,
+    "active_min": 10,
+    "total_min": 10,
+    "skill": "beginner",
+    "equipment": [
+      "none"
+    ],
+    "assembly_only": true,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-2346406",
+        "grams": 250,
+        "display": "1 cucumber, chunks"
+      },
+      {
+        "food": "fdc-170457",
+        "grams": 250,
+        "display": "2 tomatoes, wedges"
+      },
+      {
+        "food": "fdc-170110",
+        "grams": 100,
+        "display": "1 roasted red pepper, sliced"
+      },
+      {
+        "food": "fdc-2259796",
+        "grams": 60,
+        "display": "60 g feta, cubed"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 25,
+        "display": "2 tbsp olive oil"
+      },
+      {
+        "food": "fdc-167747",
+        "grams": 15,
+        "display": "1 tbsp lemon juice"
+      },
+      {
+        "food": "fdc-171328",
+        "grams": 1,
+        "display": "½ tsp dried oregano"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 1,
+        "display": "pinch of salt"
+      }
+    ],
+    "steps": [
+      "Toss the vegetables with oil, lemon, oregano, and salt.",
+      "Top with the feta."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-shrimp-rice-noodle-stir-fry",
+    "name": "Shrimp and rice noodle stir-fry",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 2,
+    "active_min": 20,
+    "total_min": 25,
+    "skill": "comfortable",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-171971",
+        "grams": 250,
+        "display": "250 g shrimp, peeled"
+      },
+      {
+        "food": "fdc-168914",
+        "grams": 250,
+        "display": "250 g cooked rice noodles"
+      },
+      {
+        "food": "fdc-170110",
+        "grams": 150,
+        "display": "1 red bell pepper, sliced"
+      },
+      {
+        "food": "fdc-169231",
+        "grams": 12,
+        "display": "1 tbsp fresh ginger, grated"
+      },
+      {
+        "food": "fdc-170005",
+        "grams": 30,
+        "display": "3 spring onion green tops, sliced"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 15,
+        "display": "1 tbsp garlic-infused olive oil"
+      },
+      {
+        "food": "fdc-171016",
+        "grams": 8,
+        "display": "1½ tsp toasted sesame oil"
+      },
+      {
+        "food": "fdc-167747",
+        "grams": 15,
+        "display": "1 tbsp lemon juice"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 3,
+        "display": "½ tsp salt"
+      }
+    ],
+    "steps": [
+      "Stir-fry the pepper and ginger in the garlic-infused oil 2 minutes.",
+      "Add the shrimp and salt; cook 3 minutes until pink.",
+      "Add the noodles, sesame oil, lemon, and spring onion tops; toss to heat through."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-peanut-butter-banana-oats",
+    "name": "Peanut butter and banana overnight oats",
+    "meal": [
+      "breakfast"
+    ],
+    "servings": 1,
+    "active_min": 5,
+    "total_min": 5,
+    "skill": "beginner",
+    "equipment": [
+      "none"
+    ],
+    "assembly_only": true,
+    "leftovers": "good",
+    "ingredients": [
+      {
+        "food": "fdc-2346396",
+        "grams": 45,
+        "display": "½ cup rolled oats"
+      },
+      {
+        "food": "lf-milk-whole",
+        "grams": 200,
+        "display": "¾ cup lactose-free milk"
+      },
+      {
+        "food": "fdc-172470",
+        "grams": 16,
+        "display": "1 tbsp peanut butter"
+      },
+      {
+        "food": "fdc-173944",
+        "grams": 100,
+        "display": "1 firm banana, sliced"
+      },
+      {
+        "food": "fdc-2710819",
+        "grams": 8,
+        "display": "1½ tsp chia seeds"
+      },
+      {
+        "food": "fdc-169661",
+        "grams": 7,
+        "display": "1 tsp maple syrup"
+      }
+    ],
+    "steps": [
+      "Stir the oats, milk, peanut butter, chia, and maple in a jar. Chill overnight.",
+      "Top with banana."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-strawberry-yogurt-parfait",
+    "name": "Strawberry and lactose-free yogurt parfait",
+    "meal": [
+      "breakfast",
+      "snack"
+    ],
+    "servings": 1,
+    "active_min": 5,
+    "total_min": 5,
+    "skill": "beginner",
+    "equipment": [
+      "none"
+    ],
+    "assembly_only": true,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "lf-yogurt-plain",
+        "grams": 170,
+        "display": "¾ cup lactose-free plain yogurt"
+      },
+      {
+        "food": "fdc-2346409",
+        "grams": 120,
+        "display": "¾ cup strawberries, sliced"
+      },
+      {
+        "food": "fdc-2346396",
+        "grams": 30,
+        "display": "⅓ cup rolled oats, toasted"
+      },
+      {
+        "food": "fdc-169661",
+        "grams": 10,
+        "display": "2 tsp maple syrup"
+      }
+    ],
+    "steps": [
+      "Layer yogurt, strawberries, and oats. Drizzle with maple."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-cheddar-potato-bake",
+    "name": "Cheddar and chive potato bake",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 4,
+    "active_min": 15,
+    "total_min": 60,
+    "skill": "beginner",
+    "equipment": [
+      "oven",
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "good",
+    "ingredients": [
+      {
+        "food": "fdc-170026",
+        "grams": 900,
+        "display": "900 g potatoes, thinly sliced"
+      },
+      {
+        "food": "fdc-328637",
+        "grams": 120,
+        "display": "1 cup cheddar, grated"
+      },
+      {
+        "food": "lf-milk-whole",
+        "grams": 300,
+        "display": "1¼ cups lactose-free milk"
+      },
+      {
+        "food": "fdc-173410",
+        "grams": 20,
+        "display": "1½ tbsp butter"
+      },
+      {
+        "food": "fdc-169994",
+        "grams": 10,
+        "display": "3 tbsp chives"
+      },
+      {
+        "food": "fdc-171326",
+        "grams": 1,
+        "display": "pinch of nutmeg"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      },
+      {
+        "food": "fdc-170931",
+        "grams": 1,
+        "display": "black pepper"
+      }
+    ],
+    "steps": [
+      "Layer the potatoes in a buttered dish with salt, pepper, chives, and most of the cheese.",
+      "Warm the milk with the nutmeg and pour over. Top with the rest of the cheese.",
+      "Bake at 190 °C (375 °F) 45 to 50 minutes until tender and golden."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-orange-ginger-chicken-bowl",
+    "name": "Orange and ginger chicken rice bowl",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 2,
+    "active_min": 20,
+    "total_min": 30,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-171052",
+        "grams": 300,
+        "display": "300 g chicken breast, sliced"
+      },
+      {
+        "food": "fdc-169097",
+        "grams": 150,
+        "display": "1 orange, segments and juice"
+      },
+      {
+        "food": "fdc-169231",
+        "grams": 12,
+        "display": "1 tbsp fresh ginger, grated"
+      },
+      {
+        "food": "fdc-2258586",
+        "grams": 120,
+        "display": "2 carrots, sliced"
+      },
+      {
+        "food": "fdc-168877",
+        "grams": 150,
+        "display": "¾ cup white rice, uncooked"
+      },
+      {
+        "food": "fdc-170150",
+        "grams": 8,
+        "display": "1 tbsp sesame seeds"
+      },
+      {
+        "food": "fdc-172336",
+        "grams": 15,
+        "display": "1 tbsp canola oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 3,
+        "display": "½ tsp salt"
+      }
+    ],
+    "steps": [
+      "Cook the rice. Brown the chicken in the oil with the salt; add the carrot and ginger and cook 4 minutes.",
+      "Add the orange segments and juice; bubble 2 minutes.",
+      "Serve over rice with sesame seeds."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-carrot-walnut-muffins",
+    "name": "Carrot and walnut muffins",
+    "meal": [
+      "breakfast",
+      "snack"
+    ],
+    "servings": 10,
+    "active_min": 15,
+    "total_min": 35,
+    "skill": "beginner",
+    "equipment": [
+      "oven"
+    ],
+    "assembly_only": false,
+    "leftovers": "good",
+    "ingredients": [
+      {
+        "food": "fdc-790214",
+        "grams": 150,
+        "display": "1 cup white rice flour"
+      },
+      {
+        "food": "fdc-2346396",
+        "grams": 80,
+        "display": "¾ cup rolled oats"
+      },
+      {
+        "food": "fdc-2258586",
+        "grams": 200,
+        "display": "2 carrots, grated"
+      },
+      {
+        "food": "fdc-170187",
+        "grams": 50,
+        "display": "½ cup walnuts, chopped"
+      },
+      {
+        "food": "fdc-171287",
+        "grams": 100,
+        "display": "2 eggs"
+      },
+      {
+        "food": "fdc-169661",
+        "grams": 80,
+        "display": "¼ cup maple syrup"
+      },
+      {
+        "food": "fdc-172336",
+        "grams": 60,
+        "display": "¼ cup canola oil"
+      },
+      {
+        "food": "fdc-172803",
+        "grams": 8,
+        "display": "2 tsp baking powder"
+      },
+      {
+        "food": "fdc-171320",
+        "grams": 3,
+        "display": "1½ tsp cinnamon"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 1,
+        "display": "pinch of salt"
+      }
+    ],
+    "steps": [
+      "Mix the dry ingredients. Whisk the eggs, maple, and oil; fold in with the carrot and walnuts.",
+      "Bake in a lined tin at 180 °C (350 °F) 20 to 22 minutes."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-mustard-maple-salmon",
+    "name": "Mustard and maple salmon with kale and potatoes",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 2,
+    "active_min": 10,
+    "total_min": 30,
+    "skill": "beginner",
+    "equipment": [
+      "oven",
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-171998",
+        "grams": 300,
+        "display": "2 salmon fillets (300 g)"
+      },
+      {
+        "food": "fdc-172234",
+        "grams": 15,
+        "display": "1 tbsp mustard"
+      },
+      {
+        "food": "fdc-169661",
+        "grams": 15,
+        "display": "1 tbsp maple syrup"
+      },
+      {
+        "food": "fdc-170026",
+        "grams": 400,
+        "display": "400 g potatoes, halved"
+      },
+      {
+        "food": "fdc-323505",
+        "grams": 120,
+        "display": "3 cups kale, shredded"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 15,
+        "display": "1 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 3,
+        "display": "½ tsp salt"
+      }
+    ],
+    "steps": [
+      "Boil the potatoes 15 minutes. Brush the salmon with the mustard and maple and bake at 200 °C (400 °F) 12 minutes.",
+      "Sauté the kale in the oil with salt 3 minutes. Serve together."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-pineapple-chicken-skewers",
+    "name": "Pineapple and ginger chicken skewers",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 3,
+    "active_min": 20,
+    "total_min": 35,
+    "skill": "beginner",
+    "equipment": [
+      "oven"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-171052",
+        "grams": 450,
+        "display": "450 g chicken breast, cubed"
+      },
+      {
+        "food": "fdc-2346398",
+        "grams": 200,
+        "display": "1½ cups fresh pineapple, chunks"
+      },
+      {
+        "food": "fdc-170110",
+        "grams": 150,
+        "display": "1 red bell pepper, chunks"
+      },
+      {
+        "food": "fdc-169231",
+        "grams": 10,
+        "display": "2 tsp fresh ginger, grated"
+      },
+      {
+        "food": "fdc-171016",
+        "grams": 10,
+        "display": "2 tsp toasted sesame oil"
+      },
+      {
+        "food": "fdc-172336",
+        "grams": 10,
+        "display": "2 tsp canola oil"
+      },
+      {
+        "food": "fdc-168877",
+        "grams": 200,
+        "display": "1 cup white rice, uncooked"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      }
+    ],
+    "steps": [
+      "Toss the chicken with ginger, oils, and salt. Thread with pineapple and pepper.",
+      "Bake at 220 °C (425 °F) 15 to 18 minutes, turning once. Serve over rice."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-caprese-gf-pasta-salad",
+    "name": "Caprese gluten-free pasta salad",
+    "meal": [
+      "lunch"
+    ],
+    "servings": 3,
+    "active_min": 15,
+    "total_min": 25,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "good",
+    "ingredients": [
+      {
+        "food": "fdc-168899",
+        "grams": 200,
+        "display": "200 g gluten-free corn and rice pasta"
+      },
+      {
+        "food": "fdc-170457",
+        "grams": 300,
+        "display": "2 cups cherry tomatoes, halved"
+      },
+      {
+        "food": "fdc-170845",
+        "grams": 125,
+        "display": "125 g fresh mozzarella, torn"
+      },
+      {
+        "food": "fdc-172232",
+        "grams": 10,
+        "display": "a big handful of basil"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 30,
+        "display": "2 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 3,
+        "display": "½ tsp salt"
+      },
+      {
+        "food": "fdc-170931",
+        "grams": 1,
+        "display": "black pepper"
+      }
+    ],
+    "steps": [
+      "Cook the pasta, drain, and cool under running water.",
+      "Toss with tomatoes, mozzarella, basil, oil, salt, and pepper."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-raspberry-chia-jam-rice-cakes",
+    "name": "Raspberry chia jam on rice cakes with peanut butter",
+    "meal": [
+      "snack"
+    ],
+    "servings": 4,
+    "active_min": 10,
+    "total_min": 25,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "good",
+    "ingredients": [
+      {
+        "food": "fdc-2346410",
+        "grams": 200,
+        "display": "1½ cups raspberries"
+      },
+      {
+        "food": "fdc-2710819",
+        "grams": 20,
+        "display": "2 tbsp chia seeds"
+      },
+      {
+        "food": "fdc-169661",
+        "grams": 20,
+        "display": "1 tbsp maple syrup"
+      },
+      {
+        "food": "fdc-170251",
+        "grams": 36,
+        "display": "4 brown rice cakes"
+      },
+      {
+        "food": "fdc-172470",
+        "grams": 32,
+        "display": "2 tbsp peanut butter"
+      }
+    ],
+    "steps": [
+      "Simmer the raspberries 5 minutes, mash, stir in the chia and maple, and cool 15 minutes to set.",
+      "Spread the rice cakes with peanut butter and top with the jam."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-tomato-rice-soup",
+    "name": "Tomato and rice soup with basil",
+    "meal": [
+      "lunch"
+    ],
+    "servings": 4,
+    "active_min": 10,
+    "total_min": 35,
+    "skill": "beginner",
+    "equipment": [
+      "stove",
+      "blender"
+    ],
+    "assembly_only": false,
+    "leftovers": "good",
+    "ingredients": [
+      {
+        "food": "fdc-170457",
+        "grams": 800,
+        "display": "800 g ripe tomatoes, chopped"
+      },
+      {
+        "food": "fdc-168877",
+        "grams": 80,
+        "display": "⅓ cup white rice"
+      },
+      {
+        "food": "fdc-172884",
+        "grams": 800,
+        "display": "3½ cups homemade chicken stock without onion or garlic"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 20,
+        "display": "1½ tbsp garlic-infused olive oil"
+      },
+      {
+        "food": "fdc-172232",
+        "grams": 10,
+        "display": "a handful of basil"
+      },
+      {
+        "food": "fdc-173431",
+        "grams": 30,
+        "display": "¼ cup parmesan, grated"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      }
+    ],
+    "steps": [
+      "Cook the tomatoes in the garlic-infused oil with salt 10 minutes. Add the stock and rice; simmer 20 minutes.",
+      "Blend half for body, stir back, and serve with basil and parmesan."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-spinach-egg-breakfast-wrap",
+    "name": "Spinach and cheddar egg wrap",
+    "meal": [
+      "breakfast"
+    ],
+    "servings": 1,
+    "active_min": 10,
+    "total_min": 10,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-173241",
+        "grams": 50,
+        "display": "2 corn tortillas"
+      },
+      {
+        "food": "fdc-171287",
+        "grams": 100,
+        "display": "2 eggs"
+      },
+      {
+        "food": "fdc-168463",
+        "grams": 50,
+        "display": "a handful of baby spinach"
+      },
+      {
+        "food": "fdc-328637",
+        "grams": 25,
+        "display": "¼ cup cheddar, grated"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 5,
+        "display": "1 tsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 1,
+        "display": "pinch of salt"
+      }
+    ],
+    "steps": [
+      "Scramble the eggs with the spinach in the oil; season.",
+      "Warm the tortillas, fill with eggs and cheddar, and roll."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lf-parmesan-polenta-roasted-veg",
+    "name": "Parmesan polenta with roasted zucchini, pepper, and tomato",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 3,
+    "active_min": 15,
+    "total_min": 40,
+    "skill": "comfortable",
+    "equipment": [
+      "oven",
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "ok",
+    "ingredients": [
+      {
+        "food": "fdc-169697",
+        "grams": 150,
+        "display": "1 cup cornmeal (polenta)"
+      },
+      {
+        "food": "fdc-173647",
+        "grams": 800,
+        "display": "3½ cups water"
+      },
+      {
+        "food": "fdc-173431",
+        "grams": 40,
+        "display": "⅓ cup parmesan, grated"
+      },
+      {
+        "food": "fdc-173410",
+        "grams": 20,
+        "display": "1½ tbsp butter"
+      },
+      {
+        "food": "fdc-169291",
+        "grams": 250,
+        "display": "1 large zucchini, chunks"
+      },
+      {
+        "food": "fdc-170110",
+        "grams": 150,
+        "display": "1 red bell pepper, chunks"
+      },
+      {
+        "food": "fdc-170457",
+        "grams": 250,
+        "display": "2 tomatoes, wedges"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 20,
+        "display": "1½ tbsp olive oil"
+      },
+      {
+        "food": "fdc-171328",
+        "grams": 2,
+        "display": "1 tsp dried oregano"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 5,
+        "display": "1 tsp salt"
+      }
+    ],
+    "steps": [
+      "Roast the vegetables with oil, oregano, and half the salt at 220 °C (425 °F) 25 minutes.",
+      "Whisk the cornmeal into simmering salted water and cook, stirring, 20 minutes. Beat in butter and parmesan.",
+      "Serve the vegetables over the polenta."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-fodmap"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for the low FODMAP elimination phase: no onion, garlic, wheat, lactose, honey, or the high-FODMAP fruit and vegetables in the Monash-group lists."
+      ]
+    }
+  },
+  {
+    "id": "lh-apple-cinnamon-oats",
+    "name": "Apple and cinnamon porridge with honey",
+    "meal": [
+      "breakfast"
+    ],
+    "servings": 1,
+    "active_min": 5,
+    "total_min": 12,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-2346396",
+        "grams": 45,
+        "display": "½ cup rolled oats"
+      },
+      {
+        "food": "fdc-746782",
+        "grams": 250,
+        "display": "1 cup milk"
+      },
+      {
+        "food": "fdc-167793",
+        "grams": 120,
+        "display": "1 apple, grated"
+      },
+      {
+        "food": "fdc-171320",
+        "grams": 1,
+        "display": "½ tsp cinnamon"
+      },
+      {
+        "food": "fdc-169640",
+        "grams": 10,
+        "display": "2 tsp honey"
+      }
+    ],
+    "steps": [
+      "Simmer the oats, milk, and apple 5 minutes, stirring.",
+      "Finish with cinnamon and honey."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-lentil-carrot-soup",
+    "name": "Red lentil and carrot soup",
+    "meal": [
+      "lunch"
+    ],
+    "servings": 4,
+    "active_min": 10,
+    "total_min": 35,
+    "skill": "beginner",
+    "equipment": [
+      "stove",
+      "blender"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-172421",
+        "grams": 400,
+        "display": "2 cups cooked lentils (from 1 cup dry)"
+      },
+      {
+        "food": "fdc-2258586",
+        "grams": 300,
+        "display": "4 carrots, sliced"
+      },
+      {
+        "food": "fdc-2346405",
+        "grams": 100,
+        "display": "2 celery sticks, sliced"
+      },
+      {
+        "food": "fdc-169230",
+        "grams": 6,
+        "display": "2 garlic cloves, chopped"
+      },
+      {
+        "food": "fdc-172884",
+        "grams": 1000,
+        "display": "4 cups homemade chicken stock without onion or garlic"
+      },
+      {
+        "food": "fdc-170923",
+        "grams": 2,
+        "display": "1 tsp ground cumin"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 15,
+        "display": "1 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      }
+    ],
+    "steps": [
+      "Soften the carrot, celery, and garlic in the oil 5 minutes. Add cumin, lentils, stock, and salt; simmer 15 minutes.",
+      "Blend partly. Eat fresh; do not store."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-chicken-sweet-potato-traybake",
+    "name": "Chicken and sweet potato traybake with rosemary",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 4,
+    "active_min": 15,
+    "total_min": 50,
+    "skill": "beginner",
+    "equipment": [
+      "oven"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-171052",
+        "grams": 600,
+        "display": "600 g chicken thighs"
+      },
+      {
+        "food": "fdc-168483",
+        "grams": 600,
+        "display": "600 g sweet potato, chunks"
+      },
+      {
+        "food": "fdc-170110",
+        "grams": 150,
+        "display": "1 red bell pepper, chunks"
+      },
+      {
+        "food": "fdc-169230",
+        "grams": 9,
+        "display": "3 garlic cloves, smashed"
+      },
+      {
+        "food": "fdc-173473",
+        "grams": 4,
+        "display": "2 sprigs rosemary"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 30,
+        "display": "2 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 5,
+        "display": "1 tsp salt"
+      },
+      {
+        "food": "fdc-170931",
+        "grams": 1,
+        "display": "black pepper"
+      }
+    ],
+    "steps": [
+      "Toss everything in a roasting tin.",
+      "Roast at 200 °C (400 °F) 40 to 45 minutes, turning once."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-pear-ricotta-toast",
+    "name": "Pear and ricotta toast with honey",
+    "meal": [
+      "breakfast"
+    ],
+    "servings": 1,
+    "active_min": 5,
+    "total_min": 5,
+    "skill": "beginner",
+    "equipment": [
+      "none"
+    ],
+    "assembly_only": true,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-172688",
+        "grams": 60,
+        "display": "2 slices whole-wheat bread, toasted"
+      },
+      {
+        "food": "fdc-171248",
+        "grams": 80,
+        "display": "⅓ cup ricotta"
+      },
+      {
+        "food": "fdc-167776",
+        "grams": 120,
+        "display": "1 pear, sliced"
+      },
+      {
+        "food": "fdc-169640",
+        "grams": 10,
+        "display": "2 tsp honey"
+      },
+      {
+        "food": "fdc-171320",
+        "grams": 1,
+        "display": "pinch of cinnamon"
+      }
+    ],
+    "steps": [
+      "Spread the toast with ricotta, top with pear, and finish with honey and cinnamon."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-garlic-herb-pasta-peas",
+    "name": "Garlic and herb pasta with peas and mozzarella",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 3,
+    "active_min": 10,
+    "total_min": 25,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-169736",
+        "grams": 240,
+        "display": "240 g pasta"
+      },
+      {
+        "food": "fdc-170419",
+        "grams": 150,
+        "display": "1 cup peas"
+      },
+      {
+        "food": "fdc-169230",
+        "grams": 9,
+        "display": "3 garlic cloves, sliced"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 30,
+        "display": "2 tbsp olive oil"
+      },
+      {
+        "food": "fdc-170416",
+        "grams": 12,
+        "display": "⅓ cup parsley, chopped"
+      },
+      {
+        "food": "fdc-170845",
+        "grams": 100,
+        "display": "100 g fresh mozzarella, torn"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      },
+      {
+        "food": "fdc-170931",
+        "grams": 1,
+        "display": "black pepper"
+      }
+    ],
+    "steps": [
+      "Cook the pasta, adding the peas for the last 2 minutes; drain, keeping a little water.",
+      "Warm the garlic in the oil until fragrant. Toss with pasta, peas, parsley, salt, and pepper; top with mozzarella."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-cauliflower-chickpea-coconut-curry",
+    "name": "Mild cauliflower and chickpea coconut curry",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 4,
+    "active_min": 15,
+    "total_min": 35,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-2685573",
+        "grams": 500,
+        "display": "1 cauliflower, florets"
+      },
+      {
+        "food": "fdc-173800",
+        "grams": 400,
+        "display": "1 can chickpeas, drained"
+      },
+      {
+        "food": "fdc-170173",
+        "grams": 400,
+        "display": "1 can coconut milk"
+      },
+      {
+        "food": "fdc-169230",
+        "grams": 9,
+        "display": "3 garlic cloves, chopped"
+      },
+      {
+        "food": "fdc-169231",
+        "grams": 15,
+        "display": "1 tbsp fresh ginger, grated"
+      },
+      {
+        "food": "fdc-172231",
+        "grams": 3,
+        "display": "1 tsp turmeric"
+      },
+      {
+        "food": "fdc-170923",
+        "grams": 3,
+        "display": "1½ tsp ground cumin"
+      },
+      {
+        "food": "fdc-170922",
+        "grams": 2,
+        "display": "1 tsp ground coriander"
+      },
+      {
+        "food": "fdc-169997",
+        "grams": 8,
+        "display": "a handful of cilantro"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 15,
+        "display": "1 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 5,
+        "display": "1 tsp salt"
+      },
+      {
+        "food": "fdc-168877",
+        "grams": 200,
+        "display": "1 cup white rice, uncooked"
+      }
+    ],
+    "steps": [
+      "Cook the rice. Fry the garlic, ginger, and spices in the oil 1 minute.",
+      "Add the cauliflower, chickpeas, coconut milk, and salt. Simmer 15 minutes until tender.",
+      "Serve over rice with cilantro."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-beef-green-bean-stir-fry",
+    "name": "Beef and green bean stir-fry",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 3,
+    "active_min": 20,
+    "total_min": 30,
+    "skill": "comfortable",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-2514743",
+        "grams": 400,
+        "display": "400 g lean beef, thinly sliced"
+      },
+      {
+        "food": "fdc-2346400",
+        "grams": 300,
+        "display": "300 g green beans, trimmed"
+      },
+      {
+        "food": "fdc-169230",
+        "grams": 6,
+        "display": "2 garlic cloves, sliced"
+      },
+      {
+        "food": "fdc-169231",
+        "grams": 12,
+        "display": "1 tbsp fresh ginger, grated"
+      },
+      {
+        "food": "fdc-169698",
+        "grams": 8,
+        "display": "1 tbsp cornstarch"
+      },
+      {
+        "food": "fdc-173647",
+        "grams": 120,
+        "display": "½ cup water"
+      },
+      {
+        "food": "fdc-171016",
+        "grams": 10,
+        "display": "2 tsp toasted sesame oil"
+      },
+      {
+        "food": "fdc-172336",
+        "grams": 15,
+        "display": "1 tbsp canola oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      },
+      {
+        "food": "fdc-168877",
+        "grams": 200,
+        "display": "1 cup white rice, uncooked"
+      }
+    ],
+    "steps": [
+      "Cook the rice. Toss the beef with cornstarch and half the salt.",
+      "Sear the beef in the canola oil in batches; lift out. Stir-fry the beans, garlic, and ginger 2 minutes; add the water, cover 3 minutes.",
+      "Return the beef with the sesame oil and remaining salt. Serve over rice."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-roast-beet-apple-salad",
+    "name": "Roast beet and apple salad with pumpkin seeds",
+    "meal": [
+      "lunch"
+    ],
+    "servings": 2,
+    "active_min": 15,
+    "total_min": 50,
+    "skill": "beginner",
+    "equipment": [
+      "oven"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-2685576",
+        "grams": 300,
+        "display": "3 beets, scrubbed and cubed"
+      },
+      {
+        "food": "fdc-167793",
+        "grams": 150,
+        "display": "1 apple, sliced"
+      },
+      {
+        "food": "fdc-2346389",
+        "grams": 120,
+        "display": "3 cups romaine, torn"
+      },
+      {
+        "food": "fdc-2515380",
+        "grams": 20,
+        "display": "2 tbsp pumpkin seeds"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 25,
+        "display": "2 tbsp olive oil"
+      },
+      {
+        "food": "fdc-169640",
+        "grams": 7,
+        "display": "1 tsp honey"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 2,
+        "display": "¼ tsp salt"
+      }
+    ],
+    "steps": [
+      "Roast the beets with half the oil at 200 °C (400 °F) 35 minutes.",
+      "Whisk the remaining oil with honey and salt. Toss with romaine, apple, beets, and seeds."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-black-bean-rice-bowl",
+    "name": "Black bean and rice bowl with cumin and cilantro",
+    "meal": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 2,
+    "active_min": 10,
+    "total_min": 25,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-175238",
+        "grams": 250,
+        "display": "1 can black beans, drained"
+      },
+      {
+        "food": "fdc-168877",
+        "grams": 150,
+        "display": "¾ cup white rice, uncooked"
+      },
+      {
+        "food": "fdc-170110",
+        "grams": 150,
+        "display": "1 red bell pepper, diced"
+      },
+      {
+        "food": "fdc-2346389",
+        "grams": 80,
+        "display": "2 cups romaine, shredded"
+      },
+      {
+        "food": "fdc-169997",
+        "grams": 8,
+        "display": "a handful of cilantro"
+      },
+      {
+        "food": "fdc-170923",
+        "grams": 3,
+        "display": "1½ tsp ground cumin"
+      },
+      {
+        "food": "fdc-169230",
+        "grams": 3,
+        "display": "1 garlic clove, minced"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 15,
+        "display": "1 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 3,
+        "display": "½ tsp salt"
+      }
+    ],
+    "steps": [
+      "Cook the rice. Warm the beans with garlic, cumin, oil, and salt 5 minutes.",
+      "Build bowls: rice, beans, pepper, romaine, cilantro."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-watermelon-cucumber-salad",
+    "name": "Watermelon and cucumber salad with basil",
+    "meal": [
+      "lunch",
+      "snack"
+    ],
+    "servings": 2,
+    "active_min": 10,
+    "total_min": 10,
+    "skill": "beginner",
+    "equipment": [
+      "none"
+    ],
+    "assembly_only": true,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-167765",
+        "grams": 300,
+        "display": "2 cups watermelon, cubed"
+      },
+      {
+        "food": "fdc-2346406",
+        "grams": 200,
+        "display": "1 cucumber, sliced"
+      },
+      {
+        "food": "fdc-172232",
+        "grams": 6,
+        "display": "a handful of basil"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 10,
+        "display": "2 tsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 1,
+        "display": "pinch of salt"
+      }
+    ],
+    "steps": [
+      "Toss and serve straight away."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-honey-garlic-chicken-broccoli",
+    "name": "Honey garlic chicken with broccoli and rice",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 3,
+    "active_min": 15,
+    "total_min": 30,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-171052",
+        "grams": 450,
+        "display": "450 g chicken thighs, cubed"
+      },
+      {
+        "food": "fdc-169640",
+        "grams": 30,
+        "display": "1½ tbsp honey"
+      },
+      {
+        "food": "fdc-169230",
+        "grams": 9,
+        "display": "3 garlic cloves, minced"
+      },
+      {
+        "food": "fdc-747447",
+        "grams": 300,
+        "display": "300 g broccoli florets"
+      },
+      {
+        "food": "fdc-169231",
+        "grams": 8,
+        "display": "2 tsp fresh ginger"
+      },
+      {
+        "food": "fdc-172336",
+        "grams": 15,
+        "display": "1 tbsp canola oil"
+      },
+      {
+        "food": "fdc-173647",
+        "grams": 60,
+        "display": "¼ cup water"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      },
+      {
+        "food": "fdc-168877",
+        "grams": 200,
+        "display": "1 cup white rice, uncooked"
+      }
+    ],
+    "steps": [
+      "Cook the rice. Brown the chicken in the oil with the salt 6 minutes.",
+      "Add garlic, ginger, honey, and water; bubble 2 minutes. Add broccoli, cover, and steam 4 minutes. Serve over rice."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-celery-potato-soup",
+    "name": "Celery and potato soup",
+    "meal": [
+      "lunch"
+    ],
+    "servings": 4,
+    "active_min": 10,
+    "total_min": 35,
+    "skill": "beginner",
+    "equipment": [
+      "stove",
+      "blender"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-2346405",
+        "grams": 300,
+        "display": "6 celery sticks, sliced"
+      },
+      {
+        "food": "fdc-170026",
+        "grams": 400,
+        "display": "2 potatoes, diced"
+      },
+      {
+        "food": "fdc-169230",
+        "grams": 6,
+        "display": "2 garlic cloves"
+      },
+      {
+        "food": "fdc-172884",
+        "grams": 900,
+        "display": "4 cups homemade chicken stock without onion or garlic"
+      },
+      {
+        "food": "fdc-746782",
+        "grams": 150,
+        "display": "⅔ cup milk"
+      },
+      {
+        "food": "fdc-173470",
+        "grams": 2,
+        "display": "2 sprigs thyme"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 15,
+        "display": "1 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 4,
+        "display": "¾ tsp salt"
+      }
+    ],
+    "steps": [
+      "Soften the celery and garlic in the oil 5 minutes. Add potato, stock, thyme, and salt; simmer 20 minutes.",
+      "Blend smooth with the milk. Eat fresh."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-ricotta-pancakes-blueberries",
+    "name": "Ricotta pancakes with blueberries",
+    "meal": [
+      "breakfast"
+    ],
+    "servings": 2,
+    "active_min": 15,
+    "total_min": 20,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-168894",
+        "grams": 120,
+        "display": "1 cup plain flour"
+      },
+      {
+        "food": "fdc-171248",
+        "grams": 150,
+        "display": "⅔ cup ricotta"
+      },
+      {
+        "food": "fdc-171287",
+        "grams": 100,
+        "display": "2 eggs"
+      },
+      {
+        "food": "fdc-746782",
+        "grams": 150,
+        "display": "⅔ cup milk"
+      },
+      {
+        "food": "fdc-172803",
+        "grams": 6,
+        "display": "1½ tsp baking powder"
+      },
+      {
+        "food": "fdc-169640",
+        "grams": 20,
+        "display": "1 tbsp honey"
+      },
+      {
+        "food": "fdc-2346411",
+        "grams": 100,
+        "display": "⅔ cup blueberries"
+      },
+      {
+        "food": "fdc-173410",
+        "grams": 10,
+        "display": "2 tsp butter for the pan"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 1,
+        "display": "pinch of salt"
+      }
+    ],
+    "steps": [
+      "Whisk the ricotta, eggs, milk, and honey; fold in the flour, baking powder, and salt.",
+      "Cook ¼-cup rounds in butter 2 minutes per side. Serve with blueberries."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-pear-oat-crumble",
+    "name": "Pear and oat crumble",
+    "meal": [
+      "snack"
+    ],
+    "servings": 6,
+    "active_min": 15,
+    "total_min": 45,
+    "skill": "beginner",
+    "equipment": [
+      "oven"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-167776",
+        "grams": 700,
+        "display": "5 pears, sliced"
+      },
+      {
+        "food": "fdc-2346396",
+        "grams": 100,
+        "display": "1 cup rolled oats"
+      },
+      {
+        "food": "fdc-168894",
+        "grams": 80,
+        "display": "⅔ cup plain flour"
+      },
+      {
+        "food": "fdc-173410",
+        "grams": 80,
+        "display": "⅓ cup butter, cold and cubed"
+      },
+      {
+        "food": "fdc-168833",
+        "grams": 60,
+        "display": "⅓ cup brown sugar"
+      },
+      {
+        "food": "fdc-171320",
+        "grams": 2,
+        "display": "1 tsp cinnamon"
+      }
+    ],
+    "steps": [
+      "Put the pears in a baking dish with half the cinnamon.",
+      "Rub the butter into the flour, oats, sugar, and remaining cinnamon; scatter over.",
+      "Bake at 180 °C (350 °F) 30 to 35 minutes."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-turkey-meatballs-pumpkin-sauce",
+    "name": "Turkey meatballs in pumpkin sauce with pasta",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 4,
+    "active_min": 25,
+    "total_min": 45,
+    "skill": "comfortable",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-174493",
+        "grams": 500,
+        "display": "500 g ground turkey"
+      },
+      {
+        "food": "fdc-171287",
+        "grams": 50,
+        "display": "1 egg"
+      },
+      {
+        "food": "fdc-2346396",
+        "grams": 40,
+        "display": "½ cup rolled oats"
+      },
+      {
+        "food": "fdc-169230",
+        "grams": 9,
+        "display": "3 garlic cloves, minced"
+      },
+      {
+        "food": "fdc-168450",
+        "grams": 400,
+        "display": "1 can pumpkin purée"
+      },
+      {
+        "food": "fdc-172884",
+        "grams": 250,
+        "display": "1 cup homemade chicken stock without onion or garlic"
+      },
+      {
+        "food": "fdc-171329",
+        "grams": 3,
+        "display": "1½ tsp paprika"
+      },
+      {
+        "food": "fdc-171328",
+        "grams": 2,
+        "display": "1 tsp dried oregano"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 20,
+        "display": "1½ tbsp olive oil"
+      },
+      {
+        "food": "fdc-169736",
+        "grams": 320,
+        "display": "320 g pasta"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 5,
+        "display": "1 tsp salt"
+      }
+    ],
+    "steps": [
+      "Mix the turkey, egg, oats, a third of the garlic, half the salt, and the oregano; roll into 16 meatballs. Brown in the oil.",
+      "Add the rest of the garlic, pumpkin, stock, paprika, and salt; simmer 15 minutes.",
+      "Serve over cooked pasta."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-cod-garlic-butter-green-beans",
+    "name": "Cod with garlic butter, green beans, and potatoes",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 2,
+    "active_min": 10,
+    "total_min": 30,
+    "skill": "beginner",
+    "equipment": [
+      "oven",
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-174191",
+        "grams": 320,
+        "display": "2 cod fillets (320 g)"
+      },
+      {
+        "food": "fdc-173410",
+        "grams": 25,
+        "display": "2 tbsp butter"
+      },
+      {
+        "food": "fdc-169230",
+        "grams": 6,
+        "display": "2 garlic cloves, minced"
+      },
+      {
+        "food": "fdc-2346400",
+        "grams": 250,
+        "display": "250 g green beans"
+      },
+      {
+        "food": "fdc-170026",
+        "grams": 400,
+        "display": "400 g potatoes, halved"
+      },
+      {
+        "food": "fdc-170416",
+        "grams": 6,
+        "display": "2 tbsp parsley"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 3,
+        "display": "½ tsp salt"
+      }
+    ],
+    "steps": [
+      "Boil the potatoes 15 minutes, adding the beans for the last 4.",
+      "Bake the cod with salt at 200 °C (400 °F) 12 minutes. Melt the butter with the garlic and parsley and spoon over everything."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-chicken-vegetable-pasta-bake",
+    "name": "Chicken, zucchini, and mozzarella pasta bake",
+    "meal": [
+      "dinner"
+    ],
+    "servings": 4,
+    "active_min": 20,
+    "total_min": 50,
+    "skill": "comfortable",
+    "equipment": [
+      "stove",
+      "oven"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-169736",
+        "grams": 300,
+        "display": "300 g pasta"
+      },
+      {
+        "food": "fdc-171052",
+        "grams": 400,
+        "display": "400 g chicken breast, diced"
+      },
+      {
+        "food": "fdc-169291",
+        "grams": 250,
+        "display": "1 large zucchini, diced"
+      },
+      {
+        "food": "fdc-170110",
+        "grams": 150,
+        "display": "1 red bell pepper, diced"
+      },
+      {
+        "food": "fdc-170845",
+        "grams": 150,
+        "display": "150 g fresh mozzarella, torn"
+      },
+      {
+        "food": "fdc-169230",
+        "grams": 6,
+        "display": "2 garlic cloves, minced"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 25,
+        "display": "2 tbsp olive oil"
+      },
+      {
+        "food": "fdc-171328",
+        "grams": 2,
+        "display": "1 tsp dried oregano"
+      },
+      {
+        "food": "fdc-172884",
+        "grams": 200,
+        "display": "¾ cup homemade chicken stock without onion or garlic"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 5,
+        "display": "1 tsp salt"
+      }
+    ],
+    "steps": [
+      "Cook the pasta 2 minutes short. Brown the chicken in the oil; add garlic, zucchini, pepper, oregano, salt, and stock; cook 5 minutes.",
+      "Toss with the pasta in a baking dish, top with mozzarella, and bake at 200 °C (400 °F) 20 minutes."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-sweet-potato-kale-hash-eggs",
+    "name": "Sweet potato and kale hash with fried eggs",
+    "meal": [
+      "breakfast",
+      "lunch"
+    ],
+    "servings": 2,
+    "active_min": 15,
+    "total_min": 30,
+    "skill": "beginner",
+    "equipment": [
+      "stove"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-168483",
+        "grams": 400,
+        "display": "2 sweet potatoes, diced"
+      },
+      {
+        "food": "fdc-323505",
+        "grams": 100,
+        "display": "2 cups kale, shredded"
+      },
+      {
+        "food": "fdc-171287",
+        "grams": 100,
+        "display": "2 eggs"
+      },
+      {
+        "food": "fdc-169230",
+        "grams": 6,
+        "display": "2 garlic cloves, minced"
+      },
+      {
+        "food": "fdc-171329",
+        "grams": 2,
+        "display": "1 tsp paprika"
+      },
+      {
+        "food": "fdc-171413",
+        "grams": 25,
+        "display": "2 tbsp olive oil"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 3,
+        "display": "½ tsp salt"
+      }
+    ],
+    "steps": [
+      "Fry the sweet potato in most of the oil, covered, 12 minutes, turning. Add garlic, paprika, salt, and kale; cook 3 minutes.",
+      "Fry the eggs in the last of the oil and serve on top."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
+  },
+  {
+    "id": "lh-apple-carrot-muffins",
+    "name": "Apple and carrot muffins",
+    "meal": [
+      "breakfast",
+      "snack"
+    ],
+    "servings": 10,
+    "active_min": 15,
+    "total_min": 35,
+    "skill": "beginner",
+    "equipment": [
+      "oven"
+    ],
+    "assembly_only": false,
+    "leftovers": "poor",
+    "ingredients": [
+      {
+        "food": "fdc-168894",
+        "grams": 220,
+        "display": "1¾ cups plain flour"
+      },
+      {
+        "food": "fdc-167793",
+        "grams": 150,
+        "display": "1 apple, grated"
+      },
+      {
+        "food": "fdc-2258586",
+        "grams": 150,
+        "display": "1 large carrot, grated"
+      },
+      {
+        "food": "fdc-171287",
+        "grams": 100,
+        "display": "2 eggs"
+      },
+      {
+        "food": "fdc-169640",
+        "grams": 80,
+        "display": "¼ cup honey"
+      },
+      {
+        "food": "fdc-172336",
+        "grams": 60,
+        "display": "¼ cup canola oil"
+      },
+      {
+        "food": "fdc-172803",
+        "grams": 8,
+        "display": "2 tsp baking powder"
+      },
+      {
+        "food": "fdc-171320",
+        "grams": 3,
+        "display": "1½ tsp cinnamon"
+      },
+      {
+        "food": "fdc-746775",
+        "grams": 1,
+        "display": "pinch of salt"
+      }
+    ],
+    "steps": [
+      "Mix the dry ingredients. Whisk eggs, honey, and oil; fold in with apple and carrot.",
+      "Bake in a lined tin at 180 °C (350 °F) 20 to 22 minutes."
+    ],
+    "tags": [],
+    "diet_written_for": [
+      "low-histamine"
+    ],
+    "notes": {
+      "written_for": [
+        "Written for a low histamine trial along the SIGHI list: fresh meat and fish, no tomato, spinach, aged cheese, cured meat, vinegar, or fermented sauces. Eat it fresh; do not keep leftovers."
+      ]
+    }
   }
 ]

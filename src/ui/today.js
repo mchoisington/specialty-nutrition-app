@@ -404,7 +404,7 @@ function todaySearchItems(person, plan, query, favOnly) {
   const match = name => q.every(w => name.toLowerCase().includes(w));
   const favR = new Set(person.favorites.recipes), favF = new Set(person.favorites.foods);
   const items = [];
-  for (const r of uiState.data.recipes) if (match(r.name) && (!favOnly || favR.has(r.id)) && !recipesIsNever(person, r.id)) items.push({ kind: 'recipe', id: r.id, name: r.name, sub: `Recipe · ${r.active_min} min active · ${r.servings} servings`, fav: favR.has(r.id), obj: r });
+  for (const r of (uiState.recipesForPlan && plan ? uiState.recipesForPlan(plan) : uiState.data.recipes)) if (match(r.name) && (!favOnly || favR.has(r.id)) && !recipesIsNever(person, r.id)) items.push({ kind: 'recipe', id: r.id, name: r.name, sub: `Recipe · ${r.active_min} min active · ${r.servings} servings`, fav: favR.has(r.id), obj: r });
   for (const f of uiState.data.foods) if (match(f.name + ' ' + (f.short || '')) && (!favOnly || favF.has(f.id))) items.push({ kind: 'food', id: f.id, name: f.short || f.name, sub: `Food · ${f.group || 'Other'}`, fav: favF.has(f.id), obj: f });
   items.sort((a, b) => Number(b.fav) - Number(a.fav));
   const out = items.slice(0, 40);

@@ -2,6 +2,9 @@
 import { load } from './store.js';
 import { buildMatcher } from './engine/dictionary.js';
 import { annotateCuisines } from './engine/cuisine.js';
+import { buildPlan } from './engine/plan.js';
+import { checkRecipe } from './engine/checker.js';
+import { buildAdaptedRecipes, familiesFor } from './engine/swaps.js';
 import { uiState, uiEsc, uiActivePerson, uiToast, uiPersist, uiEnsurePerson, uiIcon, uiBrandMark, uiAvatar, uiNavRecord, uiCanGoBack, uiGoBack, uiBackButtonHTML } from './ui/common.js';
 import { renderHomeScreen, renderWelcomeScreen } from './ui/home.js';
 import { renderPeopleScreen } from './ui/people.js';
@@ -21,10 +24,10 @@ import { renderRecipesScreen } from './ui/recipes.js';
 import { renderOwnerScreen } from './ui/owner.js';
 import { getDb, ensureDeviceIdentity, registerDevice, readOwner, isOwner } from './engine/sync.js';
 
-const APP_DATA_FILES = ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'recipes-open', 'recipes-usda', 'articles'];
+const APP_DATA_FILES = ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'recipes-open', 'recipes-usda', 'articles', 'swaps'];
 
 function appEmptyFor(name) {
-  return name === 'dictionaries' ? { tags: {}, entries: [] } : name === 'articles' ? {} : [];
+  return name === 'dictionaries' ? { tags: {}, entries: [] } : name === 'articles' ? {} : name === 'swaps' ? { families: {}, swaps: [] } : [];
 }
 
 export async function loadData() {
@@ -243,6 +246,47 @@ export function appCollectionCounts() {
   for (const r of uiState.baseRecipes || []) { const k = APP_COLLECTION_OF_SOURCE[r.source]; if (k) counts[k]++; }
   return counts;
 }
+// Adapted copies for one diet family: every base recipe with nutrition that the swap list can fix, re-checked against a plan
+// built from that family's module alone. Cached; cleared whenever the pool is reassembled.
+function appAdaptedFor(family) {
+  if (uiState.adaptedCache.has(family)) return uiState.adaptedCache.get(family);
+  const swaps = uiState.data.swaps;
+  const fam = swaps && swaps.families ? swaps.families[family] : null;
+  let list = [];
+  if (fam && fam.module && uiState.matcher) {
+    const pseudo = { id: 'family:' + family, name: family, adult: true, modules: [fam.module], allergens: [], preferences: { avoid_tags: [], avoid_terms: [] }, medications: {}, tier2: {}, phases: {}, modes: {}, acknowledged: [], flags: {}, variants: {} };
+    const plan = buildPlan({ person: pseudo, conditions: uiState.data.conditions, dictionaries: uiState.data.dictionaries, today: new Date() });
+    const base = (uiState.data.recipes || []).filter(r => !r.adapted && !r.custom && ((r.nutrition_per_serving && r.nutrition_source) || (r.ingredients || []).some(i => i.food)));
+    list = buildAdaptedRecipes({ recipes: base, families: [family], swapsData: swaps, matcher: uiState.matcher, foodsById: uiState.foodsById, checkRecipe, familyPlans: { [family]: plan } });
+    for (const r of list) uiState.recipesById.set(r.id, r);
+  }
+  uiState.adaptedCache.set(family, list);
+  return list;
+}
+// The pool for one plan: the base recipes plus adapted copies for every family the plan restricts. Same array back for the same families.
+function appRecipesForPlan(plan) {
+  const fams = familiesFor(plan, uiState.data.swaps);
+  return appPoolFor(fams);
+}
+function appRecipesForPlans(plans) {
+  const fams = [...new Set((plans || []).flatMap(p => familiesFor(p, uiState.data.swaps)))].sort();
+  return appPoolFor(fams);
+}
+function appPoolFor(fams) {
+  if (!fams.length) return uiState.data.recipes;
+  const key = fams.slice().sort().join('+');
+  if (uiState.poolCache.has(key)) return uiState.poolCache.get(key);
+  const pool = uiState.data.recipes.concat(...fams.map(appAdaptedFor));
+  uiState.poolCache.set(key, pool);
+  return pool;
+}
+// A saved week or diary may already name adapted recipe ids (they contain "~family"); build those families up front so lookups by id work at once.
+function appPrebuildAdapted() {
+  try {
+    const text = JSON.stringify({ people: (uiState.profile && uiState.profile.people) || [], diary: (uiState.profile && uiState.profile.diary) || [], household: uiState.profile && uiState.profile.household });
+    for (const family of Object.keys((uiState.data.swaps && uiState.data.swaps.families) || {})) if (text.includes('~' + family)) appAdaptedFor(family);
+  } catch (e) { console.error(e); }
+}
 function appAssembleRecipes() {
   const profile = uiState.profile || {};
   const links = profile.recipe_links || {};
@@ -259,6 +303,12 @@ function appAssembleRecipes() {
   annotateCuisines(out);
   uiState.data.recipes = out;
   uiState.recipesById = new Map(out.map(r => [r.id, r]));
+  // Adapted copies (swap layer) are built per diet family on first use and cached until the pool changes.
+  uiState.adaptedCache = new Map();
+  uiState.poolCache = new Map();
+  uiState.recipesForPlan = appRecipesForPlan;
+  uiState.recipesForPlans = appRecipesForPlans;
+  appPrebuildAdapted();
   return out;
 }
 

@@ -26,9 +26,9 @@ function stripModuleSyntax(code) {
 // --lite builds dist/peace-meal-lite.html: one person, four tabs, and without the Wikibooks recipes (no nutrition data, 4 MB).
 const LITE = process.argv.includes('--lite');
 const data = {};
-for (const f of ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'recipes-open', 'recipes-usda', 'articles']) {
+for (const f of ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'recipes-open', 'recipes-usda', 'articles', 'swaps']) {
   const p = new URL('data/' + f + '.json', root);
-  data[f] = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : (f === 'dictionaries' ? { tags: {}, entries: [] } : f === 'articles' ? {} : []);
+  data[f] = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : (f === 'dictionaries' ? { tags: {}, entries: [] } : f === 'articles' ? {} : f === 'swaps' ? { families: {}, swaps: [] } : []);
 }
 if (LITE && Array.isArray(data['recipes-open'])) data['recipes-open'] = data['recipes-open'].filter(r => r.source !== 'Wikibooks Cookbook');
 if (LITE) data['recipes-usda'] = [];   // the USDA collection stays a full-app opt-in; lite ships Peace Meal's own recipes plus the NHS and Parent Club sets
