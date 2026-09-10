@@ -17,8 +17,10 @@ export function restingEnergy({ sex, age, weight_kg, height_cm }) {
   return Math.round(sex === 'male' ? base + 5 : base - 161);
 }
 
-// goal: 'maintain' | 'loss' (Phase 1 A1: 500 to 750 kcal/day deficit) ; pregnancyTrimester adds Phase 1 D1 increments; breastfeeding adds 330 to 400.
-export function energyTarget(person, { goal = 'maintain', deficit = 500 } = {}) {
+// goal: 'maintain' | 'loss' (Phase 1 A1: 500 to 750 kcal/day deficit) | 'gain' (300 to 500 kcal/day above maintenance; 7,000 kcal is
+// roughly 1 kg, so 500 a day is about 0.5 kg a week; ESPEN geriatrics guideline for older adults with unintentional loss) ;
+// pregnancyTrimester adds Phase 1 D1 increments; breastfeeding adds 330 to 400.
+export function energyTarget(person, { goal = 'maintain', deficit = 500, surplus = 400 } = {}) {
   const ree = restingEnergy(person);
   if (ree == null) return { kcal: null, ree: null, reason: 'Needs sex, age, weight, and height.' };
   const lvl = ACTIVITY_LEVELS.find(l => l.id === (person.activity || 'light')) || ACTIVITY_LEVELS[1];
@@ -33,9 +35,16 @@ export function energyTarget(person, { goal = 'maintain', deficit = 500 } = {}) 
   } else if (goal === 'loss') {
     const d = Math.min(750, Math.max(500, Number(deficit) || 500));
     kcal = Math.max(1200, tdee - d);
-    notes.push(`Weight loss: ${d} kcal below maintenance (guideline range 500 to 750). Floor of 1,200 kcal without clinician supervision.`);
+    notes.push(`Weight loss: ${d} kcal below maintenance (guideline range 500 to 750). Floor of 1,200 kcal without a doctor or dietitian supervising.`);
+  } else if (goal === 'gain') {
+    const s = Math.min(500, Math.max(300, Number(surplus) || 400));
+    kcal = tdee + s;
+    notes.push(`Weight gain: ${s} kcal above maintenance (300 to 500 a day; about 7,000 kcal per kilogram, so 500 a day is roughly half a kilogram a week).`);
+    if (Number(person.age) >= 65) notes.push('Older adults: the ESPEN geriatrics guideline suggests about 30 kcal and 1.0 to 1.2 g of protein per kilogram a day as a starting point, and says unintentional weight loss should be worked up by a doctor first.');
   }
-  return { kcal, ree, tdee, goal, notes, sources: ['mifflin-1990', 'aha-acc-tos-obesity-2013'] };
+  const sources = ['mifflin-1990', 'aha-acc-tos-obesity-2013'];
+  if (goal === 'gain') sources.push('espen-geriatrics-2022');
+  return { kcal, ree, tdee, goal, notes, sources };
 }
 
 // MET values from the 2011 Compendium for common activities. Verify individual codes before relying on decimals.

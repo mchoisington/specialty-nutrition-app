@@ -34,6 +34,7 @@ export function snackPlan(person, plan, weekOverride) {
   else if (kind === 'gerd') { count = 2; why = 'reflux guidance: smaller meals, and nothing close to lying down'; }
   else if (kind === 'frequent') { count = 2; why = 'your plan calls for smaller, more frequent meals'; }
   else if (person && person.adult === false) { count = 2; why = 'children do well with regular snacks between meals'; }
+  else if (person && person.goals && person.goals.calorie_target === 'gain') { count = 2; why = 'weight-gain goal: snacks between meals add calories without bigger plates'; }
   else { count = 1; why = 'one afternoon snack by default'; }
   let slots;
   if (count === 0) slots = [];
@@ -102,6 +103,12 @@ export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, minutes, 
   if (favorites && favorites.includes(recipe.id)) { score += 35; reasons.push('a favorite'); }
   if (person && cuisineLoved(recipe, person)) { score += 12; reasons.push('a cuisine you love'); }
   if (person) { const sb = spiceBonus(recipe, person); if (sb.bonus) { score += sb.bonus; reasons.push(sb.reason); } }
+  // weight-gain goal: lean toward meals that carry more energy per serving
+  if (person && person.goals && person.goals.calorie_target === 'gain') {
+    const kcal = recipeTotals(recipe, foodsById).perServing.kcal || 0;
+    if (kcal >= 550) { score += 10; reasons.push('a filling, energy-dense meal for your weight-gain goal'); }
+    else if (kcal >= 400) { score += 5; reasons.push('a solid meal for your weight-gain goal'); }
+  }
   // soft avoid
   for (const h of check.hits) { score -= 25; reasons.push(`contains ${h.label} (avoid)`); }
   for (const t of check.termHits || []) { score -= 15; reasons.push(`contains "${t.term}" (your preference)`); }

@@ -103,7 +103,7 @@ export function todayTargetInfo(person, plan) {
   if (!(Number(person.weight_kg) > 0)) missing.push('weight');
   if (!(Number(person.height_cm) > 0)) missing.push('height');
   if (missing.length) return { state: 'missing', missing };
-  const t = energyTarget({ ...person, weight_kg: todayLatestWeightKg(person) || person.weight_kg }, { goal: g.calorie_target, deficit: g.deficit });
+  const t = energyTarget({ ...person, weight_kg: todayLatestWeightKg(person) || person.weight_kg }, { goal: g.calorie_target, deficit: g.deficit, surplus: g.surplus });
   if (t.kcal == null) return { state: 'missing', missing: ['sex', 'age', 'weight', 'height'] };
   return { state: 'ok', kcal: t.kcal, notes: t.notes, tdee: t.tdee, ree: t.ree };
 }
@@ -165,7 +165,7 @@ function todayTargetCardHTML(person, plan, totals, exerciseKcal) {
     const count = !!(person.goals && person.goals.count_exercise);
     const target = info.kcal + (count ? exerciseKcal : 0);
     const diff = target - totals.kcal;
-    const goalWord = info.manual ? 'your own number' : person.goals.calorie_target === 'loss' ? `weight loss, ${person.goals.deficit || 500} kcal a day below maintenance` : 'maintain weight';
+    const goalWord = info.manual ? 'your own number' : person.goals.calorie_target === 'loss' ? `weight loss, ${person.goals.deficit || 500} kcal a day below maintenance` : person.goals.calorie_target === 'gain' ? `weight gain, ${person.goals.surplus || 400} kcal a day above maintenance` : 'maintain weight';
     head = `<div class="ring-row">${uiRing({ value: totals.kcal, max: target, kind: 'kcal', unit: 'kcal', label: `of ${uiFmtNum(target)} target`, size: 148 })}
       <div class="ring-text"><p><strong>${diff >= 0 ? `${uiFmtNum(diff)} kcal under` : `${uiFmtNum(-diff)} kcal over`}</strong> the estimated target of ${uiFmtNum(target)} kcal ${uiChip('estimate', 'neutral')}</p>
       <p class="small muted">Goal: ${goalWord}.${count && exerciseKcal ? ` Includes ${uiFmtNum(exerciseKcal)} kcal of exercise added back today.` : ''} An estimate from a published equation, not a measurement; appetite, sleep, and how you feel matter too.</p>
@@ -344,11 +344,12 @@ function todayBind(root, person, plan, date) {
 
 function todayTargetModal(person, plan) {
   const g = person.goals || { calorie_target: 'off', deficit: 500 };
-  const draft = { goal: g.calorie_target === 'off' ? 'maintain' : g.calorie_target, deficit: g.deficit || 500, manual: person.manual_kcal || '', activity: person.activity || 'light' };
+  const draft = { goal: g.calorie_target === 'off' ? 'maintain' : g.calorie_target, deficit: g.deficit || 500, surplus: g.surplus || 400, manual: person.manual_kcal || '', activity: person.activity || 'light' };
   const m = uiModal(`
     <p class="small muted">A calorie target is an estimate from a published equation (Mifflin-St Jeor), not a prescription. It needs sex, age, weight, and height from the People screen.</p>
-    <div class="field"><span class="label">Goal</span>${uiSegmented('today-goal', [{ value: 'maintain', label: 'Maintain' }, { value: 'loss', label: 'Lose weight' }, { value: 'manual', label: 'Enter my own number' }], draft.goal)}</div>
+    <div class="field"><span class="label">Goal</span>${uiSegmented('today-goal', [{ value: 'maintain', label: 'Maintain' }, { value: 'loss', label: 'Lose weight' }, { value: 'gain', label: 'Gain weight' }, { value: 'manual', label: 'Enter my own number' }], draft.goal)}</div>
     <div class="field" id="today-goal-loss" ${draft.goal === 'loss' ? '' : 'hidden'}><label for="today-deficit">Daily deficit: <span id="today-deficit-val">${draft.deficit}</span> kcal</label><input id="today-deficit" type="range" min="500" max="750" step="50" value="${draft.deficit}"><div class="hint">Guidelines use 500 to 750 kcal a day below maintenance. The estimate never goes below 1,200 kcal.</div></div>
+    <div class="field" id="today-goal-gain" ${draft.goal === 'gain' ? '' : 'hidden'}><label for="today-surplus">Daily extra: <span id="today-surplus-val">${draft.surplus}</span> kcal</label><input id="today-surplus" type="range" min="300" max="500" step="50" value="${draft.surplus}"><div class="hint">300 to 500 kcal above maintenance. About 7,000 kcal makes a kilogram, so 500 a day is roughly half a kilogram (one pound) a week. If the weight loss was not on purpose, especially past 65, a doctor should look for the cause first; the app cannot.</div></div>
     <div class="field" id="today-goal-manual" ${draft.goal === 'manual' ? '' : 'hidden'}><label for="today-manual">Calories per day</label><input id="today-manual" type="number" inputmode="numeric" min="800" max="6000" value="${uiEsc(draft.manual)}"><div class="hint">Use the number your doctor or dietitian gave you.</div></div>
     <div class="field" id="today-goal-activity" ${draft.goal === 'manual' ? 'hidden' : ''}><label for="today-activity">Usual activity</label><select id="today-activity">${ACTIVITY_LEVELS.map(l => `<option value="${l.id}" ${l.id === draft.activity ? 'selected' : ''}>${uiEsc(l.label)}</option>`).join('')}</select></div>
     <div id="today-target-preview" class="notice info plain"></div>
@@ -359,6 +360,7 @@ function todayTargetModal(person, plan) {
   const preview = () => {
     const box = el.querySelector('#today-target-preview');
     el.querySelector('#today-goal-loss').hidden = draft.goal !== 'loss';
+    el.querySelector('#today-goal-gain').hidden = draft.goal !== 'gain';
     el.querySelector('#today-goal-manual').hidden = draft.goal !== 'manual';
     el.querySelector('#today-goal-activity').hidden = draft.goal === 'manual';
     if (draft.goal === 'manual') { box.innerHTML = `<div class="notice-head">Info</div><div class="notice-body">${draft.manual ? uiFmtNum(draft.manual) + ' kcal a day, entered by you.' : 'Enter a number.'}</div>`; return; }
@@ -368,16 +370,17 @@ function todayTargetModal(person, plan) {
     if (!(Number(person.weight_kg) > 0)) missing.push('weight');
     if (!(Number(person.height_cm) > 0)) missing.push('height');
     if (missing.length) { box.innerHTML = `<div class="notice-head">Info</div><div class="notice-body">Missing: <strong>${missing.join(', ')}</strong>. <a href="#/people/${uiEsc(person.id)}/basics">Add it on the Basics step</a>, then come back. You can still save the goal now.</div>`; return; }
-    const t = energyTarget({ ...person, activity: draft.activity }, { goal: draft.goal, deficit: draft.deficit });
+    const t = energyTarget({ ...person, activity: draft.activity }, { goal: draft.goal, deficit: draft.deficit, surplus: draft.surplus });
     box.innerHTML = `<div class="notice-head">Estimate</div><div class="notice-body"><strong>${uiFmtNum(t.kcal)} kcal a day</strong></div><details><summary>Notes</summary><ul class="small">${t.notes.map(n => `<li>${uiEsc(n)}</li>`).join('')}</ul></details>`;
   };
   el.querySelectorAll('[data-seg="today-goal"]').forEach(r => r.addEventListener('change', () => { draft.goal = r.value; el.querySelectorAll('[data-seg="today-goal"]').forEach(x => x.parentElement.classList.toggle('on', x.checked)); preview(); }));
   el.querySelector('#today-deficit').addEventListener('input', e => { draft.deficit = Number(e.target.value); el.querySelector('#today-deficit-val').textContent = draft.deficit; preview(); });
+  el.querySelector('#today-surplus').addEventListener('input', e => { draft.surplus = Number(e.target.value); el.querySelector('#today-surplus-val').textContent = draft.surplus; preview(); });
   el.querySelector('#today-manual').addEventListener('input', e => { draft.manual = e.target.value; preview(); });
   el.querySelector('#today-activity').addEventListener('change', e => { draft.activity = e.target.value; preview(); });
   el.querySelector('#today-target-save').addEventListener('click', () => {
     if (draft.goal === 'manual' && !(Number(draft.manual) >= 800)) { uiToast('Enter at least 800 kcal, or pick another goal.'); return; }
-    person.goals = { ...(person.goals || {}), calorie_target: draft.goal, deficit: draft.deficit };
+    person.goals = { ...(person.goals || {}), calorie_target: draft.goal, deficit: draft.deficit, surplus: draft.surplus };
     if (draft.goal === 'manual') person.manual_kcal = Math.round(Number(draft.manual));
     else person.activity = draft.activity;
     uiPersist(); m.close(); uiToast('Target saved.'); uiState.rerender();

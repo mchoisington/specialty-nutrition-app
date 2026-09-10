@@ -132,6 +132,7 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
   // Auto-include modules driven by profile flags
   if ((person.pregnancy || person.breastfeeding) && byId.has('pregnancy-gdm-breastfeeding')) selected.add('pregnancy-gdm-breastfeeding');
   if ((person.allergens || []).length && byId.has('food-allergies')) selected.add('food-allergies');
+  if (person.flags && person.flags.glp1 && byId.has('weight-management-glp1')) selected.add('weight-management-glp1');
   const screenPositive = !!(person.screen && person.screen.positive);
   if (screenPositive && byId.has('eating-disorder-screen')) selected.add('eating-disorder-screen');
   if (person.adult === false) notices.push({ level: 'block', code: 'adults-only', text: 'This app is for adults. A caregiver may manage a child\'s confirmed celiac disease or diagnosed food allergies only.' });
@@ -171,6 +172,8 @@ export function buildPlan({ person, conditions, dictionaries, today = new Date()
   const variantsFor = m => {
     if (!Array.isArray(m.variants) || !m.variants.length) return [];
     const stored = person.variants && person.variants[m.id];
+    // A GLP-1 user who did not tick the weight module themselves gets the GLP-1 guidance without the weight-loss rules.
+    if (m.id === 'weight-management-glp1' && !stored && person.flags && person.flags.glp1 && !(person.modules || []).includes(m.id)) return ['glp1'];
     if (Array.isArray(stored) && stored.length) return stored;
     if (typeof stored === 'string') return [stored];
     if (m.id === 'pregnancy-gdm-breastfeeding') { const v = []; if (person.pregnancy) v.push('pregnancy'); if (person.breastfeeding) v.push('breastfeeding'); if (person.flags && person.flags.gdm) v.push('gdm'); return v.length ? v : ['pregnancy']; }

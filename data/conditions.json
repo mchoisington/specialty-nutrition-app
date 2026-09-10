@@ -7,7 +7,8 @@
     "Rules marked \"verify\": true carry a Phase 1 VERIFY flag in their text (see docs/VERIFY-log.md).",
     "Engine wiring edits (Sept 5, 2026): variants added for higher-protein-older-adult, cancer-nutrition, low-carb-ketogenic labels; applies_if added to osteoporosis calcium/vitamin D and heart-failure fluid; top-level flags catalog added. No clinical values changed.",
     "Sept 9, 2026: removed migraine, CRPS, POTS, gluten-free (non-celiac), and the eating-disorder screen at Mary’s direction. Added rheumatoid arthritis, chronic constipation, osteoarthritis, type 1 diabetes, diverticular disease, DASH, Portfolio diet, time-restricted eating, and a pescatarian variant. Restriction-load check-in remains as a plain nutrition-adequacy notice, no longer tied to a screen.",
-    "Sept 9, 2026: no US federal dietary guidance (Dietary Guidelines for Americans, MyPlate, WIC materials) is cited anywhere in this file, at Mary’s direction. Rules rest on professional-society guidelines, trials, and reviews. USDA FoodData Central is still the nutrient measurement database; it is laboratory food-composition data, not dietary advice."
+    "Sept 9, 2026: no US federal dietary guidance (Dietary Guidelines for Americans, MyPlate, WIC materials) is cited anywhere in this file, at Mary’s direction. Rules rest on professional-society guidelines, trials, and reviews. USDA FoodData Central is still the nutrient measurement database; it is laboratory food-composition data, not dietary advice.",
+    "Sept 10, 2026: weight-management-glp1 gained variants loss (default) and glp1 (GLP-1 user without a weight-loss goal); wm-deficit and wm-target apply to the loss variant only. Global flag glp1 turns the module on with the glp1 variant. No clinical values changed."
   ],
   "modules": [
     {
@@ -2391,7 +2392,8 @@
             "aha-acc-tos-obesity-2013",
             "dietfits-2018"
           ],
-          "engine_note": "A calorie deficit needs an energy-needs estimate the app does not make; shown as a habit, not enforced as a number."
+          "engine_note": "A calorie deficit needs an energy-needs estimate the app does not make; shown as a habit, not enforced as a number.",
+          "variant": "loss"
         },
         {
           "id": "wm-target",
@@ -2404,7 +2406,8 @@
           "text": "5 to 10 percent weight loss is the clinically meaningful target.",
           "sources": [
             "aha-acc-tos-obesity-2013"
-          ]
+          ],
+          "variant": "loss"
         },
         {
           "id": "wm-glp1-meals",
@@ -2524,7 +2527,18 @@
           "Do not claim any one diet composition is superior for weight loss.",
           "Do not present the GLP-1 protein range as a verified number until the VERIFY flag is cleared."
         ]
-      }
+      },
+      "variants": [
+        {
+          "id": "loss",
+          "label": "Weight loss (with or without a GLP-1)",
+          "default": true
+        },
+        {
+          "id": "glp1",
+          "label": "Taking a GLP-1; not focused on weight loss"
+        }
+      ]
     },
     {
       "id": "ckd-non-dialysis",
@@ -6913,6 +6927,11 @@
     "older_adult_illness": {
       "label": "Older adult with an acute or chronic illness",
       "module": "higher-protein-older-adult"
+    },
+    "glp1": {
+      "label": "Taking a GLP-1 medication (Ozempic, Wegovy, Mounjaro, Zepbound, Rybelsus)",
+      "module": null,
+      "note": "Turns on the GLP-1 eating guidance (smaller meals, protein first, fluids, fiber, micronutrients) without a weight-loss goal. Add a weight-loss goal on Today if you want one."
     }
   }
 }
