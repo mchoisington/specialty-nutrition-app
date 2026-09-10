@@ -370,7 +370,7 @@ function peopleStepBasics(container, person) {
 // b) Conditions and patterns, grouped by category: condition, pattern, restriction.
 // The evidence summary minus its leading "Rating: STRONG" phrase, which the chip beside the name already says.
 function peopleSummaryText(m) {
-  const t = String(m.evidence && m.evidence.summary || '').replace(/^\s*Rating:\s*[A-Za-z -]+?(\s*\([^)]*\))?\s*[.;:,]?\s*(for\s+)?/i, '').trim();
+  const t = String(m.evidence && m.evidence.summary || '').replace(/^\s*Rating:\s*[A-Z]+(?:\s+to\s+[A-Z]+)?(?:\s*\([^)]*\))?\s*[.;:,]?\s*(?:for\s+)?/, '').trim();
   return t ? t.charAt(0).toUpperCase() + t.slice(1) : '';
 }
 let peopleCondQuery = '';
