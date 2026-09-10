@@ -894,3 +894,26 @@ td.num, th.num { text-align: right; white-space: nowrap; }
 .week-meal .eaters .avatar { width: 22px; height: 22px; font-size: 10px; }
 .week-meal .eaters .avatar-stack .avatar { margin-left: -6px; }
 .week-meal .eaters .avatar-stack .avatar:first-child { margin-left: 0; }
+
+/* ---------- Onboarding flow ---------- */
+.more-sheet .sheet-group { grid-column: 1 / -1; padding: 10px var(--s1) 0; }
+.step-why { color: var(--muted); max-width: 65ch; }
+.stepper .stepper-why { color: var(--muted); font-size: var(--fs-15); }
+.cond-group { border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface); padding: 0 12px; margin: 0; }
+.cond-group + .cond-group { margin-top: 12px; }
+.cond-group > summary { min-height: 52px; font-size: var(--fs-17); color: var(--ink); }
+.cond-group > summary .count { margin-left: auto; color: var(--muted); font-size: var(--fs-13); font-weight: 700; }
+.cond-group > summary .cond-group-hint { color: var(--muted); font-weight: 400; font-size: var(--fs-13); margin-left: 6px; }
+.cond-group .choice-list { padding-bottom: 12px; }
+.cond-row { align-items: center; }
+.cond-row .cond-name { font-weight: 700; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cond-row .cond-sum { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--muted); font-size: var(--fs-15); }
+.cond-row .about-btn { flex: none; min-height: 40px; }
+.cond-selected { border: 1px solid var(--primary); background: var(--tint-olive); border-radius: var(--radius); padding: 12px; }
+.cond-selected h2 { margin-bottom: 8px; }
+.cond-none { color: var(--muted); }
+.chip-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-grid .choice.compact { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 4px 12px; border-radius: 999px; width: auto; }
+.chip-grid .choice.compact input { width: 18px; height: 18px; margin: 0; }
+.chip-grid .choice.compact .choice-title { font-weight: 700; font-size: var(--fs-15); }
+.pref-more > summary { min-height: 48px; }

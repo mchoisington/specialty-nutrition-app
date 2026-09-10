@@ -80,6 +80,7 @@ export function renderHomeScreen(root) {
       <a class="quick-action" href="#/check">${uiIcon('check-circle')}<span>Check a food</span><small>Paste an ingredient list</small></a>
       <a class="quick-action" href="#/week">${uiIcon('calendar')}<span>Plan this week</span><small>Meals that fit your time</small></a>
       <a class="quick-action" href="#/grocery">${uiIcon('cart')}<span>Grocery list</span><small>From this week's meals</small></a>
+      ${people.length > 1 ? `<a class="quick-action" href="#/together">${uiIcon('people')}<span>Household week</span><small>Who is at which meal</small></a>` : ''}
       <a class="quick-action" href="#/breathe">${uiIcon('breathe')}<span>Breathe</span><small>A short visual reset</small></a>
     </div>`, { id: 'home-actions-h' })}
     <p class="small muted">This app is for general wellness and education. It does not diagnose or treat any condition. Any medical targets, like a sodium or protein limit, come from your doctor or dietitian, never from the app.</p>

@@ -17,16 +17,18 @@ function peoplePersist(person) {
 }
 
 const PEOPLE_STEPS = [
-  { id: 'basics', label: 'Basics' },
-  { id: 'conditions', label: 'Conditions' },
-  { id: 'allergens', label: 'Allergens' },
-  { id: 'preferences', label: 'Preferences' },
-  { id: 'medications', label: 'Medications' },
-  { id: 'clinician', label: 'Doctor or dietitian numbers' },
-  { id: 'cooking', label: 'Cooking' },
-  { id: 'review', label: 'Review' }
+  { id: 'basics', label: 'Basics', why: 'Who this is. Age, size, and activity feed the calorie estimate; a couple of yes/no questions feed specific guidelines.' },
+  { id: 'allergens', label: 'Allergies', why: 'Hard stops. Anything ticked here is never served, suggested, or overridden.' },
+  { id: 'conditions', label: 'Conditions and diets', why: 'Where the plan comes from. Each one you tick brings its published guidelines; the app merges them and shows conflicts.' },
+  { id: 'preferences', label: 'Likes and dislikes', why: 'Soft choices: foods to steer away from, spice level, cuisines you love or skip. Never overrides an allergy or a condition.' },
+  { id: 'medications', label: 'Medications', why: 'Only asked when a condition you ticked has a medication that changes its advice.' },
+  { id: 'clinician', label: 'Numbers from your doctor', why: 'Only asked when a condition needs a number the app must not choose for you, like a protein or potassium limit.' },
+  { id: 'cooking', label: 'Cooking', why: 'Your real week: time, days, kitchen, and how you feel about cooking. Meals are chosen to fit.' },
+  { id: 'review', label: 'Review', why: 'Everything on one page. Save to build the plan.' }
 ];
-const PEOPLE_CAREGIVER_STEPS = ['basics', 'conditions', 'allergens', 'cooking', 'review'];
+const PEOPLE_CAREGIVER_STEPS = ['basics', 'allergens', 'conditions', 'cooking', 'review'];
+// Notes from the source document that describe how avoidances and the age gate work. They are not choices, so they never appear in the picker.
+const PEOPLE_META_MODULES = ['food-allergies', 'medical-avoidances', 'preference-avoidances', 'pediatric'];
 const PEOPLE_COOKING_SUBS = [
   { id: 'time', label: 'Time' },
   { id: 'days', label: 'Days and interest' },
@@ -109,14 +111,24 @@ const PEOPLE_EQUIPMENT = [
 
 let peopleCustomDraft = null;
 
-function peopleStepsFor(person) {
-  return person.adult === false ? PEOPLE_STEPS.filter(s => PEOPLE_CAREGIVER_STEPS.includes(s.id)) : PEOPLE_STEPS;
+// Steps for this person. Medications and doctor numbers only appear when something on them applies; `keep` forces one in
+// (so a direct link to it still renders a stepper).
+function peopleStepsFor(person, keep) {
+  let steps = person.adult === false ? PEOPLE_STEPS.filter(s => PEOPLE_CAREGIVER_STEPS.includes(s.id)) : PEOPLE_STEPS;
+  return steps.filter(s => s.id === keep || peopleStepApplies(person, s.id));
+}
+function peopleStepApplies(person, stepId) {
+  if (stepId !== 'medications' && stepId !== 'clinician') return true;
+  let plan = null;
+  try { plan = uiPlanFor(person); } catch { return true; }
+  if (stepId === 'medications') return plan.modules.some(m => { const mod = uiState.conditionsById.get(m.id); return mod && Array.isArray(mod.medication_questions) && mod.medication_questions.length; });
+  return (plan.tier2.missing || []).length > 0 || (plan.tier2.applied || []).length > 0 || plan.modules.some(m => { const mod = uiState.conditionsById.get(m.id); return mod && Array.isArray(mod.tier2) && mod.tier2.length; });
 }
 
 // Flat list of pages in walk-through order. Cooking is one step with three sub-screens.
-function peoplePagesFor(person) {
+function peoplePagesFor(person, keep) {
   const pages = [];
-  for (const s of peopleStepsFor(person)) {
+  for (const s of peopleStepsFor(person, keep)) {
     if (s.id === 'cooking') for (const c of PEOPLE_COOKING_SUBS) pages.push({ step: 'cooking', sub: c.id, hash: `cooking/${c.id}`, label: `Cooking: ${c.label}` });
     else pages.push({ step: s.id, sub: null, hash: s.id, label: s.label });
   }
@@ -151,7 +163,7 @@ export function renderPeopleScreen(root, ctx) {
   if (parts[0] === 'new') return peopleRenderNew(root);
   const person = uiEnsurePerson(uiFindPersonById(parts[0]));
   if (!person) { root.innerHTML = `${uiPageHeader('People')}${uiEmptyState('That person was not found.', '<a class="btn" href="#/people">All people</a>')}`; return; }
-  const steps = peopleStepsFor(person);
+  const steps = peopleStepsFor(person, parts[1]);
   const stepId = steps.some(s => s.id === parts[1]) ? parts[1] : steps[0].id;
   const sub = stepId === 'cooking' ? (PEOPLE_COOKING_SUBS.some(c => c.id === parts[2]) ? parts[2] : 'time') : null;
   peopleRenderStepper(root, person, stepId, sub);
@@ -226,8 +238,8 @@ function peopleRenderNew(root) {
 }
 
 function peopleRenderStepper(root, person, stepId, sub) {
-  const steps = peopleStepsFor(person);
-  const pages = peoplePagesFor(person);
+  const steps = peopleStepsFor(person, stepId);
+  const pages = peoplePagesFor(person, stepId);
   const idx = steps.findIndex(s => s.id === stepId);
   const pageHash = stepId === 'cooking' ? `cooking/${sub}` : stepId;
   const pageIdx = pages.findIndex(p => p.hash === pageHash);
@@ -239,6 +251,7 @@ function peopleRenderStepper(root, person, stepId, sub) {
     ${uiPageHeader(uiEsc(person.name), done ? `Editing: ${uiEsc(cur.label)}.` : 'Setting up. Use Next to walk through each step; the plan is ready once you save on the Review step.', `<a class="btn small" href="#/people">${uiIcon('people')}All people</a>`)}
     <div class="stepper" aria-label="Steps">
       <div class="stepper-status">Step ${idx + 1} of ${steps.length}: ${uiEsc(cur.label)}</div>
+      ${cur.why ? `<div class="stepper-why">${uiEsc(cur.why)}</div>` : ''}
       <div class="stepper-bar" aria-hidden="true">${steps.map((s, i) => `<span class="${i < idx ? 'done' : i === idx ? 'current' : ''}"></span>`).join('')}</div>
       <div class="stepper-names" role="list">
       ${steps.map((s, i) => {
@@ -326,7 +339,8 @@ function peopleStepBasics(container, person) {
       <div class="field"><span class="label">Pregnant?</span>${uiYesNo('pregnancy', !!person.pregnancy)}</div>
       <div class="field"><span class="label">Breastfeeding?</span>${uiYesNo('breastfeeding', !!person.breastfeeding)}
         <div class="hint">Either answer turns on the pregnancy and breastfeeding rules and turns off weight-loss, ketogenic, low-carbohydrate, fasting, and elimination protocols other than allergen and celiac.</div></div>`}
-    </div>`;
+    </div>
+    ${peopleGlobalFlagsHTML(person)}`;
   const bindText = (sel, fn) => container.querySelector(sel).addEventListener('change', e => { fn(e.target.value); peoplePersist(person); });
   bindText('#pb-name', v => { if (v.trim()) person.name = v.trim(); });
   bindText('#pb-age', v => { person.age = v === '' ? null : Number(v); });
@@ -350,40 +364,48 @@ function peopleStepBasics(container, person) {
   peopleBindSeg(container, person, 'basics', 'activity', v => { person.activity = v; }, { rerender: false });
   peopleBindSeg(container, person, 'basics', 'pregnancy', v => { person.pregnancy = v === 'yes'; }, { rerender: false });
   peopleBindSeg(container, person, 'basics', 'breastfeeding', v => { person.breastfeeding = v === 'yes'; }, { rerender: false });
+  peopleBindModulePanels(container, person, 'basics');
 }
 
 // b) Conditions and patterns, grouped by category: condition, pattern, restriction.
+// The evidence summary minus its leading "Rating: STRONG" phrase, which the chip beside the name already says.
+function peopleSummaryText(m) {
+  const t = String(m.evidence && m.evidence.summary || '').replace(/^\s*Rating:\s*[A-Za-z -]+?(\s*\([^)]*\))?\s*[.;:,]?\s*(for\s+)?/i, '').trim();
+  return t ? t.charAt(0).toUpperCase() + t.slice(1) : '';
+}
+let peopleCondQuery = '';
 function peopleStepConditions(container, person) {
-  let modules = uiState.data.conditions.slice();
+  let modules = uiState.data.conditions.filter(m => !PEOPLE_META_MODULES.includes(m.id));
   if (person.adult === false) modules = modules.filter(peopleIsCaregiverModule);
+  const selected = new Set((person.modules || []).filter(id => !PEOPLE_META_MODULES.includes(id)));
   const groups = [
-    { key: 'condition', title: 'Medical conditions' },
-    { key: 'pattern', title: 'Eating patterns' },
-    { key: 'restriction', title: 'Restrictions' }
+    { key: 'condition', title: 'Medical conditions', hint: 'diabetes, reflux, kidney, heart, celiac, IBS and more' },
+    { key: 'pattern', title: 'Ways of eating', hint: 'vegetarian, Mediterranean, DASH, low-carb, low added sugar' }
   ];
-  const auto = { 'food-allergies': 'Turned on automatically when you list an allergen.', 'pregnancy-gdm-breastfeeding': 'Also turned on automatically by the pregnancy or breastfeeding answer.', 'medical-avoidances': 'Describes how condition-driven avoidances work. Selecting it adds no numbers.', 'preference-avoidances': 'Describes how preferences work. Your actual preferences are set on the Preferences step.', pediatric: 'Applies to a child profile (caregiver mode).' };
-  if (person.adult !== false) modules = modules.filter(m => m.id !== 'pediatric');
-  const selected = new Set(person.modules || []);
-  const cats = new Set(modules.map(m => m.category));
-  for (const c of cats) if (!groups.some(g => g.key === c)) groups.push({ key: c, title: c.charAt(0).toUpperCase() + c.slice(1) });
+  const q = peopleCondQuery.trim().toLowerCase();
+  const matches = m => !q || (m.name + ' ' + (m.evidence && m.evidence.summary || '') + ' ' + (m.aliases || []).join(' ')).toLowerCase().includes(q);
+  const row = m => `<label class="choice cond-row">
+      <input type="checkbox" data-module="${uiEsc(m.id)}" ${selected.has(m.id) ? 'checked' : ''}>
+      <span class="choice-body"><span class="cond-name">${uiEsc(m.name)} ${uiRatingBadge(m.evidence && m.evidence.rating)}</span><span class="cond-sum">${uiEsc(peopleSummaryText(m))}</span></span>
+      <button type="button" class="btn small about-btn" data-edu="${uiEsc(m.id)}" aria-label="About ${uiEsc(m.name)}">${uiIcon('book')}About</button>
+    </label>`;
+  const chosen = modules.filter(m => selected.has(m.id));
   container.innerHTML = `
-    <p>Select everything that applies. The plan merges the rules and shows every conflict rather than picking a side. Tap a name to read about it before choosing.</p>
-    ${modules.length ? '' : uiEmptyState('No condition modules are loaded (data/conditions.json is missing or empty).', '', 'list')}
+    <p class="step-why">Tick what applies. Each one brings its published guidelines into the plan; the evidence chip says how strong they are. Tap <strong>About</strong> to read before you decide. Allergies are on their own step and are never loosened by anything here.</p>
+    <div class="cond-selected">
+      <h2>${chosen.length ? `Your selections (${chosen.length})` : 'Nothing selected yet'}</h2>
+      ${chosen.length ? `<div class="choice-list">${chosen.map(m => row(m) + peopleModulePanelHTML(m, person)).join('')}</div>` : '<p class="cond-none small">No conditions or ways of eating yet. That is fine: the plan will still use your allergies, likes, and cooking answers. Pick from the lists below or search.</p>'}
+    </div>
+    <div class="field" style="margin-top:1rem"><label for="cond-search">Search</label><div class="search-row">${uiIcon('search')}<input id="cond-search" type="search" placeholder="Type: diabetes, reflux, celiac, vegetarian" value="${uiEsc(peopleCondQuery)}" autocomplete="off"></div></div>
     ${groups.map(g => {
-      const list = modules.filter(m => m.category === g.key);
-      if (!list.length) return '';
-      return `<h2>${g.title}</h2><div class="choice-list">${list.map(m => {
-        const locked = m.id === 'food-allergies';
-        return `<label class="choice" ${locked ? 'aria-disabled="true"' : ''}>
-          <input type="checkbox" data-module="${uiEsc(m.id)}" ${selected.has(m.id) ? 'checked' : ''} ${locked ? 'disabled' : ''}>
-          <span class="choice-body">
-            <span class="row"><button type="button" class="btn link module-name" data-edu="${uiEsc(m.id)}" aria-label="Read about ${uiEsc(m.name)}">${uiEsc(m.name)}</button> <button type="button" class="btn link rating-open" data-edu="${uiEsc(m.id)}" aria-label="Evidence for ${uiEsc(m.name)}">${uiRatingBadge(m.evidence && m.evidence.rating)}</button> <button type="button" class="btn small about-btn" data-edu="${uiEsc(m.id)}" aria-label="About ${uiEsc(m.name)}">${uiIcon('book')}About</button></span>
-            <span class="small muted">${uiEsc(m.evidence && m.evidence.summary || '')}</span>
-            ${auto[m.id] ? `<span class="small muted"><br>${auto[m.id]}</span>` : ''}
-          </span></label>${selected.has(m.id) && !locked ? peopleModulePanelHTML(m, person) : ''}`;
-      }).join('')}</div>`;
+      const list = modules.filter(m => m.category === g.key && !selected.has(m.id) && matches(m));
+      const total = modules.filter(m => m.category === g.key && !selected.has(m.id)).length;
+      if (!total) return '';
+      const open = !!q || g.key === 'condition';
+      return `<details class="cond-group" ${open ? 'open' : ''}><summary>${g.title}<span class="cond-group-hint">${g.hint}</span><span class="count">${list.length}${q ? ` of ${total}` : ''}</span></summary>
+        ${list.length ? `<div class="choice-list">${list.map(row).join('')}</div>` : `<p class="small muted" style="padding-bottom:12px">Nothing here matches "${uiEsc(peopleCondQuery)}".</p>`}</details>`;
     }).join('')}
-    ${peopleGlobalFlagsHTML(person)}`;
+    ${q && !modules.some(m => !selected.has(m.id) && matches(m)) ? `<p class="small muted">No match for "${uiEsc(peopleCondQuery)}". A diet that is not on the list can be added on the Likes and dislikes step.</p>` : ''}`;
   container.querySelectorAll('[data-module]').forEach(inp => inp.addEventListener('change', () => {
     const id = inp.dataset.module;
     person.modules = person.modules || [];
@@ -391,6 +413,8 @@ function peopleStepConditions(container, person) {
     if (!inp.checked) person.modules = person.modules.filter(x => x !== id);
     peopleRefresh(container, person, 'conditions', `[data-module="${id}"]`);
   }));
+  const search = container.querySelector('#cond-search');
+  search.addEventListener('input', () => { peopleCondQuery = search.value; const pos = search.selectionStart; peopleRenderStep(container, person, 'conditions', null); const s2 = container.querySelector('#cond-search'); s2.focus(); try { s2.setSelectionRange(pos, pos); } catch { /* ignore */ } });
   peopleBindModulePanels(container, person, 'conditions');
   container.querySelectorAll('[data-edu]').forEach(b => b.addEventListener('click', e => {
     e.preventDefault();
@@ -520,8 +544,8 @@ function peopleStepPreferences(container, person) {
     ['kosher', 'Kosher', porkTag ? `Avoids pork (tag: ${uiTagLabel(porkTag)}) and shellfish by name matching.` : 'No pork tag exists in the dictionary, so pork and shellfish rules are applied by name matching on ingredient text.']
   ];
   container.innerHTML = `
-    <p>Preferences are soft. They lower a recipe's score and show as a caution, and you can override them any time. They never loosen an allergen or a condition rule.</p>
-    <h2>Pre-built patterns</h2>
+    <p class="step-why">These are soft. They steer which recipes get picked and show a caution when one slips through; nothing here loosens an allergy or a condition.</p>
+    <h2>Ways of eating</h2>
     <div class="choice-list">
       ${patterns.map(([id, label, hint]) => `<label class="choice"><input type="checkbox" data-pattern="${id}" ${prefs.patterns.includes(id) ? 'checked' : ''}><span class="choice-body"><span class="choice-title">${uiEsc(label)}</span> <span class="small muted">${uiEsc(hint)}</span></span></label>`).join('')}
     </div>
@@ -540,8 +564,9 @@ function peopleStepPreferences(container, person) {
     <div class="field"><span class="label">Cuisines you love</span><div class="chip-grid">${CUISINES.filter(c => c.id !== 'other').map(c => `<label class="choice compact"><input type="checkbox" data-clove="${c.id}" ${(prefs.cuisines_love || []).includes(c.id) ? 'checked' : ''}><span class="choice-body"><span class="choice-title">${uiEsc(c.label)}</span></span></label>`).join('')}</div></div>
     <div class="field" hidden>
       <div class="hint">Comma separated. Matched as plain text in ingredient lists and recipe names. Soft.</div></div>
-    <h2 id="custom-diet">A diet not on the list</h2>
-    ${peopleCustomDietHTML(person)}`;
+    <details class="pref-more" id="custom-diet"><summary>A diet that is not on the list (optional)</summary>
+    <p class="small muted">Name it, say what it avoids, and the app treats it as your own module: soft rules, marked "Defined by you", no evidence rating.</p>
+    ${peopleCustomDietHTML(person)}</details>`;
   container.querySelectorAll('[data-pattern]').forEach(inp => inp.addEventListener('change', () => {
     const id = inp.dataset.pattern;
     if (inp.checked && !prefs.patterns.includes(id)) prefs.patterns.push(id);
@@ -985,7 +1010,7 @@ function peopleStepReview(container, person) {
     ['Weight, height', uiEsc(wh || 'not entered')],
     ['Activity', uiEsc(act ? act.label : 'not set')],
     ['Pregnant or breastfeeding', person.pregnancy || person.breastfeeding ? 'Yes' : 'No'],
-    ['Modules', plan.modules.length ? plan.modules.map(m => m.category === 'custom' ? `${uiEsc(m.name)} ${uiUserDefinedBadge()}` : uiEsc(m.name)).join(', ') : 'none'],
+    ['Conditions and diets', plan.modules.length ? plan.modules.map(m => m.category === 'custom' ? `${uiEsc(m.name)} ${uiUserDefinedBadge()}` : uiEsc(m.name)).join(', ') : 'none'],
     ['Turned off', plan.disabledModules.length ? plan.disabledModules.map(d => `${uiEsc(uiModuleName(d.id))} (by ${uiEsc(uiModuleName(d.by))})`).join(', ') : 'none'],
     ['Options', Object.entries(person.variants || {}).filter(([, v]) => v && v.length).map(([k, v]) => `${uiEsc(uiModuleName(k))}: ${uiEsc([].concat(v).join(', '))}`).join('; ') || 'defaults'],
     ['Flags', Object.entries(person.flags || {}).filter(([, v]) => v).map(([k]) => uiEsc((uiState.conditionsMeta.flags[k] || { label: k }).label)).join('; ') || 'none'],

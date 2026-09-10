@@ -6907,7 +6907,7 @@
       "module": "heart-failure"
     },
     "overweight": {
-      "label": "Your clinician has said weight loss would help (used only where a guideline ties advice to overweight)",
+      "label": "Your doctor has said losing weight would help (used only where a guideline ties advice to overweight)",
       "module": null
     },
     "older_adult_illness": {

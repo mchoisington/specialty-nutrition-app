@@ -134,7 +134,10 @@ function appRenderNav() {
   if (!sheet) { sheet = document.createElement('div'); sheet.id = 'more-sheet'; sheet.className = 'more-sheet'; sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-label', 'More screens'); document.getElementById('app').appendChild(sheet); }
   sheet.hidden = !appMoreOpen;
   scrim.hidden = !appMoreOpen;
-  sheet.innerHTML = `<div class="sheet-title"><span class="eyebrow">More</span><button type="button" class="btn small icon" id="more-close" aria-label="Close the More menu">${uiIcon('close')}</button></div>` + more.map(s => appNavLink(s, cur)).join('');
+  const MORE_GROUPS = [['Plan and cook', ['plan', 'week', 'recipes', 'grocery', 'pantry', 'together']], ['Track', ['today', 'log', 'check', 'people']], ['Learn and settings', ['learn', 'breathe', 'settings']]];
+  const grouped = MORE_GROUPS.map(([title, ids]) => { const items = more.filter(s => ids.includes(s.id)); return items.length ? `<div class="sheet-group"><span class="eyebrow">${title}</span></div>` + items.map(s => appNavLink(s, cur)).join('') : ''; }).join('');
+  const rest = more.filter(s => !MORE_GROUPS.some(([, ids]) => ids.includes(s.id))).map(s => appNavLink(s, cur)).join('');
+  sheet.innerHTML = `<div class="sheet-title"><span class="eyebrow">More</span><button type="button" class="btn small icon" id="more-close" aria-label="Close the More menu">${uiIcon('close')}</button></div>` + grouped + rest;
   const toggleMore = open => { appMoreOpen = open; appRenderNav(); if (open) { const first = sheet.querySelector('a'); if (first) first.focus(); } else { const b = document.getElementById('more-btn'); if (b) b.focus(); } };
   document.getElementById('more-btn').addEventListener('click', () => toggleMore(!appMoreOpen));
   sheet.querySelector('#more-close').addEventListener('click', () => toggleMore(false));
