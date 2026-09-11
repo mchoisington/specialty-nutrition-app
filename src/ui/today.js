@@ -62,8 +62,9 @@ function todayAmountText(entry) {
 export function todayAddDiaryEntry(person, { date, meal, kind, ref, amount = 1, unit = 'serving', grams = null, note = '', name = '', nutrients = null }) {
   todayEnsure(person);
   const entry = { id: todayNewId('d'), date, person: person.id, meal: /^snack/.test(String(meal)) || meal === 'component' ? 'snacks' : meal, kind, ref, amount, unit, grams, note, name };
-  if (kind === 'custom') entry.nutrients = nutrients || {};
-  entry.nutrients = todayNutrientsFor(entry);
+  // A plain write-in (name only, nutrients === null) keeps nutrients null: the report's averages skip it rather than count zeros.
+  if (kind === 'custom' && nutrients === null) { entry.nutrients = null; entry.no_numbers = true; }
+  else { if (kind === 'custom') entry.nutrients = nutrients || {}; entry.nutrients = todayNutrientsFor(entry); }
   uiState.profile.diary.push(entry);
   uiPersist();
   return entry;
@@ -195,7 +196,7 @@ function todayMealsHTML(person, plan, entries) {
           const n = e.nutrients || {};
           return `<div class="entry-row">
             ${e.kind !== 'custom' ? `<button class="heart-btn ${fav ? 'on' : ''}" type="button" data-fav="${e.kind}:${uiEsc(e.ref)}" aria-pressed="${fav}" aria-label="${fav ? 'Remove from favorites' : 'Add to favorites'}">${uiIcon('heart', { fill: fav })}</button>` : '<span style="width:40px;flex:none"></span>'}
-            <div class="entry-main"><div><span class="entry-name">${uiEsc(todayEntryName(e))}</span> <span class="entry-amount">${uiEsc(todayAmountText(e))}</span></div><div class="entry-kcal">${uiFmtNum(n.kcal)} kcal</div>
+            <div class="entry-main"><div><span class="entry-name">${uiEsc(todayEntryName(e))}</span> <span class="entry-amount">${uiEsc(todayAmountText(e))}</span></div><div class="entry-kcal">${e.nutrients ? uiFmtNum(n.kcal) + ' kcal' : 'no numbers'}</div>
               <div class="entry-nut">${uiFmtNum(n.protein_g, 1)} g protein · ${uiFmtNum(n.carb_g, 1)} g carb · ${uiFmtNum(n.fiber_g, 1)} g fiber · ${uiFmtNum(n.sodium_mg)} mg sodium · ${uiFmtNum(n.satfat_g, 1)} g sat fat</div>
               ${e.note ? `<div class="entry-note">${uiEsc(e.note)}</div>` : ''}</div>
             <div class="entry-acts"><button class="btn small icon" type="button" data-edit="${uiEsc(e.id)}" aria-label="Edit ${uiEsc(todayEntryName(e))}" title="Edit">${uiIcon('edit')}</button><button class="btn small icon danger" type="button" data-remove="${uiEsc(e.id)}" aria-label="Remove ${uiEsc(todayEntryName(e))}" title="Remove">${uiIcon('trash')}</button></div>
@@ -281,7 +282,7 @@ function todayBind(root, person, plan, date) {
   root.querySelector('#today-copy-yesterday').addEventListener('click', () => {
     const prev = todayEntries(person, todayShiftDate(date, -1));
     if (!prev.length) { uiToast('Nothing was logged yesterday.'); return; }
-    for (const e of prev) uiState.profile.diary.push({ ...e, id: todayNewId('d'), date, nutrients: { ...e.nutrients } });
+    for (const e of prev) uiState.profile.diary.push({ ...e, id: todayNewId('d'), date, nutrients: e.nutrients ? { ...e.nutrients } : null });
     uiPersist(); uiToast(`Copied ${prev.length} entr${prev.length === 1 ? 'y' : 'ies'} from yesterday.`); uiState.rerender();
   });
   root.querySelector('#today-from-plan').addEventListener('click', () => {
@@ -418,12 +419,13 @@ function todaySearchItems(person, plan, query, favOnly) {
 export function todayAddModal(person, plan, date, meal) {
   const state = { q: '', fav: false };
   const m = uiModal(`
+    ${uiState.lite ? `<div class="field"><label for="today-w-name">Write it in</label><div class="row"><input id="today-w-name" type="text" placeholder="Toast with butter" autocomplete="off" style="flex:1;min-width:0"><button class="btn primary" type="button" id="today-w-add">Add</button></div><div class="hint">Just the name. Or search below to have it checked and counted.</div></div>` : ''}
     <div class="row"><input type="search" id="today-q" placeholder="Search recipes and foods" aria-label="Search recipes and foods" style="flex:1;min-width:0"><button class="today-chip" type="button" id="today-fav-chip" aria-pressed="false">${uiIcon('heart')}Favorites</button></div>
     <div id="today-results" style="margin-top:.5rem"></div>
-    <details style="margin-top:.75rem"><summary>Custom entry (from a label)</summary>
+    ${uiState.lite ? '' : `<details style="margin-top:.75rem"><summary>Custom entry (from a label)</summary>
       <div class="today-row"><div class="field"><label for="today-c-name">Name</label><input id="today-c-name" type="text"></div><div class="field" style="max-width:110px"><label for="today-c-kcal">kcal</label><input id="today-c-kcal" type="number" inputmode="numeric" min="0"></div></div>
       <div class="today-row" style="margin-top:.5rem"><div class="field"><label for="today-c-protein">Protein g</label><input id="today-c-protein" type="number" inputmode="decimal" min="0"></div><div class="field"><label for="today-c-carb">Carb g</label><input id="today-c-carb" type="number" inputmode="decimal" min="0"></div><div class="field"><label for="today-c-fiber">Fiber g</label><input id="today-c-fiber" type="number" inputmode="decimal" min="0"></div><div class="field"><label for="today-c-sodium">Sodium mg</label><input id="today-c-sodium" type="number" inputmode="numeric" min="0"></div><div class="field"><label for="today-c-satfat">Sat fat g</label><input id="today-c-satfat" type="number" inputmode="decimal" min="0"></div></div>
-      <div class="btn-row"><button class="btn" type="button" id="today-c-add">Add custom entry</button></div><p class="small muted">Custom entries are not checked against your plan's avoid rules; only their numbers count.</p></details>
+      <div class="btn-row"><button class="btn" type="button" id="today-c-add">Add custom entry</button></div><p class="small muted">Custom entries are not checked against your plan's avoid rules; only their numbers count.</p></details>`}
   `, { title: `Add to ${(TODAY_MEALS.find(x => x.id === meal) || { label: meal }).label}` });
   if (!m) return;
   const el = m.el;
@@ -440,7 +442,19 @@ export function todayAddModal(person, plan, date, meal) {
   };
   el.querySelector('#today-q').addEventListener('input', e => { state.q = e.target.value; draw(); });
   el.querySelector('#today-fav-chip').addEventListener('click', e => { state.fav = !state.fav; e.currentTarget.classList.toggle('on', state.fav); e.currentTarget.setAttribute('aria-pressed', String(state.fav)); draw(); });
-  el.querySelector('#today-c-add').addEventListener('click', () => {
+  const wAdd = el.querySelector('#today-w-add');
+  if (wAdd) {
+    const save = () => {
+      const name = el.querySelector('#today-w-name').value.trim();
+      if (!name) { uiToast('Type what you ate.'); return; }
+      todayAddDiaryEntry(person, { date, meal, kind: 'custom', ref: null, amount: 1, unit: 'entry', name, nutrients: null });
+      m.close(); uiToast('Added.'); uiState.rerender();
+    };
+    wAdd.addEventListener('click', save);
+    el.querySelector('#today-w-name').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); save(); } });
+  }
+  const cAdd = el.querySelector('#today-c-add');
+  if (cAdd) cAdd.addEventListener('click', () => {
     const name = el.querySelector('#today-c-name').value.trim();
     if (!name) { uiToast('Enter a name.'); return; }
     const num = id => { const v = el.querySelector(id).value; return v === '' ? 0 : Number(v); };
@@ -448,7 +462,7 @@ export function todayAddModal(person, plan, date, meal) {
     m.close(); uiToast('Added.'); uiState.rerender();
   });
   draw();
-  el.querySelector('#today-q').focus();
+  el.querySelector(uiState.lite ? '#today-w-name' : '#today-q').focus();
 }
 
 // Amount form for a recipe (servings) or a food (portion or grams). Also used to edit an existing entry.
@@ -535,8 +549,12 @@ function todayCustomEditModal(entry) {
     entry.name = m.el.querySelector('#today-ce-name').value.trim() || entry.name;
     entry.meal = m.el.querySelector('#today-ce-meal').value;
     const nut = { ...n };
-    for (const k of ['kcal', 'protein_g', 'carb_g', 'fiber_g', 'sodium_mg', 'satfat_g']) nut[k] = Number(m.el.querySelector('#today-ce-' + k).value) || 0;
-    entry.nutrients = todayNutrientsFor({ kind: 'custom', nutrients: nut });
+    const fields = ['kcal', 'protein_g', 'carb_g', 'fiber_g', 'sodium_mg', 'satfat_g'];
+    for (const k of fields) nut[k] = Number(m.el.querySelector('#today-ce-' + k).value) || 0;
+    // A write-in stays without numbers unless some were typed; otherwise blank fields would count as zeros in the averages.
+    const anyNumber = fields.some(k => String(m.el.querySelector('#today-ce-' + k).value).trim() !== '');
+    if (entry.no_numbers && !anyNumber) entry.nutrients = null;
+    else { entry.nutrients = todayNutrientsFor({ kind: 'custom', nutrients: nut }); delete entry.no_numbers; }
     uiPersist(); m.close(); uiToast('Saved.'); uiState.rerender();
   });
 }
