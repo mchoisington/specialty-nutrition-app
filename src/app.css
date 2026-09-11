@@ -932,6 +932,8 @@ td.num, th.num { text-align: right; white-space: nowrap; }
 .lite-symptoms { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .lite-sym { min-height: 48px; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--hairline); background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; }
 .lite-sym.on { background: var(--tint-plum); border-color: var(--accent); color: var(--accent); }
+.lite-sym-row { border-left: 4px solid var(--accent); }
+.lite-sym-row .field { margin-top: 8px; }
 .report-sheet { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); padding: var(--s3); }
 .report-sheet .report-title { font-size: var(--fs-24); }
 .report-sheet .report-meta { color: var(--muted); font-size: var(--fs-15); margin-bottom: var(--s2); }

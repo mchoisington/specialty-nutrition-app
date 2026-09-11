@@ -78,41 +78,63 @@ export function renderLiteTodayScreen(root) {
 
 function liteSymptomModal(person, date) {
   const list = [...LOG_SYMPTOMS.map(s => ({ id: s.id, label: s.label, help: s.help })), ...liteCustomSymptoms(person)];
-  const state = { picked: {}, note: '', time: new Date().toTimeString().slice(0, 5) };
+  const labelOf = id => { const f = list.find(x => x.id === id); return f ? f.label : liteSymptomLabel(id); };
+  const now = new Date().toTimeString().slice(0, 5);
+  // Each tapped symptom gets its own how bad, when, and note. Order is the order tapped.
+  const state = { picked: new Map() };
+  const idx = new Map();   // symptom id -> stable number, for radio group names
+  const num = id => { if (!idx.has(id)) idx.set(id, idx.size + 1); return idx.get(id); };
   const m = uiModal(`
-    <p class="small muted">Tap everything you feel, then how bad. This goes on the doctor report with what you ate in the 24 hours before.</p>
+    <p class="small muted">Tap everything you feel. Each one gets its own how bad and when. This goes on the doctor report with what you ate in the 24 hours before.</p>
     <div class="lite-symptoms">${list.map(s => `<button type="button" class="lite-sym" data-sym="${uiEsc(s.id)}" aria-pressed="false" title="${uiEsc(s.help || '')}">${uiEsc(s.label)}</button>`).join('')}</div>
     <div class="field"><label for="lite-sym-new">Something else</label><input id="lite-sym-new" type="text" placeholder="Type it and press Add" autocomplete="off"><div class="btn-row" style="margin-top:6px"><button class="btn small" type="button" id="lite-sym-add">Add</button></div></div>
-    <div class="field"><span class="label">How bad?</span>${uiSegmented('lite-level', LITE_LEVELS, 2, { label: 'How bad' })}</div>
-    <div class="field"><label for="lite-sym-time">When</label><input id="lite-sym-time" type="time" value="${state.time}" style="width:auto"></div>
-    <div class="field"><label for="lite-sym-note">Note (optional)</label><input id="lite-sym-note" type="text" placeholder="Started an hour after lunch" autocomplete="off"></div>
+    <div id="lite-sym-rows" class="stack"></div>
     <div class="btn-row"><button class="btn primary lite-big" type="button" id="lite-sym-save">Save</button></div>`, { title: 'How do you feel?' });
   if (!m) return;
-  let level = 2;
-  const bind = () => m.el.querySelectorAll('[data-sym]').forEach(b => { b.onclick = () => { const id = b.dataset.sym; if (state.picked[id]) delete state.picked[id]; else state.picked[id] = true; b.classList.toggle('on', !!state.picked[id]); b.setAttribute('aria-pressed', String(!!state.picked[id])); }; });
+  const rowsEl = m.el.querySelector('#lite-sym-rows');
+  const renderRows = () => {
+    rowsEl.innerHTML = [...state.picked.entries()].map(([id, v]) => { const n = num(id); return `<div class="card tight lite-sym-row" data-row="${n}">
+      <h3 class="big-sub" style="margin-top:0">${uiEsc(labelOf(id))}</h3>
+      <div class="field"><span class="label">How bad?</span>${uiSegmented('lite-level-' + n, LITE_LEVELS, v.level, { label: 'How bad: ' + labelOf(id) })}</div>
+      <div class="field"><label for="lite-sym-time-${n}">When</label><input id="lite-sym-time-${n}" type="time" value="${uiEsc(v.time)}" style="width:auto"></div>
+      <div class="field"><label for="lite-sym-note-${n}">Note (optional)</label><input id="lite-sym-note-${n}" type="text" value="${uiEsc(v.note)}" placeholder="Started an hour after lunch" autocomplete="off"></div>
+    </div>`; }).join('');
+    for (const [id, v] of state.picked.entries()) {
+      const n = num(id);
+      rowsEl.querySelectorAll(`[data-seg="lite-level-${n}"]`).forEach(r => r.addEventListener('change', () => { v.level = Number(r.value); rowsEl.querySelectorAll(`[data-seg="lite-level-${n}"]`).forEach(x => x.parentElement.classList.toggle('on', x.checked)); }));
+      rowsEl.querySelector(`#lite-sym-time-${n}`).addEventListener('input', e => { v.time = e.target.value; });
+      rowsEl.querySelector(`#lite-sym-note-${n}`).addEventListener('input', e => { v.note = e.target.value; });
+    }
+  };
+  const toggle = (id, on) => {
+    if (on) { if (!state.picked.has(id)) state.picked.set(id, { level: 2, time: now, note: '' }); } else state.picked.delete(id);
+    const b = m.el.querySelector(`[data-sym="${CSS.escape(id)}"]`);
+    if (b) { b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }
+    renderRows();
+  };
+  const bind = () => m.el.querySelectorAll('[data-sym]').forEach(b => { b.onclick = () => toggle(b.dataset.sym, !state.picked.has(b.dataset.sym)); });
   bind();
-  m.el.querySelectorAll('[data-seg="lite-level"]').forEach(r => r.addEventListener('change', () => { level = Number(r.value); m.el.querySelectorAll('[data-seg="lite-level"]').forEach(x => x.parentElement.classList.toggle('on', x.checked)); }));
   m.el.querySelector('#lite-sym-add').addEventListener('click', () => {
     const v = m.el.querySelector('#lite-sym-new').value.trim();
     if (!v) return;
     person.custom_symptoms = person.custom_symptoms || [];
     if (!person.custom_symptoms.includes(v)) person.custom_symptoms.push(v);
     const id = 'custom:' + v;
-    state.picked[id] = true;
-    const wrap = m.el.querySelector('.lite-symptoms');
-    wrap.insertAdjacentHTML('beforeend', `<button type="button" class="lite-sym on" data-sym="${uiEsc(id)}" aria-pressed="true">${uiEsc(v)}</button>`);
+    if (!list.some(x => x.id === id)) { list.push({ id, label: v }); m.el.querySelector('.lite-symptoms').insertAdjacentHTML('beforeend', `<button type="button" class="lite-sym" data-sym="${uiEsc(id)}" aria-pressed="false">${uiEsc(v)}</button>`); }
     m.el.querySelector('#lite-sym-new').value = '';
     bind(); uiPersist();
+    toggle(id, true);
   });
   m.el.querySelector('#lite-sym-save').addEventListener('click', () => {
-    const ids = Object.keys(state.picked);
-    if (!ids.length) { uiToast('Tap at least one symptom, or use "Feeling fine today".'); return; }
-    const time = m.el.querySelector('#lite-sym-time').value || '12:00';
-    const at = new Date(date + 'T' + time + ':00').toISOString();
-    const symptoms = {}; for (const id of ids) symptoms[id] = level;
+    if (!state.picked.size) { uiToast('Tap at least one symptom, or use "Feeling fine today".'); return; }
     uiState.profile.log = uiState.profile.log || [];
-    uiState.profile.log.push({ date, person: person.id, meal: 'symptom', recipe: null, name: null, text: null, symptoms, notes: m.el.querySelector('#lite-sym-note').value.trim() || null, at, logged_at: new Date().toISOString() });
-    uiPersist(); m.close(); uiToast('Saved. It will show on the doctor report with what you ate before it.'); uiState.rerender();
+    const loggedAt = new Date().toISOString();
+    // One entry per symptom, so each keeps its own severity, time, and note on the report.
+    for (const [id, v] of state.picked.entries()) {
+      const at = new Date(date + 'T' + (v.time || '12:00') + ':00').toISOString();
+      uiState.profile.log.push({ date, person: person.id, meal: 'symptom', recipe: null, name: null, text: null, symptoms: { [id]: v.level }, notes: v.note.trim() || null, at, logged_at: loggedAt });
+    }
+    uiPersist(); m.close(); uiToast(state.picked.size === 1 ? 'Saved. It will show on the doctor report with what you ate before it.' : `Saved ${state.picked.size} symptoms. They will show on the doctor report with what you ate before.`); uiState.rerender();
   });
 }
 
