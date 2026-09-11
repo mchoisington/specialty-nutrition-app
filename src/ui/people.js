@@ -215,7 +215,7 @@ function peopleRenderList(root) {
 function peopleRenderNew(root) {
   const first = !uiState.profile.people.length;
   root.innerHTML = `
-    ${uiPageHeader(first ? 'The first person' : 'Add a person', first ? 'Everything stays on this device. Start with one person; family members can be added later, each with their own plan.' : 'A new person gets their own conditions, allergens, numbers, and week.')}
+    ${uiPageHeader('Add a person')}
     <div class="card">
       <form id="people-new-form">
         <div class="field"><label for="people-new-name">Name</label><input id="people-new-name" type="text" autocomplete="off" required maxlength="40"></div>

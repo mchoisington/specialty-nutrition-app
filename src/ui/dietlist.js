@@ -15,7 +15,7 @@ export function dietStrictCardsHTML(person, plan) {
   const fams = dietFamiliesFor(person, plan);
   if (!fams.length) return '';
   return uiSection('Approved foods', `<div class="stack-2">${fams.map(f => `<div class="card tight">
-    ${uiSwitch('strict-' + f.id, `Strict mode for ${f.label}`, f.strict ? 'On: a recipe counts as safe only when every ingredient is on the approved list or on your own tolerated list.' : 'Off: the avoid list alone decides. Anything not recognised is still never counted safe.', f.strict)}
+    ${uiSwitch('strict-' + f.id, `Strict mode for ${f.label}`, f.strict ? 'On: a recipe counts as safe only when every ingredient is on the approved list, or on your own tolerated list.' : 'Off: a recipe counts as safe unless an ingredient is on the avoid list. Looser. Foods the app does not know can slip through.', f.strict)}
     <div class="row"><a class="btn small" href="#/plan/foods/${uiEsc(f.id)}">${uiIcon('list')}See the approved list</a>${(person.diet_lists && person.diet_lists[f.id] && ((person.diet_lists[f.id].tolerated || []).length || (person.diet_lists[f.id].reacts || []).length)) ? `<span class="small muted">${(person.diet_lists[f.id].tolerated || []).length} added by you, ${(person.diet_lists[f.id].reacts || []).length} removed by you</span>` : ''}</div>
   </div>`).join('')}</div>`, { id: 'plan-approved-h' });
 }
@@ -26,7 +26,7 @@ export function dietBindStrictCards(root, person) {
     person.strict_diets = person.strict_diets || {};
     person.strict_diets[family] = el.checked;
     delete person.week_snapshot;   // the week is rebuilt under the new rule
-    uiPersist(); uiToast(el.checked ? 'Strict mode on. Only approved foods are planned.' : 'Strict mode off. The avoid list alone decides.'); uiState.rerender();
+    uiPersist(); uiToast(el.checked ? 'Strict mode on. Only approved foods are planned.' : 'Strict mode off. Only foods on the avoid list are blocked.'); uiState.rerender();
   }));
 }
 
@@ -67,7 +67,7 @@ export function renderDietListScreen(root, family) {
   root.innerHTML = `
     ${uiPageHeader(`Approved foods: ${uiEsc(fam.label)}`, uiEsc(fam.intro || ''), `<button class="btn small" type="button" id="diet-print">${uiIcon('cite')}Print</button><button class="btn small" type="button" id="diet-copy">${uiIcon('copy')}Copy as list</button><button class="btn small" type="button" id="diet-save">${uiIcon('download')}Save text</button><a class="btn small" href="#/plan">${uiIcon('list')}Plan</a>`)}
     ${!restricts ? uiNoticeHTML({ level: 'info', text: `${person.name}'s plan does not restrict ${fam.label} foods right now, so this list is for reading only.` }) : ''}
-    <div class="card tight">${uiSwitch('strict-' + family, `Strict mode for ${fam.label}`, strict ? 'On: a recipe counts as safe only when every ingredient is on this list or on your tolerated list. Unknown ingredients are never counted safe.' : 'Off: the avoid list alone decides. Unknown ingredients are still never counted safe.', strict)}</div>
+    <div class="card tight">${uiSwitch('strict-' + family, `Strict mode for ${fam.label}`, strict ? 'On: a recipe counts as safe only when every ingredient is on this list, or on your own tolerated list.' : 'Off: a recipe counts as safe unless an ingredient is on the avoid list. Looser. Foods the app does not know can slip through.', strict)}</div>
     <p class="small muted">Sources for the list: ${uiSourcesHTML(fam.sources || [])}.${unverified ? ` ${unverified} item${unverified === 1 ? '' : 's'} marked "not re-checked" came from the app's dictionary and general practice and were not re-verified against the source leaflet in this build.` : ''}</p>
     ${uiSection('Your own changes', `<div class="grid-2">
       <div class="card"><h3>Foods you tolerate ${uiChip(String(mine.tolerated.length), 'pass')}</h3><p class="small muted">Added to your approved list. Use this for foods you have tested and kept.</p>
