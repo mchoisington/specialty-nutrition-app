@@ -166,7 +166,7 @@ export function renderLiteReportScreen(root) {
   root.innerHTML = `
     ${uiPageHeader('Doctor report', 'What you ate, how you felt, and your weight, ready to print or send. Nothing leaves this device unless you send it.', `<button class="btn small primary" type="button" id="lite-print">${uiIcon('cite')}Print</button><button class="btn small" type="button" id="lite-export">${uiIcon('share')}Save as file</button>`)}
     <div class="card tight"><div class="row">
-      <div class="field" style="margin:0"><span class="label">Range</span>${uiSegmented('lite-range', [{ value: 7, label: '7 days' }, { value: 14, label: '14 days' }, { value: 30, label: '30 days' }, { value: 90, label: '90 days' }], liteReportUi.days, { label: 'Range' })}</div>
+      <div class="field" style="margin:0"><span class="label">Range</span>${uiSegmented('lite-range', [{ value: 7, label: '7 days' }, { value: 14, label: '14 days' }, { value: 30, label: '30 days' }, { value: 90, label: '90 days' }, { value: 180, label: '6 months' }], liteReportUi.days, { label: 'Range' })}</div>
       <div class="field" style="margin:0"><span class="label">Include</span>${uiSegmented('lite-mode', [{ value: 'all', label: 'Full diary' }, { value: 'symptoms', label: 'Only days with symptoms' }], liteReportUi.mode, { label: 'Include' })}</div>
     </div></div>
     ${body}`;

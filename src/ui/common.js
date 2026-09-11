@@ -218,6 +218,26 @@ export function uiToast(msg) {
   uiToast._t = setTimeout(() => t.classList.remove('show'), 2400);
 }
 
+// A short yes/no pop-up layered over whatever sheet is open, so that sheet stays put. Resolves true only on the confirm button.
+export function uiConfirmSheet({ title, text, confirm = 'Yes', cancel = 'Cancel' }) {
+  return new Promise(resolve => {
+    const root = document.getElementById('modal-root');
+    if (!root) { resolve(false); return; }
+    const layer = document.createElement('div');
+    layer.className = 'modal-backdrop confirm-layer';
+    layer.innerHTML = `<div class="modal confirm" role="alertdialog" aria-modal="true" aria-label="${uiEsc(title || 'Are you sure?')}"><div class="modal-head"><h2>${uiEsc(title || '')}</h2></div><div class="modal-body"><p>${uiEsc(text)}</p><div class="btn-row"><button class="btn primary" type="button" data-yes="1">${uiEsc(confirm)}</button><button class="btn" type="button" data-no="1">${uiEsc(cancel)}</button></div></div></div>`;
+    const prev = document.activeElement;
+    const done = v => { document.removeEventListener('keydown', onKey, true); layer.remove(); if (prev && prev.focus) prev.focus(); resolve(v); };
+    const onKey = e => { if (e.key === 'Escape') { e.stopPropagation(); done(false); } };
+    layer.addEventListener('click', e => { if (e.target === layer) done(false); });
+    layer.querySelector('[data-yes]').addEventListener('click', () => done(true));
+    layer.querySelector('[data-no]').addEventListener('click', () => done(false));
+    document.addEventListener('keydown', onKey, true);
+    root.appendChild(layer);
+    layer.querySelector('[data-no]').focus();
+  });
+}
+
 export function uiModal(html, opts = {}) {
   const root = document.getElementById('modal-root');
   if (!root) return null;

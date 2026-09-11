@@ -92,9 +92,10 @@ export function mealFits(recipe, meal, { canCook, minutes, slot }) {
   return { fits: true, why: '' };
 }
 
-export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, minutes, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked, person, slot }) {
+// allowCaution: only the swap sheet passes this, to rank the caution list a person can choose from by hand. The planner never does.
+export function scoreRecipe({ recipe, check, cooking, dayIdx, canCook, minutes, recentIds, dayTotals, plan, foodsById, weekFoods, favorites, disliked, person, slot, allowCaution }) {
   if (check.verdict === 'fail') return { score: -Infinity, reasons: ['hard exclusion'] };
-  if (check.verdict !== 'pass') return { score: -Infinity, reasons: ['not fully safe: ' + cautionWhy(check)] };
+  if (check.verdict !== 'pass' && !allowCaution) return { score: -Infinity, reasons: ['not fully safe: ' + cautionWhy(check)] };
   if (disliked && disliked.includes(recipe.id)) return { score: -Infinity, reasons: ['marked never again'] };
   if (person && cuisineSkipped(recipe, person)) return { score: -Infinity, reasons: ['cuisine skipped'] };
   if (person && spiceSkipped(recipe, person)) return { score: -Infinity, reasons: ['too spicy for your setting'] };
@@ -168,9 +169,10 @@ export function cautionWhy(check) {
   if (terms.length) parts.push('avoid word: ' + [...new Set(terms)].join(', '));
   if (check.verifyLabel && check.verifyLabel.length) parts.push('label must be checked for ' + check.verifyLabel.map(v => v.label).join(', '));
   if (check.exceeds && check.exceeds.length) parts.push('one serving is over the daily ' + check.exceeds.map(e => String(e.nutrient).replace(/_(mg|mcg|g|kcal)$/, '').replace(/_/g, ' ')).join(', '));
-  if (check.unknownRisk && check.unknownRisk.length) parts.push('unknown-risk ingredient');
-  if (check.unrecognized && check.unrecognized.length) parts.push('ingredient not recognized: ' + check.unrecognized.slice(0, 3).join(', '));
   if (check.notApproved && check.notApproved.length) parts.push('not on the approved list: ' + [...new Set(check.notApproved.map(n => n.label))].slice(0, 3).join(', ') + (check.notApproved.some(n => n.why === 'reacts') ? ' (you reacted to it)' : ''));
+  if (check.unknownRisk && check.unknownRisk.length) parts.push('unknown-risk ingredient');
+  // raw ingredient lines can be long; keep the first few words of each
+  if (check.unrecognized && check.unrecognized.length) parts.push('ingredient not recognized: ' + check.unrecognized.slice(0, 3).map(u => { const w = String(u).split(/\s+/); return w.length > 5 ? w.slice(0, 5).join(' ') + '…' : u; }).join(', '));
   return parts.join('; ') || 'needs a look';
 }
 

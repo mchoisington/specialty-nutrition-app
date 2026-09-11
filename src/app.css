@@ -836,6 +836,9 @@ td.num, th.num { text-align: right; white-space: nowrap; }
 .modal-head h2 { flex: 1; font-size: var(--fs-20); }
 .modal-head .modal-back { display: inline-flex; }
 .modal-body { display: flex; flex-direction: column; gap: 12px; }
+.modal-backdrop.confirm-layer { z-index: 60; align-items: center; padding: var(--s2); }
+.modal.confirm { max-width: 420px; border-radius: 16px; }
+
 .modal-body > .field + .field { margin-top: 0; }
 .modal-grab { width: 40px; height: 4px; border-radius: 999px; background: var(--hairline); margin: 0 auto; }
 @media (min-width: 640px) { .modal-grab { display: none; } }

@@ -1,9 +1,9 @@
 // Week: a 7-day plan from the planner, with swaps, logging, and recipe detail.
-import { buildWeekPlan, scoreRecipe, recipeMeal, SLOT_LABEL, DAYS, snackPlan, daySlots, isSnackSlot, mealFits, repickSlots } from '../engine/planner.js';
+import { buildWeekPlan, scoreRecipe, recipeMeal, SLOT_LABEL, DAYS, snackPlan, daySlots, isSnackSlot, mealFits, repickSlots, cautionWhy } from '../engine/planner.js';
 import { recipeHeat, spicePreference } from '../engine/spice.js';
 import { checkRecipe } from '../engine/checker.js';
 import { compareToPlan, recipeTotals, emptyTotals, addTotals } from '../engine/nutrition.js';
-import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiWeekKey, uiToday, uiIsoDate, uiFmtDate, uiFmtNum, uiNutrientLabel, uiModal, uiToast, uiVerdictWord, uiVerdictChip, uiPageHeader, uiSection, uiChip, uiIcon, uiNoticeHTML, uiEmptyState, uiSwitch, uiMeterTone } from './common.js';
+import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiWeekKey, uiToday, uiIsoDate, uiFmtDate, uiFmtNum, uiNutrientLabel, uiModal, uiToast, uiVerdictWord, uiVerdictChip, uiPageHeader, uiSection, uiChip, uiIcon, uiNoticeHTML, uiEmptyState, uiSwitch, uiMeterTone, uiConfirmSheet } from './common.js';
 import { grocerySyncChanges, grocerySetEaters } from './grocery.js';
 import { todayAddDiaryEntry, todayTargetInfo } from './today.js';
 import { recipesDetailModal, recipesTasteHTML, recipesBindTaste, recipesIsNever } from './recipes.js';
@@ -68,8 +68,9 @@ function weekApplyOverrides(week, person, plan) {
     if (!meal) continue;
     if (recipesIsNever(person, recipe.id)) continue;
     const check = checkRecipe(recipe, plan, uiState.matcher, uiState.foodsById, person);
-    if (check.verdict !== 'pass') continue;
-    Object.assign(meal, { recipe: recipe.id, name: recipe.name, source: recipe.assembly_only ? 'assembly' : 'cook', servings: meal.servings || 1, servingsMade: meal.servings || 1, reasons: ['you chose this'], check: { verdict: check.verdict, hits: check.hits.map(h => ({ tag: h.tag, label: h.label, hard: h.hard })), exceeds: check.exceeds.map(e => e.nutrient) }, swapped: true });
+    // A person may pin a caution recipe by hand (the swap sheet asks them to confirm first). A hard exclusion is never planned.
+    if (check.verdict === 'fail') continue;
+    Object.assign(meal, { recipe: recipe.id, name: recipe.name, source: recipe.assembly_only ? 'assembly' : 'cook', servings: meal.servings || 1, servingsMade: meal.servings || 1, reasons: [check.verdict === 'pass' ? 'you chose this' : 'you chose this, marked caution'], check: { verdict: check.verdict, hits: check.hits.map(h => ({ tag: h.tag, label: h.label, hard: h.hard })), exceeds: check.exceeds.map(e => e.nutrient) }, swapped: true, chosenCaution: check.verdict !== 'pass' });
   }
   for (const day of week.days) {
     let totals = emptyTotals();
@@ -109,7 +110,7 @@ export function renderWeekScreen(root) {
   const snackAuto = snackPlan(person, plan);
   const spiceWord = { none: 'no heat', mild: 'mild only', medium: 'medium', hot: 'bring the heat' }[spicePreference(person)] || '';
   root.innerHTML = `
-    ${uiPageHeader(uiState.lite ? 'Your meals this week' : `Week for ${uiEsc(person.name)}`, uiState.lite ? `Starting ${uiFmtDate(week.days[0].date)}. Every meal clears your rules. Tap a meal to read it, the arrows to swap it, and the heart to see it more often.` : `Starting ${uiFmtDate(week.days[0].date)}. ${week.eligibleCount} of ${uiState.data.recipes.length} recipes are eligible${week.skippedNoNutrition ? `; ${uiFmtNum(week.skippedNoNutrition)} without nutrition data are left out` : ''}. Cooking for ${household} most days (from the Cooking step); change any day's eaters in the people box on that day. Tap a day's cooking chip or minutes to change that one day, this week only. Only recipes that pass every check are planned; anything marked caution is left out.`, `<button class="btn small" type="button" id="week-regen">${uiIcon('swap')}${uiState.lite ? 'New week' : 'Regenerate'}</button><a class="btn small" href="#/recipes">${uiIcon('leaf')}Recipes</a>`)}
+    ${uiPageHeader(uiState.lite ? 'Your meals this week' : `Week for ${uiEsc(person.name)}`, uiState.lite ? `Starting ${uiFmtDate(week.days[0].date)}. Every meal the app picks clears your rules. Tap a meal to read it, the arrows to swap it, and the heart to see it more often.` : `Starting ${uiFmtDate(week.days[0].date)}. ${week.eligibleCount} of ${uiState.data.recipes.length} recipes are eligible${week.skippedNoNutrition ? `; ${uiFmtNum(week.skippedNoNutrition)} without nutrition data are left out` : ''}. Cooking for ${household} most days (from the Cooking step); change any day's eaters in the people box on that day. Tap a day's cooking chip or minutes to change that one day, this week only. Only recipes that pass every check are planned; anything marked caution is left out unless you swap it in yourself.`, `<button class="btn small" type="button" id="week-regen">${uiIcon('swap')}${uiState.lite ? 'New week' : 'Regenerate'}</button><a class="btn small" href="#/recipes">${uiIcon('leaf')}Recipes</a>`)}
     <div class="card tight">${uiSwitch('week-budget', 'Save money', 'Prefer recipes that reuse ingredients already on this week\'s grocery list, so you buy fewer things.', budget)}${(week.skippedNoNutrition || unknownOn) ? uiSwitch('week-unknown', 'Also use recipes that have no nutrition numbers', `${week.skippedNoNutrition ? uiFmtNum(week.skippedNoNutrition) + ' community recipes' : 'Some community recipes'} list their ingredients as plain text, so the app has no calories, sodium, or other numbers for them. Off: they stay out of your week and every planned meal counts toward your daily totals. On: far more variety, but those meals cannot be added to your daily totals or checked against a daily limit. Allergens and avoid lists are still checked either way.`, unknownOn) : ''}
       <div class="switch" style="cursor:default"><div class="switch-text"><span class="switch-title">Snacks each day</span><span class="hint">${uiEsc(typeof wo.snacks_per_day === 'number' ? `This week only: ${snacks.count}. Your standing setting is ${snackAuto.count} (${snackAuto.why}).${wo.snacks_per_day > snacks.count ? ' The evening snack is left out for reflux.' : ''}` : snackAuto.auto ? `${snackAuto.count}, from ${snackAuto.why}. Change it here for this week only, or on the Cooking step for good.` : `${snackAuto.count}, your setting on the Cooking step. Change it here for this week only.`)}${spicePreference(person) !== 'any' ? ` Spice setting: ${uiEsc(spiceWord)}.` : ''}</span></div>
         <label class="visually-hidden" for="week-snacks">Snacks each day this week</label><select id="week-snacks" style="width:auto"><option value="auto" ${typeof wo.snacks_per_day !== 'number' ? 'selected' : ''}>Usual (${snackAuto.count})</option>${[0, 1, 2, 3].map(n => `<option value="${n}" ${wo.snacks_per_day === n ? 'selected' : ''}>${n === 0 ? 'None' : n}</option>`).join('')}</select></div></div>
@@ -326,7 +327,7 @@ function weekDayHTML(d, di, plan, person) {
     ${d.meals.map(m => {
       return `<div class="week-meal">
       <div class="slot">${WEEK_SLOT_LABEL[m.slot] || m.slot}</div>
-      ${m.recipe ? `<button type="button" class="meal-chip" data-recipe="${uiEsc(m.recipe)}" aria-label="${uiEsc(m.name)}, ${uiVerdictWord(m.check.verdict)}. Open recipe."><span class="dot ${m.check.verdict}" aria-hidden="true"></span><span class="meal-chip-text"><span class="meal-chip-name">${uiEsc(m.name)}</span><span class="meal-chip-sub">${weekSourceGlyph(m.source)}<span>${uiVerdictWord(m.check.verdict)}${m.servingsMade && m.servingsMade > m.servings ? ` · make ${m.servingsMade}` : ''}${m.swapped ? ' · swapped' : ''}${m.repicked ? ' · re-picked' : ''}${weekHeatWord(m.recipe)}</span></span></span></button>
+      ${m.recipe ? `<button type="button" class="meal-chip" data-recipe="${uiEsc(m.recipe)}" aria-label="${uiEsc(m.name)}, ${uiVerdictWord(m.check.verdict)}. Open recipe."><span class="dot ${m.check.verdict}" aria-hidden="true"></span><span class="meal-chip-text"><span class="meal-chip-name">${uiEsc(m.name)}</span><span class="meal-chip-sub">${weekSourceGlyph(m.source)}<span>${uiVerdictWord(m.check.verdict)}${m.servingsMade && m.servingsMade > m.servings ? ` · make ${m.servingsMade}` : ''}${m.chosenCaution ? ' · your pick' : m.swapped ? ' · swapped' : ''}${m.repicked ? ' · re-picked' : ''}${weekHeatWord(m.recipe)}</span></span></span></button>
         ${m.check.hits && m.check.hits.length ? `<div class="meal-note">Caution: ${m.check.hits.map(h => uiEsc(h.label)).join(', ')}</div>` : ''}
         ${weekMisfitNote(m, d)}
         ${m.check.exceeds && m.check.exceeds.length ? `<div class="meal-note">One serving exceeds the daily ${m.check.exceeds.map(uiNutrientLabel).map(uiEsc).join(', ')}.</div>` : ''}
@@ -382,10 +383,15 @@ function weekSwapModal(di, slot, person, plan, week) {
   const candidates = (uiState.recipesForPlan ? uiState.recipesForPlan(plan) : uiState.data.recipes).filter(r => recipeMeal(r, slot) && r.id !== (current && current.recipe));
   const favorites = (person.favorites && person.favorites.recipes) || [];
   const disliked = (person.disliked && person.disliked.recipes) || [];
-  const scored = candidates.map(r => {
-    const check = checkRecipe(r, plan, uiState.matcher, uiState.foodsById, person);
+  const checked = candidates.map(r => ({ r, check: checkRecipe(r, plan, uiState.matcher, uiState.foodsById, person) }));
+  const scored = checked.map(({ r, check }) => {
     const s = scoreRecipe({ recipe: r, check, cooking, dayIdx, canCook: day.canCook, recentIds, dayTotals, plan, foodsById: uiState.foodsById, favorites, disliked, person, slot });
     return { r, check, score: s.score, reasons: s.reasons };
+  }).filter(x => x.score > -Infinity).sort((a, b) => b.score - a.score).slice(0, 5);
+  // Caution recipes are never planned, but a person can pick one by hand after confirming. Ranked the same way; hard exclusions never appear.
+  const cautions = checked.filter(({ check }) => check.verdict === 'caution').map(({ r, check }) => {
+    const s = scoreRecipe({ recipe: r, check, cooking, dayIdx, canCook: day.canCook, recentIds, dayTotals, plan, foodsById: uiState.foodsById, favorites, disliked, person, slot, allowCaution: true });
+    return { r, check, score: s.score, why: cautionWhy(check) };
   }).filter(x => x.score > -Infinity).sort((a, b) => b.score - a.score).slice(0, 5);
   const m = uiModal(`
     <p class="small muted">Top alternatives for ${WEEK_SLOT_LABEL[slot] || slot} on ${uiFmtDate(day.date)}, scored the same way the planner scores them. Only recipes that pass every check are listed.</p>
@@ -394,11 +400,26 @@ function weekSwapModal(di, slot, person, plan, week) {
       <div class="list-sub">${x.r.active_min} min active, ${x.r.total_min} total, ${uiEsc(x.r.skill)}${x.r.assembly_only ? ', assembly only' : ''} · score ${Math.round(x.score)}</div>
       ${x.reasons.length ? `<ul class="small">${x.reasons.map(r => `<li>${uiEsc(r)}</li>`).join('')}</ul>` : ''}
       <div class="btn-row" style="margin-top:8px"><button class="btn small primary" type="button" data-pick="${uiEsc(x.r.id)}">Use this</button><button class="btn small" type="button" data-detail="${uiEsc(x.r.id)}">Details</button>${recipesTasteHTML(person, x.r.id)}</div>
-    </div></div>`).join('')}</div>` : uiEmptyState('No alternative fits this slot.')}`, { title: 'Swap meal' });
+    </div></div>`).join('')}</div>` : uiEmptyState('No alternative fits this slot.')}
+    ${cautions.length ? `<details class="week-cautions" style="margin-top:12px"><summary>Marked caution (${cautions.length})</summary>
+    <p class="small muted">Not planned by the app. You can still pick one; it will ask you first.</p>
+    <div class="list">${cautions.map(x => `<div class="list-row"><div class="list-main">
+      <div class="list-title"><span class="dot caution" aria-hidden="true"></span>${uiEsc(x.r.name)} ${uiVerdictChip('caution')}</div>
+      <div class="list-sub">${uiEsc(x.why.split('; ').slice(0, 2).join('; '))}</div>
+      <div class="list-sub">${x.r.active_min} min active, ${x.r.total_min} total, ${uiEsc(x.r.skill)}${x.r.assembly_only ? ', assembly only' : ''}</div>
+      <div class="btn-row" style="margin-top:8px"><button class="btn small" type="button" data-pick-caution="${uiEsc(x.r.id)}">Use anyway</button><button class="btn small" type="button" data-detail="${uiEsc(x.r.id)}">Details</button></div>
+    </div></div>`).join('')}</div></details>` : ''}`, { title: 'Swap meal' });
   if (!m) return;
   m.el.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => {
     weekSetOverride(person, di, slot, b.dataset.pick, `Swapped ${WEEK_DAY_NAMES[day.day] || uiFmtDate(day.date)} ${slot}`);
     m.close(); uiToast('Meal swapped.'); uiState.rerender();
+  }));
+  m.el.querySelectorAll('[data-pick-caution]').forEach(b => b.addEventListener('click', async () => {
+    const r = uiState.recipesById.get(b.dataset.pickCaution);
+    const yes = await uiConfirmSheet({ title: 'Marked caution', text: `${r ? r.name : 'This recipe'} is marked caution for you. Put it in your week anyway?`, confirm: 'Yes, use it', cancel: 'No' });
+    if (!yes) return;
+    weekSetOverride(person, di, slot, b.dataset.pickCaution, `Swapped ${WEEK_DAY_NAMES[day.day] || uiFmtDate(day.date)} ${slot} (marked caution, your pick)`);
+    m.close(); uiToast('Meal swapped. It is marked caution.'); uiState.rerender();
   }));
   m.el.querySelectorAll('[data-detail]').forEach(b => b.addEventListener('click', () => weekRecipeModal(b.dataset.detail, person, plan)));
   recipesBindTaste(m.el, person, (kind, id, on) => {

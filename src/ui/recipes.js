@@ -5,7 +5,7 @@ import { round } from '../engine/nutrition.js';
 import { CUISINES, CUISINE_LABEL, cuisineSkipped } from '../engine/cuisine.js';
 import { recipeHeat, spiceSkipped, spicePreference } from '../engine/spice.js';
 import { isComponent } from '../engine/planner.js';
-import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiModal, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiNutrientLabel, uiVerdictWord, uiTagLabel, uiPageHeader, uiChip, uiIcon, uiNoticeHTML, uiEmptyState, uiSourcesHTML } from './common.js';
+import { uiState, uiEsc, uiActivePerson, uiPlanFor, uiPersist, uiToast, uiModal, uiIsoDate, uiToday, uiFmtDate, uiFmtNum, uiNutrientLabel, uiVerdictWord, uiTagLabel, uiPageHeader, uiChip, uiIcon, uiNoticeHTML, uiEmptyState, uiSourcesHTML, uiConfirmSheet } from './common.js';
 import { todayAddDiaryEntry, todayIsFavorite, todayToggleFavorite } from './today.js';
 import { weekGet, weekSetOverride } from './week.js';
 import { recipesEdLinkSheet, recipesEdEditorModal, recipesEdDraftFrom, recipesEdBlankDraft, recipesEdPasteModal, recipesEdDeleteCustom } from './recipes-edit.js';
@@ -175,7 +175,7 @@ export function recipesDetailModal(recipeId, person, plan, opts = {}) {
   const dayOpts = week ? week.days.map((d, di) => { const [, mo, da] = d.date.split('-'); return `<option value="${di}">${RECIPES_DAY_NAMES[d.day] || uiFmtDate(d.date)} ${Number(mo)}/${Number(da)}</option>`; }).join('') : '';
   let changed = !!opts.changed;
   const canAct = person.id !== 'group';   // the Together group is a temporary combined person: no diary, no week of its own
-  const canPlan = check.verdict === 'pass';   // the week only takes recipes that pass every check
+  const canPlan = check.verdict !== 'fail';   // the week takes recipes that pass; a caution recipe goes in only after the person confirms
   const m = uiModal(`
     <div class="verdict compact ${check.verdict}"><span class="verdict-word">${uiVerdictWord(check.verdict)}</span> <span class="small">${check.hits.length ? 'Matches: ' + check.hits.map(h => uiEsc(h.label) + (h.hard ? ' (hard)' : '')).join(', ') : 'No avoid tags matched.'}${check.notApproved && check.notApproved.length ? ' Not on the approved ' + uiEsc([...new Set(check.notApproved.map(n => n.family.replace('low-', 'low ').replace('fodmap', 'FODMAP')))].join(' and ')) + ' list: ' + [...new Set(check.notApproved.map(n => n.label))].map(uiEsc).join(', ') + (check.notApproved.some(n => n.why === 'reacts') ? ' (a food you react to)' : '') + '.' : ''}${check.exceeds.length ? ' One serving exceeds the daily ' + check.exceeds.map(e => uiEsc(uiNutrientLabel(e.nutrient))).join(', ') + '.' : ''}${check.verifyLabel && check.verifyLabel.length ? ' Check the label for: ' + check.verifyLabel.map(v => uiEsc(v.label)).join(', ') + '.' : ''}</span></div>
     ${r.adapted ? uiNoticeHTML({ level: 'info', text: `Adapted from "${r.adapted.fromName}" for a ${r.adapted.label} diet. ${r.adapted.swaps.map(sw => sw.to ? `${sw.from} became ${sw.to}: ${sw.how}` : `${sw.from} was left out: ${sw.how}`).join(' ')}${r.nutrition_approx ? ' The nutrition numbers are the original recipe\'s published figures and are approximate after these swaps.' : ' Nutrition is recomputed from the new ingredients.'}` }) : ''}
@@ -193,7 +193,7 @@ export function recipesDetailModal(recipeId, person, plan, opts = {}) {
     <div class="recipe-actions">
       ${canAct ? `<div class="row">${recipesTasteHTML(person, r.id)}<span class="small muted">Heart to see it first in the week; never again removes it from every suggestion.</span></div>
       <div class="row action-line"><label class="visually-hidden" for="rd-meal">Meal</label><select id="rd-meal" style="width:auto">${mealOpts}</select><button class="btn small" type="button" id="rd-today">${uiIcon('plus')}Add to Today</button></div>` : ''}
-      ${week ? `<div class="row action-line"><label class="visually-hidden" for="rd-day">Day</label><select id="rd-day" style="width:auto">${dayOpts}</select><label class="visually-hidden" for="rd-slot">Slot</label><select id="rd-slot" style="width:auto">${slotOpts}</select><button class="btn small" type="button" id="rd-week" ${canPlan ? '' : 'disabled'}>${uiIcon('calendar')}Put in this week</button>${canPlan ? '' : `<span class="small muted">${check.verdict === 'fail' ? 'Not allowed: hard exclusion.' : 'Not planned: marked caution. Read the matches above first.'}</span>`}</div>` : ''}
+      ${week ? `<div class="row action-line"><label class="visually-hidden" for="rd-day">Day</label><select id="rd-day" style="width:auto">${dayOpts}</select><label class="visually-hidden" for="rd-slot">Slot</label><select id="rd-slot" style="width:auto">${slotOpts}</select><button class="btn small" type="button" id="rd-week" ${canPlan ? '' : 'disabled'}>${uiIcon('calendar')}Put in this week</button>${canPlan ? (check.verdict === 'caution' ? '<span class="small muted">Marked caution: you will be asked first.</span>' : '') : '<span class="small muted">Not allowed: hard exclusion.</span>'}</div>` : ''}
       <div class="btn-row">
         ${r.custom ? `<button class="btn small" type="button" id="rd-edit">${uiIcon('edit')}Edit</button><button class="btn small danger" type="button" id="rd-delete">${uiIcon('trash')}Delete</button>` : ''}
         ${!r.custom && (r.ingredients || []).some(i => !i.food) ? `<button class="btn small" type="button" id="rd-link">${uiIcon('link')}${linkedCount ? 'Edit ingredient links' : 'Link ingredients'}</button>` : ''}
@@ -235,11 +235,19 @@ export function recipesDetailModal(recipeId, person, plan, opts = {}) {
     changed = true;
   });
   const wk = el.querySelector('#rd-week');
-  if (wk) wk.addEventListener('click', () => {
+  if (wk) wk.addEventListener('click', async () => {
     const di = Number(el.querySelector('#rd-day').value);
     const slot = el.querySelector('#rd-slot').value;
     const day = week.days[di];
     const dayName = RECIPES_DAY_NAMES[day.day] || uiFmtDate(day.date);
+    if (check.verdict === 'caution') {
+      const yes = await uiConfirmSheet({ title: 'Marked caution', text: `${r.name} is marked caution for you. Put it in your week anyway?`, confirm: 'Yes, use it', cancel: 'No' });
+      if (!yes) return;
+      weekSetOverride(person, di, slot, r.id, `Put ${r.name} in ${dayName} ${slot} (marked caution, your pick)`);
+      uiToast(`${r.name} is now ${dayName}'s ${slot}, marked caution. The grocery list was updated.`);
+      changed = true;
+      return;
+    }
     weekSetOverride(person, di, slot, r.id, `Put ${r.name} in ${dayName} ${slot}`);
     uiToast(`${r.name} is now ${dayName}'s ${slot}. The grocery list was updated.`);
     changed = true;
