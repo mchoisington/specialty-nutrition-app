@@ -25,6 +25,9 @@ function stripModuleSyntax(code) {
 
 // --lite builds dist/peace-meal-lite.html: one person, four tabs, and without the Wikibooks recipes (no nutrition data, 4 MB).
 const LITE = process.argv.includes('--lite');
+// --pages builds the hosted copy for GitHub Pages instead: dist/pages/lite/ (or dist/pages/full/) with index.html, a manifest,
+// PNG icons, and a small service worker, so the page can be added to an iPhone home screen and opened offline.
+const PAGES = process.argv.includes('--pages');
 const data = {};
 for (const f of ['sources', 'conditions', 'dictionaries', 'foods', 'recipes', 'recipes-open', 'recipes-usda', 'articles', 'swaps', 'diet-lists']) {
   const p = new URL('data/' + f + '.json', root);
@@ -51,6 +54,45 @@ let out = html
   .replace(/<script>[^<]*serviceWorker[^<]*<\/script>\s*/, '');
 fs.mkdirSync(new URL('dist/', root), { recursive: true });
 if (LITE) out = out.replace(/<title>Peace Meal<\/title>/, '<title>Peace Meal for one</title>').replace(/one table, everyone's funky dietary needs, every recommendation cited/, 'your meals, your symptoms, your doctor report, every recommendation cited');
-const outName = LITE ? 'dist/peace-meal-lite.html' : 'dist/nutrition-app.html';
-fs.writeFileSync(new URL(outName, root), out);
-console.log(outName, (out.length / 1024).toFixed(0) + ' KB');
+if (PAGES) {
+  const dir = LITE ? 'dist/pages/lite/' : 'dist/pages/full/';
+  const name = LITE ? 'Peace Meal for one' : 'Peace Meal';
+  fs.mkdirSync(new URL(dir, root), { recursive: true });
+  // hosted copy: real icon files and a manifest (iOS ignores SVG and data: touch icons), plus the service worker
+  out = out
+    .replace(/<link rel="icon"[^>]*>\s*/, '<link rel="icon" href="icon-180.png" type="image/png">\n<link rel="manifest" href="manifest.webmanifest">\n')
+    .replace(/<link rel="apple-touch-icon"[^>]*>\s*/, `<link rel="apple-touch-icon" href="icon-180.png">\n<meta name="apple-mobile-web-app-title" content="${name}">\n<meta name="apple-mobile-web-app-capable" content="yes">\n<meta name="apple-mobile-web-app-status-bar-style" content="default">\n`)
+    ;
+  // The breathe page is inlined as data and also contains </body>, so only the document's own closing tag (the last one) gets the service worker script.
+  const bodyEnd = out.lastIndexOf('</body>');
+  const swReg = `<script>\nif ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {\n  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });\n}\n</script>\n`;
+  out = out.slice(0, bodyEnd) + swReg + out.slice(bodyEnd);
+  fs.writeFileSync(new URL(dir + 'index.html', root), out);
+  fs.writeFileSync(new URL(dir + 'manifest.webmanifest', root), JSON.stringify({
+    name, short_name: name, description: LITE ? 'Your meals, your symptoms, your doctor report. Data stays on this phone.' : 'One table, everyone\'s dietary needs, every recommendation cited. Data stays on this device.',
+    start_url: './', scope: './', display: 'standalone', background_color: '#FBFAF7', theme_color: '#3D5A3C',
+    icons: [{ src: 'icon-180.png', sizes: '180x180', type: 'image/png' }, { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' }, { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }]
+  }, null, 2));
+  for (const f of ['icon-180.png', 'icon-512.png']) fs.copyFileSync(new URL(f, root), new URL(dir + f, root));
+  // Service worker: network first so an update lands on the next open when online; the cached copy serves offline.
+  // __BUILD__ is stamped by the Pages workflow with the commit, so each deploy gets a fresh cache.
+  fs.writeFileSync(new URL(dir + 'sw.js', root), `const VERSION = 'pm-pages-__BUILD__';
+const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-512.png'];
+self.addEventListener('install', e => { e.waitUntil((async () => { const c = await caches.open(VERSION); await Promise.all(SHELL.map(u => c.add(u).catch(() => null))); self.skipWaiting(); })()); });
+self.addEventListener('activate', e => { e.waitUntil((async () => { for (const k of await caches.keys()) if (k !== VERSION) await caches.delete(k); await self.clients.claim(); })()); });
+self.addEventListener('fetch', e => {
+  const req = e.request;
+  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  e.respondWith((async () => {
+    const c = await caches.open(VERSION);
+    try { const fresh = await fetch(req); if (fresh && fresh.ok) c.put(req, fresh.clone()); return fresh; }
+    catch { const hit = await c.match(req) || (req.mode === 'navigate' ? await c.match('./index.html') : null); if (hit) return hit; throw new Error('offline and not cached'); }
+  })());
+});
+`);
+  console.log(dir, (out.length / 1024).toFixed(0) + ' KB');
+} else {
+  const outName = LITE ? 'dist/peace-meal-lite.html' : 'dist/nutrition-app.html';
+  fs.writeFileSync(new URL(outName, root), out);
+  console.log(outName, (out.length / 1024).toFixed(0) + ' KB');
+}
