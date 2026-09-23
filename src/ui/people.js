@@ -406,7 +406,7 @@ function peopleStepConditions(container, person) {
       const list = modules.filter(m => m.category === g.key && !selected.has(m.id) && matches(m));
       const total = modules.filter(m => m.category === g.key && !selected.has(m.id)).length;
       if (!total) return '';
-      const open = !!q || g.key === 'condition';
+      const open = true;   // both groups start expanded so nothing is hidden behind an arrow (Mary: show everything under Ways of eating)
       return `<details class="cond-group" ${open ? 'open' : ''}><summary>${g.title}<span class="cond-group-hint">${g.hint}</span><span class="count">${list.length}${q ? ` of ${total}` : ''}</span></summary>
         ${list.length ? `<div class="choice-list">${list.map(row).join('')}</div>` : `<p class="small muted" style="padding-bottom:12px">Nothing here matches "${uiEsc(peopleCondQuery)}".</p>`}</details>`;
     }).join('')}
