@@ -18,7 +18,8 @@ export function renderSettingsScreen(root) {
     </div>`, { id: 'set-appearance-h' })}
     ${uiSection('Backup', `<div class="card">
       <p>Everything lives in this browser's storage on this device. Export a JSON file to back it up or move it to another device.</p>
-      <div class="btn-row"><button class="btn primary" type="button" id="set-export">${uiIcon('share')}Export JSON</button><button class="btn" type="button" id="set-copy">${uiIcon('copy')}Copy JSON to clipboard</button></div>
+      <div class="btn-row"><button class="btn primary lite-big" type="button" id="set-share">${uiIcon('share')}Send a backup</button><button class="btn" type="button" id="set-export">${uiIcon('share')}Export JSON</button><button class="btn" type="button" id="set-copy">${uiIcon('copy')}Copy JSON to clipboard</button></div>
+      <p class="small muted">Send a backup opens your phone's share sheet: mail it to yourself, save it to Files or iCloud Drive, or AirDrop it. To restore on a new phone, open the app there and import the file below.</p>
     </div>`, { id: 'set-backup-h' })}
     ${uiSection('Import', `<div class="card">
       <p>Importing replaces everything on this device with the contents of the file. You will be asked to confirm.</p>
@@ -63,6 +64,7 @@ export function renderSettingsScreen(root) {
     const ok = uiDownload(`peace-meal-${uiIsoDate()}.json`, exportJSON(profile));
     uiToast(ok ? 'Export started.' : 'Download blocked here. Use "Copy JSON" instead.');
   });
+  root.querySelector('#set-share').addEventListener('click', () => settingsShareBackup());
   root.querySelector('#set-copy').addEventListener('click', async () => {
     const ok = await uiCopyText(exportJSON(profile));
     uiToast(ok ? 'JSON copied.' : 'Could not copy.');
@@ -255,4 +257,26 @@ function settingsBindCollections(root, profile) {
     if (yes) yes.addEventListener('click', () => { if (uiState.modalClose) uiState.modalClose(); setColl('usda', true); });
     if (no) no.addEventListener('click', () => { if (uiState.modalClose) uiState.modalClose(); });
   });
+}
+
+// One-tap backup: the phone's share sheet with the JSON file attached (Mail, Messages, Save to Files, AirDrop).
+// Where file sharing is not available (desktop browsers, older phones) it falls back to a plain download.
+export async function settingsShareBackup() {
+  const json = exportJSON(uiState.profile);
+  const name = `peace-meal-${uiIsoDate()}.json`;
+  try {
+    if (typeof File === 'function' && navigator.share && navigator.canShare) {
+      const file = new File([json], name, { type: 'application/json' });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'Peace Meal backup' });
+        uiToast('Backup sent.');
+        return true;
+      }
+    }
+  } catch (e) {
+    if (e && e.name === 'AbortError') return false;   // they closed the share sheet
+  }
+  const ok = uiDownload(name, json);
+  uiToast(ok ? 'Backup file saved.' : 'Sharing is not available here. Use "Copy JSON" instead.');
+  return ok;
 }

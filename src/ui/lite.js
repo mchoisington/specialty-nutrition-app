@@ -7,6 +7,7 @@ import { todayAddDiaryEntry, todayAddModal, todayLatestWeightKg, todayChartSVG, 
 import { weekGet } from './week.js';
 import { LOG_SYMPTOMS } from './log.js';
 import { SLOT_LABEL } from '../engine/planner.js';
+import { settingsShareBackup } from './settings.js';
 
 const LITE_LEVELS = [{ value: 1, label: 'Mild' }, { value: 2, label: 'Moderate' }, { value: 3, label: 'Bad' }];
 const LITE_SLOT_TO_DIARY = { breakfast: 'breakfast', lunch: 'lunch', dinner: 'dinner', 'snack-am': 'snacks', 'snack-pm': 'snacks', 'snack-eve': 'snacks' };
@@ -50,6 +51,7 @@ export function renderLiteTodayScreen(root) {
       <a class="quick-action" href="#/report">${uiIcon('cite')}<span>Doctor report</span><small>Food, symptoms, weight</small></a>
       <a class="quick-action" href="#/breathe">${uiIcon('breathe')}<span>Breathe</span><small>A short visual reset</small></a>
       <a class="quick-action" href="#/plan">${uiIcon('list')}<span>My plan</span><small>What I avoid and why</small></a>
+      <button class="quick-action" type="button" id="lite-backup">${uiIcon('share')}<span>Send a backup</span><small>Mail or save your data</small></button>
     </div>`, { id: 'lite-also-h' })}
     <p class="small muted">This app is for general wellness and education. It does not diagnose or treat any condition. Any medical targets come from your doctor or dietitian, never from the app.</p>`;
   root.querySelectorAll('[data-ate]').forEach(b => b.addEventListener('click', () => {
@@ -60,6 +62,7 @@ export function renderLiteTodayScreen(root) {
   }));
   root.querySelectorAll('[data-other]').forEach(b => b.addEventListener('click', () => todayAddModal(person, plan, date, LITE_SLOT_TO_DIARY[b.dataset.other] || b.dataset.other)));
   root.querySelector('#lite-feel').addEventListener('click', () => liteSymptomModal(person, date));
+  root.querySelector('#lite-backup').addEventListener('click', () => settingsShareBackup());
   root.querySelector('#lite-fine').addEventListener('click', () => {
     uiState.profile.log = uiState.profile.log || [];
     uiState.profile.log.push({ date, person: person.id, meal: 'day', recipe: null, name: null, text: null, symptoms: {}, notes: 'Feeling fine', fine: true, at: new Date().toISOString(), logged_at: new Date().toISOString() });

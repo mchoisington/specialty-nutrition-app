@@ -280,6 +280,7 @@ hr, .divider { border: 0; border-top: 1px solid var(--hairline); margin: var(--s
 @media (min-width: 640px) { .quick-actions { grid-template-columns: repeat(4, 1fr); } }
 .quick-action { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: var(--s2); min-height: 96px; border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface); text-decoration: none; color: var(--ink); font-weight: 700; box-shadow: var(--shadow); }
 .quick-action .ico { width: 28px; height: 28px; color: var(--primary); }
+button.quick-action { font: inherit; font-weight: 700; text-align: left; cursor: pointer; width: 100%; }
 .quick-action:hover { border-color: var(--primary); background: var(--tint-olive); color: var(--primary-strong); }
 .quick-action small { font-weight: 400; color: var(--muted); }
 
