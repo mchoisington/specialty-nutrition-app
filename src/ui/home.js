@@ -33,7 +33,7 @@ function renderLiteWelcome(root) {
     <section class="welcome" aria-labelledby="welcome-h">
       ${uiBrandMark({ label: 'Peace Meal for one' })}
       <div>
-        <h1 id="welcome-h">Peace Meal for one</h1>
+        <h1 id="welcome-h">Peace Meal for one <span class="chip plum lite-tag">Lite</span></h1>
         <p class="welcome-lede">Meals that fit your body.</p>
         <p class="welcome-sub">If certain foods make you sick and you are juggling a list of things you cannot eat, this app does the remembering for you. It plans a week of meals and snacks that fit your rules, keeps track of what you ate and how you felt, watches your weight, and turns all of it into a report you can hand to your doctor.</p>
       </div>

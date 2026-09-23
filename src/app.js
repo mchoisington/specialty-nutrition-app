@@ -140,7 +140,7 @@ function appRenderNav() {
   const who = person ? `<a class="who" href="#/people" aria-label="Active person: ${uiEsc(person.name)}. Open People.">${uiAvatar(person.name)}<span class="who-name">${uiEsc(person.name)}</span></a>` : '';
 
   // Phone top bar: Back (when there is somewhere to go), brand, active person.
-  top.innerHTML = `${canBack ? uiBackButtonHTML('back-phone') : ''}<a class="brand" href="#/${APP_HOME}">${uiBrandMark({ label: APP_BRAND })}<span class="brand-name">${APP_BRAND}</span></a><div class="spacer"></div>${who}`;
+  top.innerHTML = `${canBack ? uiBackButtonHTML('back-phone') : ''}<a class="brand" href="#/${APP_HOME}">${uiBrandMark({ label: APP_BRAND })}<span class="brand-name">${APP_BRAND}</span>${APP_LITE ? '<span class="chip plum lite-tag">Lite</span>' : ''}</a><div class="spacer"></div>${who}`;
 
   // Desktop rail: brand at top, nav, active person at the bottom.
   side.innerHTML = `<a class="rail-brand" href="#/${APP_HOME}">${uiBrandMark({ label: APP_BRAND })}<span class="brand-name">${APP_BRAND}</span></a>
